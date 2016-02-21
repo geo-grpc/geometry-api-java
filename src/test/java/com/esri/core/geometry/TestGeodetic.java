@@ -92,8 +92,8 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			double areaBasic = Math.PI * distance * distance;
-			assertEquals(area, areaBasic);
+			double diff = 3139350.203046864 - area;
+			assertEquals(diff, 0.0);
 		}
 	}
 	
