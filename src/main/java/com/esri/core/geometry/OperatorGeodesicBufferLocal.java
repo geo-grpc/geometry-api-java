@@ -39,6 +39,12 @@ class OperatorGeodesicBufferLocal extends OperatorGeodesicBuffer {
 	public Geometry execute(Geometry inputGeometry, SpatialReference sr,
 			int curveType, double distanceMeters, double maxDeviationMeters,
 			boolean bReserved, ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(
+				inputGeometry);
+		double[] distances = new double[1];
+		distances[0] = distanceMeters;
+		GeometryCursor outputCursor = execute(inputCursor, sr, curveType, distances, maxDeviationMeters, false, false, progressTracker);
+
+		return outputCursor.next();
 	}
 }

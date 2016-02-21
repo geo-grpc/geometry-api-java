@@ -80,6 +80,18 @@ public class TestGeodetic extends TestCase {
 			assertTrue(Math.abs(d - 19964450.206594173) < 1e-12 * 19964450.206594173);
 		}
 	}
+
+	@Test
+	public void testGeodeticBuffer() {
+		{
+			SpatialReference sr = SpatialReference.create(4326);
+			Point p1 = new Point(0.0, 0.0);
+			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+			Polygon poly = (Polygon)opBuf.execute(p1, sr, 0, 1000, 50, false, null);
+			assertNotNull(poly);
+			assertTrue(poly.getType() == Geometry.Type.Polygon);
+		}
+	}
 	
 	@Test
 	public void testLengthAccurateCR191313() {
@@ -101,4 +113,7 @@ public class TestGeodetic extends TestCase {
 		 * assertTrue(Math.abs(length - 2738362.3249366437) < 2e-9 * length);
 		 */
 	}
-	}
+
+	
+
+}
