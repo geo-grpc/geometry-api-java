@@ -29,20 +29,36 @@ class OperatorGeodesicBufferLocal extends OperatorGeodesicBuffer {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor inputGeometries,
-			SpatialReference sr, int curveType, double[] distancesMeters,
-			double maxDeviationMeters, boolean bReserved, boolean bUnion,
-			ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+								  SpatialReference sr,
+								  int curveType,
+								  double[] distancesMeters,
+								  double maxDeviationMeters,
+								  boolean bReserved,
+								  boolean bUnion,
+								  ProgressTracker progressTracker) {
+
+		if (bUnion) {
+			OperatorGeodesicBufferCursor cursor = new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
+			return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, sr,progressTracker);
+		} else {
+			return new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
+		}
 	}
 
 	@Override
-	public Geometry execute(Geometry inputGeometry, SpatialReference sr,
-			int curveType, double distanceMeters, double maxDeviationMeters,
-			boolean bReserved, ProgressTracker progressTracker) {
-		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(
-				inputGeometry);
+	public Geometry execute(Geometry inputGeometry,
+							SpatialReference sr,
+							int curveType,
+							double distanceMeters,
+							double maxDeviationMeters,
+							boolean bReserved,
+							ProgressTracker progressTracker) {
+
+		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(inputGeometry);
+
 		double[] distances = new double[1];
 		distances[0] = distanceMeters;
+
 		GeometryCursor outputCursor = execute(inputCursor, sr, curveType, distances, maxDeviationMeters, false, false, progressTracker);
 
 		return outputCursor.next();

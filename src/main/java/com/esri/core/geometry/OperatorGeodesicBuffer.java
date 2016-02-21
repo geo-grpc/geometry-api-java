@@ -61,7 +61,6 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	abstract public Geometry execute(Geometry inputGeometry, SpatialReference sr, int curveType, double distanceMeters, double maxDeviationMeters, boolean bReserved, ProgressTracker progressTracker);
 
 	public static OperatorGeodesicBuffer local() {
-		return (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance()
-						.getOperator(Type.GeodesicBuffer);
+		return (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Type.GeodesicBuffer);
 	}
 }

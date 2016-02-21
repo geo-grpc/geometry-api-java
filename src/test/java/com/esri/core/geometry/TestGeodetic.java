@@ -82,14 +82,18 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
-	public void testGeodeticBuffer() {
+	public void testGeodeticBufferPoint() {
 		{
 			SpatialReference sr = SpatialReference.create(4326);
 			Point p1 = new Point(0.0, 0.0);
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-			Polygon poly = (Polygon)opBuf.execute(p1, sr, 0, 1000, 50, false, null);
+			double distance = 1000;
+			Polygon poly = (Polygon)opBuf.execute(p1, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
+			double area = poly.calculateArea2D();
+			double areaBasic = Math.PI * distance * distance;
+			assertEquals(area, areaBasic);
 		}
 	}
 	
