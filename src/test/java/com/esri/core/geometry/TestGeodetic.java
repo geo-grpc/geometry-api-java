@@ -83,6 +83,9 @@ public class TestGeodetic extends TestCase {
 
 	@Test
 	public void testVicenty() {
+		// test data from
+		// http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
+
 		double a = 6378137.0; // radius of spheroid for WGS_1984
 		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
 		double rpu = Math.PI / 180.0;
@@ -150,8 +153,30 @@ public class TestGeodetic extends TestCase {
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
 			double distance = 1000;
 			Polygon poly = (Polygon)opBuf.execute(p1, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
+			//String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
+			double area = poly.calculateArea2D();
+			double diff = Math.abs(2.550450219554701E-4 - area);
+			assertEquals(2.550450219554701E-4, area);
+		}
+	}
+
+	@Test
+	public void testGeodeticBufferMultiPoint() {
+		{
+			SpatialReference sr = SpatialReference.create(4326);
+			Point p1 = new Point(0.0, 0.0);
+			MultiPoint mp = new MultiPoint();
+			mp.add(p1);
+			Point p2 = new Point(-165.0, -45.0);
+			mp.add(p2);
+			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+			double distance = 1000;
+			Polygon poly = (Polygon)opBuf.execute(mp, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
+			assertNotNull(poly);
+			assertTrue(poly.getType() == Geometry.Type.Polygon);
+			assertEquals(poly.getPathCount(), 2);
 			double area = poly.calculateArea2D();
 			double diff = Math.abs(3139350.203046864 - area);
 			assertTrue("The difference between the circular and the geodesic buffer shouldn't be to great",diff < 100.0);

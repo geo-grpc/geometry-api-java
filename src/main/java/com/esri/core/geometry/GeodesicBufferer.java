@@ -196,8 +196,7 @@ class GeodesicBufferer {
 //        // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
 //    }
 //
-//    private static final class GeometryCursorForMultiPoint extends
-//            GeometryCursor {
+//      private static final class GeometryCursorForMultiPoint extends GeometryCursor {
 //        private int m_index;
 //        private Geometry m_buffered_polygon;
 //        private MultiPoint m_mp;
@@ -209,8 +208,10 @@ class GeodesicBufferer {
 //        private int m_max_vertex_in_complete_circle;
 //        private ProgressTracker m_progress_tracker;
 //
-//        GeometryCursorForMultiPoint(MultiPoint mp, double distance,
-//                                    SpatialReference sr, double densify_dist,
+//        GeometryCursorForMultiPoint(MultiPoint mp,
+//                                    double distance,
+//                                    SpatialReference sr,
+//                                    double densify_dist,
 //                                    int max_vertex_in_complete_circle,
 //                                    ProgressTracker progress_tracker) {
 //            m_index = 0;
@@ -243,9 +244,13 @@ class GeodesicBufferer {
 //                m_x = point.getX();
 //                m_y = point.getY();
 //
-//                m_buffered_polygon = GeodesicBufferer.buffer(point, m_distance,
-//                        m_spatialReference, m_densify_dist,
-//                        m_max_vertex_in_complete_circle, m_progress_tracker);
+//                m_buffered_polygon = GeodesicBufferer.buffer(point,
+//                        m_distance,
+//                        m_spatialReference,
+//                        m_densify_dist,
+//                        m_max_vertex_in_complete_circle,
+//                        m_progress_tracker);
+//
 //                b_first = true;
 //            }
 //
@@ -257,6 +262,7 @@ class GeodesicBufferer {
 //                res = m_buffered_polygon; // do not clone the last geometry.
 //            }
 //
+//            // TODO put a breakpoint here and see what this transformation is for
 //            if (!b_first)// don't apply transformation unnecessary
 //            {
 //                Transformation2D transform = new Transformation2D();
@@ -719,7 +725,7 @@ class GeodesicBufferer {
         addCircle_((MultiPathImpl) resultPolygon._getImpl(), point);
         return setStrongSimple_(resultPolygon);
     }
-//
+
 //    private Geometry bufferMultiPoint_() {
 //        assert (m_distance > 0);
 //        GeometryCursorForMultiPoint mpCursor = new GeometryCursorForMultiPoint(
@@ -1498,14 +1504,26 @@ class GeodesicBufferer {
 
         double dcos = Math.cos(dA);
         double dsin = Math.sin(dA);
+        double degToRad = Math.PI / 180.0;
+        double radToDeg = 180.0 / Math.PI;
+        double lam1 = point.getX() * degToRad;
+        double phi1 = point.getY() * degToRad;
+        double a = 6378137.0; // radius of spheroid for WGS_1984
+        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+        PeDouble lam2 = new PeDouble();
+        PeDouble phi2 = new PeDouble();
+        double az12 = Math.PI / 2.0;
+
         Point2D pt = new Point2D();
         for (int quadrant = 3; quadrant >= 0; quadrant--) {
             pt.setCoords(0.0, m_abs_distance);
+
             switch (quadrant) {
                 case 0: {// upper left quadrant
                     for (int i = 0; i < real_size; i++) {
-                        result_mp.lineTo(pt.x + center.x, pt.y + center.y);
-                        pt.rotateReverse(dcos, dsin);
+                        az12 += dA;
+                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
                     }
                     break;
                 }
@@ -1514,8 +1532,9 @@ class GeodesicBufferer {
                         // + real_size * 1,
                         // Point_2D::construct(-pt.y,
                         // pt.x));
-                        result_mp.lineTo(-pt.y + center.x, pt.x + center.y);
-                        pt.rotateReverse(dcos, dsin);
+                        az12 += dA;
+                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
                     }
                     break;
                 }
@@ -1523,8 +1542,9 @@ class GeodesicBufferer {
                     // m_circle_template.set(i + real_size * 2,
                     // Point_2D::construct(-pt.x, -pt.y));
                     for (int i = 0; i < real_size; i++) {
-                        result_mp.lineTo(-pt.x + center.x, -pt.y + center.y);
-                        pt.rotateReverse(dcos, dsin);
+                        az12 += dA;
+                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
                     }
                     break;
                 }
@@ -1532,7 +1552,9 @@ class GeodesicBufferer {
                 {// lower right quadrant
                     // m_circle_template.set(i + real_size * 3,
                     // Point_2D::construct(pt.y, -pt.x));
-                    result_mp.startPath(pt.y + center.x, -pt.x + center.y);// we
+                    GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+
+                    result_mp.startPath(lam2.val * radToDeg, phi2.val * radToDeg);// we
                     // start
                     // at
                     // the
@@ -1547,8 +1569,9 @@ class GeodesicBufferer {
                     // +
                     // center
                     for (int i = 1; i < real_size; i++) {
-                        pt.rotateReverse(dcos, dsin);
-                        result_mp.lineTo(pt.y + center.x, -pt.x + center.y);
+                        az12 += dA;
+                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
                     }
                     break;
                 }
