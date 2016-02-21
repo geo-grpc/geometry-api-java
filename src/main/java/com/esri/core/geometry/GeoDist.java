@@ -150,13 +150,16 @@ final class GeoDist {
 		double cosSigma = Math.cos(sigma);
 		double sinSigma = Math.sin(sigma);
 
-		double lamda = (sinSigma * Math.sin(az12)) / (Math.cos(beta1) * cosSigma - sinBeta1 * sinSigma * Math.cos(az12));
+		double lambdaNumerator = sinSigma * Math.sin(az12);
+		double lambdaDenominator = cosBeta1 * cosSigma - sinBeta1 * sinSigma * Math.cos(az12);
+		double lambda = Math.atan2(lambdaNumerator, lambdaDenominator);
 		double C = (f / 16) * cosAlpha2 * (4 + f * (4 - 3 * cosAlpha2));
+
 		// from equation 184 in Rapp
-		double cos2sigmaM = Math.cos(2*sigma1 + sigma);
+		double cos2sigmaM = Math.cos(2 * sigma1 + sigma);
 		double cos2sigmaM2 = cos2sigmaM * cos2sigmaM;
 		double squareBrackets_184 = cos2sigmaM + C * cosSigma * (-1 + 2 * cos2sigmaM2);
-		lam2.val = lamda - (1 - C) * f * sinAlpha * (sigma + C * sinSigma * squareBrackets_184);
+		lam2.val = lam1 + lambda - (1 - C) * f * sinAlpha * (sigma + C * sinSigma * squareBrackets_184);
 
 		double phiNumerator = sinBeta1 * cosSigma + cosBeta1 * sinSigma * Math.cos(az12);
 		double messyBlock = (sinBeta1 * sinSigma - cosBeta1 * cosSigma * Math.cos(az12));

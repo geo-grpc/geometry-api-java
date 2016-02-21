@@ -87,11 +87,59 @@ public class TestGeodetic extends TestCase {
 		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
 		double rpu = Math.PI / 180.0;
 		double dpu = 180.0 / Math.PI;
-		Point p1 = new Point(0.0, 0.0);
-		PeDouble answer1 = new PeDouble();
-		PeDouble answer2 = new PeDouble();
-		GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, 2000, 0.0 * rpu, answer1, answer2);
-		assertEquals(0.01808739, answer2.val * dpu, 0.000001);
+		double distance = 2000.0;
+		{
+			Point p1 = new Point(0.0, 0.0);
+			PeDouble lam = new PeDouble();
+			PeDouble phi = new PeDouble();
+			GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, distance, 0.0 * rpu, lam, phi);
+			assertEquals(0.0, lam.val * dpu, 0.000001);
+			assertEquals(0.01808739, phi.val * dpu, 0.000001);
+
+			PeDouble actualDistance = new PeDouble();
+			GeoDist.geodesic_distance_ngs(a, e2, p1.getX() * rpu, p1.getY() * rpu, lam.val, phi.val, actualDistance, null, null);
+			assertEquals(actualDistance.val, distance, .02);
+
+		}
+		{
+			Point p1 = new Point(45.0, 45.0);
+			PeDouble lam = new PeDouble();
+			PeDouble phi = new PeDouble();
+			GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, distance, 20.0 * rpu, lam, phi);
+
+			assertEquals(45.01691097, phi.val * dpu, 0.000001);
+			assertEquals(45.00867811, lam.val * dpu, 0.000001);
+		}
+		{
+			Point p1 = new Point(60.0, 45.0);
+			PeDouble lam = new PeDouble();
+			PeDouble phi = new PeDouble();
+			GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, distance, 20.0 * rpu, lam, phi);
+
+			//45.01691097
+			assertEquals(45.01691097, phi.val * dpu, 0.000001);
+			assertEquals(60.00867811, lam.val * dpu, 0.000001);
+		}
+		{
+			Point p1 = new Point(-65.0, -45.0);
+			PeDouble lam = new PeDouble();
+			PeDouble phi = new PeDouble();
+			GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, distance, -20.0 * rpu, lam, phi);
+
+			//-44.98308832 -65.00867301
+			assertEquals(-44.98308832, phi.val * dpu, 0.000001);
+			assertEquals(-65.00867301, lam.val * dpu, 0.000001);
+		}
+		{
+			Point p1 = new Point(-165.0, -45.0);
+			PeDouble lam = new PeDouble();
+			PeDouble phi = new PeDouble();
+			GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, distance, 220.0 * rpu, lam, phi);
+
+			//-45.01378505 -165.01630863
+			assertEquals(-45.01378505, phi.val * dpu, 0.000001);
+			assertEquals(-165.01630863, lam.val * dpu, 0.000001);
+		}
 	}
 
 	@Test
