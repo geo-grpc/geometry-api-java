@@ -163,38 +163,38 @@ class GeodesicBufferer {
 //    private Point2D[] m_helper_array;
     private int m_progress_counter;
 //
-    private void generateCircleTemplate_() {
-        if (m_circle_template == null) {
-            m_circle_template = new ArrayList<Point2D>(0);
-        } else if (!m_circle_template.isEmpty()) {
-            return;
-        }
-
-        int N = calcN_(4);
-
-        assert (N >= 4);
-        int real_size = (N + 3) / 4;
-        double dA = (Math.PI * 0.5) / real_size;
-        m_dA = dA;
-
-        for (int i = 0; i < real_size * 4; i++)
-            m_circle_template.add(null);
-
-        double dcos = Math.cos(dA);
-        double dsin = Math.sin(dA);
-        Point2D pt = new Point2D(0.0, 1.0);
-
-        for (int i = 0; i < real_size; i++) {
-            m_circle_template.set(i + real_size * 0, new Point2D(pt.y, -pt.x));
-            m_circle_template.set(i + real_size * 1, new Point2D(-pt.x, -pt.y));
-            m_circle_template.set(i + real_size * 2, new Point2D(-pt.y, pt.x));
-            m_circle_template.set(i + real_size * 3, pt);
-            pt = new Point2D(pt.x, pt.y);
-            pt.rotateReverse(dcos, dsin);
-        }
-        // the template is filled with the index 0 corresponding to the point
-        // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
-    }
+//    private void generateCircleTemplate_() {
+//        if (m_circle_template == null) {
+//            m_circle_template = new ArrayList<Point2D>(0);
+//        } else if (!m_circle_template.isEmpty()) {
+//            return;
+//        }
+//
+//        int N = calcN_(4);
+//
+//        assert (N >= 4);
+//        int real_size = (N + 3) / 4;
+//        double dA = (Math.PI * 0.5) / real_size;
+//        m_dA = dA;
+//
+//        for (int i = 0; i < real_size * 4; i++)
+//            m_circle_template.add(null);
+//
+//        double dcos = Math.cos(dA);
+//        double dsin = Math.sin(dA);
+//        Point2D pt = new Point2D(0.0, 1.0);
+//
+//        for (int i = 0; i < real_size; i++) {
+//            m_circle_template.set(i + real_size * 0, new Point2D(pt.y, -pt.x));
+//            m_circle_template.set(i + real_size * 1, new Point2D(-pt.x, -pt.y));
+//            m_circle_template.set(i + real_size * 2, new Point2D(-pt.y, pt.x));
+//            m_circle_template.set(i + real_size * 3, pt);
+//            pt = new Point2D(pt.x, pt.y);
+//            pt.rotateReverse(dcos, dsin);
+//        }
+//        // the template is filled with the index 0 corresponding to the point
+//        // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
+//    }
 //
 //    private static final class GeometryCursorForMultiPoint extends
 //            GeometryCursor {
@@ -882,6 +882,7 @@ class GeodesicBufferer {
 //        return resultPolygon;
 //    }
 //
+    //TODO prepare this for Geodesic
     private int calcN_(int minN) {
         if (m_densify_dist == 0)
             return m_max_vertex_in_complete_circle;

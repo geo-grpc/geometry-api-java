@@ -82,6 +82,19 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
+	public void testVicenty() {
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+		double rpu = Math.PI / 180.0;
+		double dpu = 180.0 / Math.PI;
+		Point p1 = new Point(0.0, 0.0);
+		PeDouble answer1 = new PeDouble();
+		PeDouble answer2 = new PeDouble();
+		GeoDist.geodesic_forward(a, e2, p1.getX() * rpu, p1.getY() * rpu, 2000, 0.0 * rpu, answer1, answer2);
+		assertEquals(0.01808739, answer2.val * dpu, 0.000001);
+	}
+
+	@Test
 	public void testGeodeticBufferPoint() {
 		{
 			SpatialReference sr = SpatialReference.create(4326);
@@ -92,8 +105,9 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			double diff = 3139350.203046864 - area;
-			assertEquals(diff, 0.0);
+			double diff = Math.abs(3139350.203046864 - area);
+			assertTrue("The difference between the circular and the geodesic buffer shouldn't be to great",diff < 100.0);
+			assertTrue("The difference between the circular and the geodesic buffer should be greater than 0", diff > 0.0);
 		}
 	}
 	

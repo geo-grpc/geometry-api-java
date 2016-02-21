@@ -92,6 +92,79 @@ final class GeoDist {
 				* PE_PI2;
 	}
 
+	static public void geodesic_forward(double a,
+										double e2,
+										double lam1,
+										double phi1,
+										double distance,
+										double az12,
+										PeDouble lam2,
+										PeDouble phi2) {
+		// http://www.fgg.uni-lj.si/~/mkuhar/Zalozba/Rapp_Geom_Geod_%20Vol_II.pdf
+		// it gets messy in here. This is the vicenty direct equations from Rapp, 1993
+		// calculate A and B
+		// calc reduced latitude, beta1: (grabbed this from geodesic_distance_ngs)
+		double f = 1.0 - Math.sqrt(1.0 - e2);
+		double boa = 1.0 - f;
+		double beta1 = Math.atan(boa * Math.tan(phi1)); /* better reduced latitude */
+
+		//TODO might be buggy
+		double cosBeta1 = Math.cos(beta1);
+		// gets used in final results
+		double sinBeta1 = Math.sin(beta1);
+
+		// Alpha1 in Rapp is az12, the azimuth of the direction traveled
+		double sinAlpha = cosBeta1 * Math.sin(az12);
+		double sinAlpha2 = sinAlpha * sinAlpha;
+		double cosAlpha2 = 1 - sinAlpha2;
+		double ePrime2 = e2 / (1 - e2);
+		double u2 = ePrime2 * cosAlpha2;
+
+		double A = 1 + (u2/16384) * (4096 + u2 * (320 - 175 * u2));
+		double B = (u2 / 1024) * (256 + u2 * (74 - 47 * u2));
+
+		// pre cooked for while loop
+		double B_4th = B / 4;
+		double B_6th = B / 6;
+
+		double sigma1 = Math.atan(Math.tan(beta1) / Math.cos(az12));
+
+		double deltaSigma = 0;
+		double b = a * (1 - f);
+		double firstApprox = distance / (b * A);
+		double sigma = firstApprox;
+		double lastSigma = Double.MIN_VALUE;
+
+		while (!PE_EQ(sigma, lastSigma)) {
+			lastSigma = sigma;
+			double cos2sigmaM = Math.cos(2*sigma1 + sigma);
+			double cos2sigmaM2 = cos2sigmaM * cos2sigmaM;
+			double sinSigma2 = Math.sin(sigma) * Math.sin(sigma);
+			double cosSigmaGroup = Math.cos(sigma) * (-1 + 2 * cos2sigmaM2);
+			double cos2SigmaMGroup = cos2sigmaM * (-3 + 4 * sinSigma2) * (-3 + 4 * cos2sigmaM2);
+			deltaSigma = B * Math.sin(sigma) * (cos2sigmaM + B_4th * cosSigmaGroup - B_6th * cos2SigmaMGroup);
+			sigma = firstApprox + deltaSigma;
+		}
+
+		// removing repetitive trig expressions
+		double cosSigma = Math.cos(sigma);
+		double sinSigma = Math.sin(sigma);
+
+		double lamda = (sinSigma * Math.sin(az12)) / (Math.cos(beta1) * cosSigma - sinBeta1 * sinSigma * Math.cos(az12));
+		double C = (f / 16) * cosAlpha2 * (4 + f * (4 - 3 * cosAlpha2));
+		// from equation 184 in Rapp
+		double cos2sigmaM = Math.cos(2*sigma1 + sigma);
+		double cos2sigmaM2 = cos2sigmaM * cos2sigmaM;
+		double squareBrackets_184 = cos2sigmaM + C * cosSigma * (-1 + 2 * cos2sigmaM2);
+		lam2.val = lamda - (1 - C) * f * sinAlpha * (sigma + C * sinSigma * squareBrackets_184);
+
+		double phiNumerator = sinBeta1 * cosSigma + cosBeta1 * sinSigma * Math.cos(az12);
+		double messyBlock = (sinBeta1 * sinSigma - cosBeta1 * cosSigma * Math.cos(az12));
+		double messyBlock2 = messyBlock * messyBlock;
+		double phiDenominator = (1 - f) * Math.sqrt(sinAlpha2 + messyBlock2);
+		phi2.val = Math.atan2(phiNumerator, phiDenominator);
+	}
+
 	static public void geodesic_distance_ngs(double a, double e2, double lam1,
 			double phi1, double lam2, double phi2, PeDouble p_dist,
 			PeDouble p_az12, PeDouble p_az21) {
