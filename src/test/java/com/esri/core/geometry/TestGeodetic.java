@@ -172,27 +172,11 @@ public class TestGeodetic extends TestCase {
 			polyline.lineTo(4, 8);
 			SpatialReference sr = SpatialReference.create(4326);
 
-			ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
-			for (int ipath = 0; ipath < polyline.getPathCount(); ipath++) {
-				int pathStart = polyline.getPathStart(ipath);
-				int pathEnd = polyline.getPathEnd(ipath);
-				for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
-					Point pt = polyline.getPoint(ipoint);
-					listeningGeometryCursor.tick(pt);
-				}
-			}
-			double distance = 1000;
-			double[] distances = new double[1];
-			distances[0] = distance;
-
+			double distance = 25000;
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-//			OperatorUnion opUnion = (OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union);
-			GeometryCursor buffCursor = opBuf.execute((GeometryCursor)listeningGeometryCursor, sr, GeodeticCurveType.Geodesic, distances, 0.2, false, true, null);
+			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 10.0, false, null);
 
-			Polygon poly = (Polygon)buffCursor.next();
 			String words = GeometryEngine.geometryToWkt(poly, 0);
-			//Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
-			//String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();

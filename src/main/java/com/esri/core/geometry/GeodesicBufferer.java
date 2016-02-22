@@ -456,8 +456,8 @@ class GeodesicBufferer {
                 return bufferPoint_();
 //            case Geometry.GeometryType.MultiPoint:
 //                return bufferMultiPoint_();
-//            case Geometry.GeometryType.Polyline:
-//                return bufferPolyline_();
+            case Geometry.GeometryType.Polyline:
+                return bufferPolyline_();
 //            case Geometry.GeometryType.Polygon:
 //                return bufferPolygon_();
 //            case Geometry.GeometryType.Envelope:
@@ -477,15 +477,33 @@ class GeodesicBufferer {
             return bufferPoint_(point);
         }
 
-        assert (m_distance > 0);
-        m_geometry = preparePolyline_((Polyline) (m_geometry));
+        // geodesic densify here
 
-        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
-        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
-                cursor,
-                m_spatialReference,
-                m_progress_tracker);
-        Geometry result = union_cursor.next();
+        ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
+        for (int ipath = 0; ipath < ((Polyline)m_geometry).getPathCount(); ipath++) {
+            int pathStart = ((Polyline)m_geometry).getPathStart(ipath);
+            int pathEnd = ((Polyline)m_geometry).getPathEnd(ipath);
+            for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
+                Point pt = ((Polyline)m_geometry).getPoint(ipoint);
+                listeningGeometryCursor.tick(pt);
+            }
+        }
+
+        double[] distances = new double[1];
+        distances[0] = m_distance;
+
+        OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+        GeometryCursor buffCursor = opBuf.execute((GeometryCursor)listeningGeometryCursor, m_spatialReference, GeodeticCurveType.Geodesic, distances, m_densify_dist, false, true, m_progress_tracker);
+
+//        assert (m_distance > 0);
+        m_geometry = preparePolyline_((Polyline) (m_geometry));
+//
+//        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
+//        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
+//                cursor,
+//                m_spatialReference,
+//                m_progress_tracker);
+        Geometry result = buffCursor.next();
         return result;
     }
 //
@@ -1475,7 +1493,10 @@ class GeodesicBufferer {
         // criterion.
         //TODO create geodetic densify
         Polyline generalized_polyline = (Polyline) ((OperatorGeneralize) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Generalize)).execute(
-                input_geom, m_densify_dist * 0.25, false, m_progress_tracker);
+                input_geom,
+                m_densify_dist * 0.25,
+                false,
+                m_progress_tracker);
 
         int path_point_count = 0;
         for (int i = 0, npath = generalized_polyline.getPathCount(); i < npath; i++) {
