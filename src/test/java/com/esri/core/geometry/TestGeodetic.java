@@ -2,6 +2,7 @@ package com.esri.core.geometry;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestGeodetic extends TestCase {
@@ -163,24 +164,62 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
-	public void testGeodeticBufferMultiPoint() {
+	public void testGeodeticBufferPolyline() {
 		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0,0);
+			polyline.lineTo(0, 4);
+			polyline.lineTo(4, 8);
 			SpatialReference sr = SpatialReference.create(4326);
-			Point p1 = new Point(0.0, 0.0);
-			MultiPoint mp = new MultiPoint();
-			mp.add(p1);
-			Point p2 = new Point(-165.0, -45.0);
-			mp.add(p2);
-			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+
+			ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
+			for (int ipath = 0; ipath < polyline.getPathCount(); ipath++) {
+				int pathStart = polyline.getPathStart(ipath);
+				int pathEnd = polyline.getPathEnd(ipath);
+				for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
+					Point pt = polyline.getPoint(ipoint);
+					listeningGeometryCursor.tick(pt);
+				}
+			}
 			double distance = 1000;
-			Polygon poly = (Polygon)opBuf.execute(mp, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
+			double[] distances = new double[1];
+			distances[0] = distance;
+
+			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+//			OperatorUnion opUnion = (OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union);
+			GeometryCursor buffCursor = opBuf.execute((GeometryCursor)listeningGeometryCursor, sr, GeodeticCurveType.Geodesic, distances, 0.2, false, true, null);
+
+			Polygon poly = (Polygon)buffCursor.next();
+			String words = GeometryEngine.geometryToWkt(poly, 0);
+			//Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
+			//String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
-			assertEquals(poly.getPathCount(), 2);
 			double area = poly.calculateArea2D();
-			double diff = Math.abs(3139350.203046864 - area);
-			assertTrue("The difference between the circular and the geodesic buffer shouldn't be to great",diff < 100.0);
-			assertTrue("The difference between the circular and the geodesic buffer should be greater than 0", diff > 0.0);
+			double diff = Math.abs(2.550450219554701E-4 - area);
+			assertEquals(2.550450219554701E-4, area);
+		}
+	}
+
+	@Test
+	public void testGeodeticBufferMultiPoint() {
+		{
+//			SpatialReference sr = SpatialReference.create(4326);
+//			Point p1 = new Point(0.0, 0.0);
+//			MultiPoint mp = new MultiPoint();
+//			mp.add(p1);
+//			Point p2 = new Point(-165.0, -45.0);
+//			mp.add(p2);
+//			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+//			double distance = 1000;
+//			Polygon poly = (Polygon)opBuf.execute(mp, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
+//			assertNotNull(poly);
+//			assertTrue(poly.getType() == Geometry.Type.Polygon);
+//			assertEquals(poly.getPathCount(), 2);
+//			double area = poly.calculateArea2D();
+//			double diff = Math.abs(3139350.203046864 - area);
+//			assertTrue("The difference between the circular and the geodesic buffer shouldn't be to great",diff < 100.0);
+//			assertTrue("The difference between the circular and the geodesic buffer should be greater than 0", diff > 0.0);
 		}
 	}
 	
