@@ -25,19 +25,29 @@
 package com.esri.core.geometry;
 
 //This is a stub
-class OperatorGeodeticDensifyLocal extends
-		OperatorGeodeticDensifyByLength {
+class OperatorGeodeticDensifyLocal extends OperatorGeodeticDensifyByLength {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor geoms,
-			double maxSegmentLengthMeters, SpatialReference sr, int curveType,
-			ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+								  double maxSegmentLengthMeters,
+								  SpatialReference sr,
+								  int curveType,
+								  ProgressTracker progressTracker) {
+		if (maxSegmentLengthMeters <= 0)
+			// TODO fix geometry exception to match native implementation
+			throw new GeometryException("max segment length must be positive and greater than 0");// GEOMTHROW(invalid_argument);
+
+		return new OperatorGeodeticDensifyCursor(geoms, maxSegmentLengthMeters, progressTracker);
 	}
 
 	@Override
-	public Geometry execute(Geometry geom, double maxSegmentLengthMeters,
-			SpatialReference sr, int curveType, ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+	public Geometry execute(Geometry geom,
+							double maxSegmentLengthMeters,
+							SpatialReference sr,
+							int curveType,
+							ProgressTracker progressTracker) {
+		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(geom);
+		GeometryCursor outputCursor = execute(inputCursor, maxSegmentLengthMeters, sr, curveType, progressTracker);
+		return outputCursor.next();
 	}
 }

@@ -60,6 +60,6 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
 
     // virtual bool IsRecycling() OVERRIDE { return false; }
     Geometry geodesicBuffer(Geometry geom, double distance) {
-        return GeodesicBufferer.buffer(geom, distance, m_spatialReference, NumberUtils.TheNaN, 96, m_progressTracker);
+        return GeodesicBufferer.buffer(geom, distance, m_spatialReference, m_maxDeviation, 96, m_progressTracker);
     }
 }

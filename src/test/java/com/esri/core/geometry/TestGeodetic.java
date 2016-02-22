@@ -174,7 +174,7 @@ public class TestGeodetic extends TestCase {
 
 			double distance = 25000;
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 10.0, false, null);
+			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 200.0, false, null);
 
 			String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);

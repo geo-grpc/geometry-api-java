@@ -26,8 +26,10 @@ package com.esri.core.geometry;
 class OperatorDensifyByLengthLocal extends OperatorDensifyByLength {
 
 	@Override
-	public GeometryCursor execute(GeometryCursor inputGeometries,
-			double maxLength, ProgressTracker progressTracker) {
+	public GeometryCursor execute(
+			GeometryCursor inputGeometries,
+			double maxLength,
+			ProgressTracker progressTracker) {
 		if (maxLength <= 0)
 			// TODO fix geometry exception to match native implementation
 			throw new IllegalArgumentException();// GEOMTHROW(invalid_argument);

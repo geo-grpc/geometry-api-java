@@ -54,7 +54,6 @@ abstract class OperatorGeodeticDensifyByLength extends Operator {
 	public abstract Geometry execute(Geometry geom, double maxSegmentLengthMeters, SpatialReference sr, int curveType, ProgressTracker progressTracker);
 
 	public static OperatorGeodeticDensifyByLength local() {
-		return (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance()
-						.getOperator(Type.GeodeticDensifyByLength);
+		return (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Type.GeodeticDensifyByLength);
 	}
 }

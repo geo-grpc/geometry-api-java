@@ -65,22 +65,18 @@ class GeodesicBufferer {
         if (max_vertex_in_complete_circle < 12)
             max_vertex_in_complete_circle = 12;
 
-        double max_dd = Math.abs(distance)
-                * (1 - Math.cos(Math.PI / max_vertex_in_complete_circle));
+        double max_dd = Math.abs(distance) * (1 - Math.cos(Math.PI / max_vertex_in_complete_circle));
 
-        if (max_dd > densify_dist)
+        if (max_dd > densify_dist) {
             densify_dist = max_dd;// the densify distance has to agree with the
             // max_vertex_in_complete_circle
-        else {
-            double vertex_count = Math.PI
-                    / Math.acos(1.0 - densify_dist / Math.abs(distance));
+        } else {
+            double vertex_count = Math.PI / Math.acos(1.0 - densify_dist / Math.abs(distance));
             if (vertex_count < (double) max_vertex_in_complete_circle - 1.0) {
                 max_vertex_in_complete_circle = (int) vertex_count;
                 if (max_vertex_in_complete_circle < 12) {
                     max_vertex_in_complete_circle = 12;
-                    densify_dist = Math.abs(distance)
-                            * (1 - Math.cos(Math.PI
-                            / max_vertex_in_complete_circle));
+                    densify_dist = Math.abs(distance) * (1 - Math.cos(Math.PI / max_vertex_in_complete_circle));
                 }
             }
         }
@@ -89,8 +85,7 @@ class GeodesicBufferer {
         geodesicBufferer.m_max_vertex_in_complete_circle = max_vertex_in_complete_circle;
         // when filtering close points we do not want the filter to distort
         // generated buffer too much.
-        geodesicBufferer.m_filter_tolerance = Math.min(geodesicBufferer.m_small_tolerance,
-                densify_dist * 0.25);
+        geodesicBufferer.m_filter_tolerance = Math.min(geodesicBufferer.m_small_tolerance, densify_dist * 0.25);
         return geodesicBufferer.buffer_();
     }
 
@@ -477,14 +472,19 @@ class GeodesicBufferer {
             return bufferPoint_(point);
         }
 
+        // TODO no idea what this does?
+        m_geometry = preparePolyline_((Polyline) (m_geometry));
+
         // geodesic densify here
+        OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+        Geometry geometryDense = opGLength.execute(m_geometry, m_abs_distance / 3.5, m_spatialReference, 0, m_progress_tracker);
 
         ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
-        for (int ipath = 0; ipath < ((Polyline)m_geometry).getPathCount(); ipath++) {
-            int pathStart = ((Polyline)m_geometry).getPathStart(ipath);
-            int pathEnd = ((Polyline)m_geometry).getPathEnd(ipath);
+        for (int ipath = 0; ipath < ((Polyline)geometryDense).getPathCount(); ipath++) {
+            int pathStart = ((Polyline)geometryDense).getPathStart(ipath);
+            int pathEnd = ((Polyline)geometryDense).getPathEnd(ipath);
             for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
-                Point pt = ((Polyline)m_geometry).getPoint(ipoint);
+                Point pt = ((Polyline)geometryDense).getPoint(ipoint);
                 listeningGeometryCursor.tick(pt);
             }
         }
@@ -496,7 +496,7 @@ class GeodesicBufferer {
         GeometryCursor buffCursor = opBuf.execute((GeometryCursor)listeningGeometryCursor, m_spatialReference, GeodeticCurveType.Geodesic, distances, m_densify_dist, false, true, m_progress_tracker);
 
 //        assert (m_distance > 0);
-        m_geometry = preparePolyline_((Polyline) (m_geometry));
+
 //
 //        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
 //        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
@@ -1473,19 +1473,29 @@ class GeodesicBufferer {
             return true;
         Envelope2D env = new Envelope2D();
         mp_impl.queryPathEnvelope2D(ipath, env);
-        if (Math.max(env.getWidth(), env.getHeight()) < m_densify_dist * 0.5)
+        return isDegenerateEnv2D(env);
+    }
+
+    private boolean isDegenerateEnv2D(Envelope2D env2D) {
+        Point upperLeftPt = new Point(env2D.getUpperLeft());
+        Point upperRightPt = new Point(env2D.getUpperRight());
+        Point lowerLeftPt = new Point(env2D.getLowerLeft());
+        Point lowerRightPt = new Point(env2D.getLowerRight());
+
+        double wTop = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, upperRightPt);
+        double wBottom = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(lowerLeftPt, lowerRightPt);
+        double height = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, lowerLeftPt); // same as height on right
+
+        if (wTop < m_densify_dist * 0.5 || wBottom < m_densify_dist * 0.5 || height < m_densify_dist * 0.5)
             return true;
 
         return false;
     }
 
     private boolean isDegenerateGeometry_(Geometry geom) {
-        Envelope2D env = new Envelope2D();
-        geom.queryEnvelope2D(env);
-        if (Math.max(env.getWidth(), env.getHeight()) < m_densify_dist * 0.5)
-            return true;
-
-        return false;
+        Envelope2D env2D = new Envelope2D();
+        geom.queryEnvelope2D(env2D);
+        return isDegenerateEnv2D(env2D);
     }
 
     private Polyline preparePolyline_(Polyline input_geom) {
