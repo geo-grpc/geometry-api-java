@@ -114,7 +114,44 @@ public class TestGeodetic extends TestCase {
 			polyline.lineTo(0,1);
 
 		}
+	}
 
+	@Test
+	public void testDensifyPolygon() {
+		{
+			Polygon polygon = new Polygon();
+			polygon.startPath(0, 0);
+			polygon.lineTo(0, 4);
+			polygon.lineTo(4, 4);
+			polygon.lineTo(4, 0);
+			polygon.closeAllPaths();
+			SpatialReference sr = SpatialReference.create(4326);
+			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+			Polygon polygonDense = (Polygon) op.execute(polygon, sr, 5000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polygon.calculateLength2D(), polygonDense.calculateLength2D(), .005);
+			assertEquals(polygon.calculateArea2D(), polygonDense.calculateArea2D(), 0.007);
+//			assertEquals(polygon.getPoint(polygon.getPointCount() - 1).getX(), polygonDense.getPoint(polygonDense.getPointCount() - 1).getX());
+//			assertEquals(polygon.getPoint(polygon.getPointCount() - 1).getY(), polygonDense.getPoint(polygonDense.getPointCount() - 1).getY());
+//			assertEquals(polygon.getPoint(0).getX(), polygonDense.getPoint(0).getX());
+//			assertEquals(polygon.getPoint(0).getY(), polygonDense.getPoint(0).getY());
+
+			polygon.startPath(-2, -2);
+			polygon.lineTo(-4, -4);
+			polygon.lineTo(-8, -8);
+			polygon.closeAllPaths();
+			polygonDense = (Polygon) op.execute(polygon, sr, 5000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polygon.calculateLength2D(), polygonDense.calculateLength2D(), .004);
+			assertEquals(polygon.calculateArea2D(), polygonDense.calculateArea2D(), 0.1);
+//			assertEquals(polygon.calculatePathLength2D(0), polygonDense.calculatePathLength2D(0), .004);
+//			assertEquals(polygon.calculatePathLength2D(1), polygonDense.calculatePathLength2D(1), .004);
+		}
+
+		{
+			Polygon polygon = new Polygon();
+			polygon.startPath(0,0);
+			polygon.lineTo(0,1);
+
+		}
 	}
 
 	@Test
