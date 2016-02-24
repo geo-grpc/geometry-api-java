@@ -3,31 +3,31 @@ package com.esri.core.geometry;
 /**
  * Created by davidraleigh on 2/24/16.
  */
-class GeodesicDensify {
+class GeodesicDensifier {
     static Geometry densifyByLength(Geometry geom, SpatialReference sr, double maxLength, ProgressTracker progressTracker) {
         if (geom.isEmpty() || geom.getDimension() < 1)
             return geom;
 
         int geometryType = geom.getType().value();
 
-        GeodesicDensify geodesicDensify = new GeodesicDensify(maxLength, sr, progressTracker);
+        GeodesicDensifier geodesicDensifier = new GeodesicDensifier(maxLength, sr, progressTracker);
         // TODO implement IsMultiPath and remove Polygon and Polyline call to
         // match Native
         // if (Geometry.IsMultiPath(geometryType))
         if (geometryType == Geometry.GeometryType.Polygon)
-            return geodesicDensify.densifyMultiPath((MultiPath) geom);
+            return geodesicDensifier.densifyMultiPath((MultiPath) geom);
         else if (Geometry.GeometryType.Polyline == geometryType)
-            return geodesicDensify.densifyMultiPath((MultiPath) geom);
+            return geodesicDensifier.densifyMultiPath((MultiPath) geom);
         else if (Geometry.isSegment(geometryType))
-            return geodesicDensify.densifySegment((Segment) geom);
+            return geodesicDensifier.densifySegment((Segment) geom);
         else if (geometryType == Geometry.GeometryType.Envelope)
-            return geodesicDensify.densifyEnvelope((Envelope) geom);
+            return geodesicDensifier.densifyEnvelope((Envelope) geom);
         else
             // TODO fix geometry exception to match native implementation
             throw GeometryException.GeometryInternalError();// GEOMTHROW(internal_error);
     }
 
-    GeodesicDensify(double maxLength, SpatialReference sr, ProgressTracker progressTracker) {
+    GeodesicDensifier(double maxLength, SpatialReference sr, ProgressTracker progressTracker) {
         m_startPoint = new Point();
         m_endPoint = new Point();
         m_maxLength = maxLength;

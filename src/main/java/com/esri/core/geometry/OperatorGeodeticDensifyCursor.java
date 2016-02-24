@@ -35,7 +35,7 @@ public class OperatorGeodeticDensifyCursor extends GeometryCursor {
         Geometry geom;
         if ((geom = m_inputGeoms.next()) != null) {
             m_index = m_inputGeoms.getGeometryID();
-            return GeodesicDensify.densifyByLength(geom, m_spatialReference, m_maxLength, m_progressTracker);
+            return GeodesicDensifier.densifyByLength(geom, m_spatialReference, m_maxLength, m_progressTracker);
         }
         return null;
     }

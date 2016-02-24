@@ -150,6 +150,9 @@ class GeodesicBufferer {
     private double m_dA;
     private boolean m_b_output_loops;
     private boolean m_bfilter;
+    private double m_a;
+    private double m_e2;
+
     //TODO delete the below template as they don't work with geodesics
 //    private ArrayList<Point2D> m_circle_template;
 
@@ -193,92 +196,60 @@ class GeodesicBufferer {
 //        // the template is filled with the index 0 corresponding to the point
 //        // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
 //    }
-//
-//      private static final class GeometryCursorForMultiPoint extends GeometryCursor {
-//        private int m_index;
-//        private Geometry m_buffered_polygon;
-//        private MultiPoint m_mp;
-//        private SpatialReference m_spatialReference;
-//        private double m_distance;
-//        private double m_densify_dist;
-//        private double m_x;
-//        private double m_y;
-//        private int m_max_vertex_in_complete_circle;
-//        private ProgressTracker m_progress_tracker;
-//
-//        GeometryCursorForMultiPoint(MultiPoint mp,
-//                                    double distance,
-//                                    SpatialReference sr,
-//                                    double densify_dist,
-//                                    int max_vertex_in_complete_circle,
-//                                    ProgressTracker progress_tracker) {
-//            m_index = 0;
-//            m_mp = mp;
-//            m_x = 0;
-//            m_y = 0;
-//            m_distance = distance;
-//            m_spatialReference = sr;
-//            m_densify_dist = densify_dist;
-//            m_max_vertex_in_complete_circle = max_vertex_in_complete_circle;
-//            m_progress_tracker = progress_tracker;
-//        }
-//
-//        @Override
-//        public Geometry next() {
-//            Point point = new Point();
-//            while (true) {
-//                if (m_index == m_mp.getPointCount())
-//                    return null;
-//
-//                m_mp.getPointByVal(m_index, point);
-//                m_index++;
-//                if (point.isEmpty())
-//                    continue;
-//                break;
-//            }
-//
-//            boolean b_first = false;
-//            if (m_buffered_polygon == null) {
-//                m_x = point.getX();
-//                m_y = point.getY();
-//
-//                m_buffered_polygon = GeodesicBufferer.buffer(point,
-//                        m_distance,
-//                        m_spatialReference,
-//                        m_densify_dist,
-//                        m_max_vertex_in_complete_circle,
-//                        m_progress_tracker);
-//
-//                b_first = true;
-//            }
-//
-//            Geometry res;
-//            if (m_index < m_mp.getPointCount()) {
-//                res = new Polygon();
-//                m_buffered_polygon.copyTo(res);
-//            } else {
-//                res = m_buffered_polygon; // do not clone the last geometry.
-//            }
-//
-//            // TODO put a breakpoint here and see what this transformation is for
-//            if (!b_first)// don't apply transformation unnecessary
-//            {
-//                Transformation2D transform = new Transformation2D();
-//                double dx = point.getX() - m_x;
-//                double dy = point.getY() - m_y;
-//                transform.setShift(dx, dy);
-//                res.applyTransformation(transform);
-//            }
-//
-//            return res;
-//        }
-//
-//        @Override
-//        public int getGeometryID() {
-//            return 0;
-//        }
-//    }
-//
+
+      private static final class GeometryCursorForMultiPoint extends GeometryCursor {
+        private int m_index;
+        private MultiPoint m_mp;
+        private SpatialReference m_spatialReference;
+        private double m_distance;
+        private double m_densify_dist;
+        private int m_max_vertex_in_complete_circle;
+        private ProgressTracker m_progress_tracker;
+
+        GeometryCursorForMultiPoint(MultiPoint mp,
+                                    double distance,
+                                    SpatialReference sr,
+                                    double densify_dist,
+                                    int max_vertex_in_complete_circle,
+                                    ProgressTracker progress_tracker) {
+            m_index = 0;
+            m_mp = mp;
+            m_distance = distance;
+            m_spatialReference = sr;
+            m_densify_dist = densify_dist;
+            m_max_vertex_in_complete_circle = max_vertex_in_complete_circle;
+            m_progress_tracker = progress_tracker;
+        }
+
+        @Override
+        public Geometry next() {
+            Point point = new Point();
+            while (true) {
+                if (m_index == m_mp.getPointCount())
+                    return null;
+
+                m_mp.getPointByVal(m_index, point);
+                m_index++;
+                if (point.isEmpty())
+                    continue;
+                break;
+            }
+
+            return GeodesicBufferer.buffer(
+                    point,
+                    m_distance,
+                    m_spatialReference,
+                    m_densify_dist,
+                    m_max_vertex_in_complete_circle,
+                    m_progress_tracker);
+        }
+
+        @Override
+        public int getGeometryID() {
+            return 0;
+        }
+    }
+
     private static final class GeometryCursorForPolyline extends GeometryCursor {
         private GeodesicBufferer m_bufferer;
         private int m_index;
@@ -348,7 +319,7 @@ class GeodesicBufferer {
             return 0;
         }
     }
-//
+
 //    private static final class GeometryCursorForPolygon extends GeometryCursor {
 //        private GeodesicBufferer m_bufferer;
 //        private int m_index;
@@ -392,6 +363,7 @@ class GeodesicBufferer {
 //        }
 //    }
 //
+
     private GeodesicBufferer(ProgressTracker progress_tracker) {
         m_buffer_commands = new ArrayList<GeodesicBufferCommand>(0);
         m_progress_tracker = progress_tracker;
@@ -406,8 +378,10 @@ class GeodesicBufferer {
         m_dA = -1;
         m_b_output_loops = true;
         m_bfilter = true;
+        m_a = 6378137.0; // radius of spheroid for WGS_1984
+        m_e2 = 0.0066943799901413165; // ellipticity for WGS_1984
     }
-//
+
     private Geometry buffer_() {
         int gt = m_geometry.getType().value();
 //        if (Geometry.isSegment(gt)) {// convert segment to a polyline and repeat
@@ -449,8 +423,8 @@ class GeodesicBufferer {
         switch (m_geometry.getType().value()) {
             case Geometry.GeometryType.Point:
                 return bufferPoint_();
-//            case Geometry.GeometryType.MultiPoint:
-//                return bufferMultiPoint_();
+            case Geometry.GeometryType.MultiPoint:
+                return bufferMultiPoint_();
             case Geometry.GeometryType.Polyline:
                 return bufferPolyline_();
 //            case Geometry.GeometryType.Polygon:
@@ -506,7 +480,8 @@ class GeodesicBufferer {
         Geometry result = buffCursor.next();
         return result;
     }
-//
+
+
 //    private Geometry bufferPolygon_() {
 //        if (m_distance == 0)
 //            return m_geometry;// return input to the output.
@@ -740,6 +715,7 @@ class GeodesicBufferer {
 //        }
 //    }
 //
+
     private Geometry bufferPoint_() {
         return bufferPoint_((Point) (m_geometry));
     }
@@ -751,17 +727,22 @@ class GeodesicBufferer {
         return setStrongSimple_(resultPolygon);
     }
 
-//    private Geometry bufferMultiPoint_() {
-//        assert (m_distance > 0);
-//        GeometryCursorForMultiPoint mpCursor = new GeometryCursorForMultiPoint(
-//                (MultiPoint) (m_geometry), m_distance, m_spatialReference,
-//                m_densify_dist, m_max_vertex_in_complete_circle,
-//                m_progress_tracker);
-//        GeometryCursor c = ((OperatorUnion) OperatorFactoryLocal.getInstance()
-//                .getOperator(Operator.Type.Union)).execute(mpCursor,
-//                m_spatialReference, m_progress_tracker);
-//        return c.next();
-//    }
+    private Geometry bufferMultiPoint_() {
+        assert (m_distance > 0);
+        GeometryCursorForMultiPoint mpCursor = new GeometryCursorForMultiPoint(
+                (MultiPoint)m_geometry,
+                m_distance,
+                m_spatialReference,
+                m_densify_dist,
+                m_max_vertex_in_complete_circle,
+                m_progress_tracker);
+        // TODO is this union necessary??!??!??!
+        GeometryCursor c = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
+                mpCursor,
+                m_spatialReference,
+                m_progress_tracker);
+        return c.next();
+    }
 //
 //    private Geometry bufferEnvelope_() {
 //        Polygon polygon = new Polygon(m_geometry.getDescription());
@@ -836,7 +817,7 @@ class GeodesicBufferer {
 //
 //        return setWeakSimple_(resultPolygon);
 //    }
-//
+
     private Polygon bufferPolylinePath_(Polyline polyline, int ipath, boolean bfilter) {
         assert (m_distance != 0);
         //TODO, circle template doesn't work with Geodesics (unless all circles are on the same line of latitude)
@@ -885,6 +866,7 @@ class GeodesicBufferer {
         return bufferCleanup_(result_polyline, false);
     }
 
+    // Planar and Geodesic are equivalent
     private void progress_() {
         m_progress_counter++;
         if (m_progress_counter % 1024 == 0) {
@@ -893,6 +875,7 @@ class GeodesicBufferer {
                 throw new RuntimeException("user_canceled");
         }
     }
+
 
     private Polygon bufferCleanup_(MultiPath multi_path, boolean simplify_result) {
         double tol = simplify_result ? m_tolerance : m_small_tolerance;
@@ -1565,85 +1548,30 @@ class GeodesicBufferer {
         double radToDeg = 180.0 / Math.PI;
         double lam1 = point.getX() * degToRad;
         double phi1 = point.getY() * degToRad;
-        double a = 6378137.0; // radius of spheroid for WGS_1984
-        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+
         PeDouble lam2 = new PeDouble();
         PeDouble phi2 = new PeDouble();
-        double az12 = Math.PI / 2.0;
+        double az12 = 0;
 
         Point2D pt = new Point2D();
-        for (int quadrant = 3; quadrant >= 0; quadrant--) {
-            pt.setCoords(0.0, m_abs_distance);
+        GeoDist.geodesic_forward(m_a, m_e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
 
-            switch (quadrant) {
-                case 0: {// upper left quadrant
-                    for (int i = 0; i < real_size; i++) {
-                        az12 += dA;
-                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
-                    }
-                    break;
-                }
-                case 1: {// upper left quadrant
-                    for (int i = 0; i < real_size; i++) {// m_circle_template.set(i
-                        // + real_size * 1,
-                        // Point_2D::construct(-pt.y,
-                        // pt.x));
-                        az12 += dA;
-                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
-                    }
-                    break;
-                }
-                case 2: {// lower left quadrant
-                    // m_circle_template.set(i + real_size * 2,
-                    // Point_2D::construct(-pt.x, -pt.y));
-                    for (int i = 0; i < real_size; i++) {
-                        az12 += dA;
-                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
-                    }
-                    break;
-                }
-                default:// case 3:
-                {// lower right quadrant
-                    // m_circle_template.set(i + real_size * 3,
-                    // Point_2D::construct(pt.y, -pt.x));
-                    GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-
-                    result_mp.startPath(lam2.val * radToDeg, phi2.val * radToDeg);// we
-                    // start
-                    // at
-                    // the
-                    // quadrant
-                    // 3.
-                    // The
-                    // first
-                    // point
-                    // is
-                    // (0,
-                    // -m_distance)
-                    // +
-                    // center
-                    for (int i = 1; i < real_size; i++) {
-                        az12 += dA;
-                        GeoDist.geodesic_forward(a, e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-                        result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
-                    }
-                    break;
-                }
-            }
-
-            progress_();
+        result_mp.startPath(lam2.val * radToDeg, phi2.val * radToDeg);// we
+        // start at the quadrant 3.
+        for (int i = 1; i < real_size * 4; i++) {
+            az12 += dA;
+            GeoDist.geodesic_forward(m_a, m_e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
+            result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
         }
     }
-//
-//    private static Polygon setWeakSimple_(Polygon poly) {
-//        ((MultiPathImpl) poly._getImpl()).setIsSimple(
-//                MultiVertexGeometryImpl.GeometryXSimple.Weak, 0.0, false);
-//        return poly;
-//    }
-//
+
+    // Planar and Geodesic are equivalent
+    private static Polygon setWeakSimple_(Polygon poly) {
+        ((MultiPathImpl) poly._getImpl()).setIsSimple(MultiVertexGeometryImpl.GeometryXSimple.Weak, 0.0, false);
+        return poly;
+    }
+
+    // Planar and Geodesic are equivalent
     private Polygon setStrongSimple_(Polygon poly) {
         ((MultiPathImpl) poly._getImpl()).setIsSimple(MultiVertexGeometryImpl.GeometryXSimple.Strong, m_tolerance,false);
         ((MultiPathImpl) poly._getImpl())._updateOGCFlags();
