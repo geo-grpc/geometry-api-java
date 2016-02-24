@@ -44,7 +44,15 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
 	 * @param bUnion If True, the buffered geometries will be unioned, otherwise they wont be unioned.
 	 */
-	abstract public GeometryCursor execute(GeometryCursor inputGeometries, SpatialReference sr, int curveType, double[] distancesMeters, double maxDeviationMeters, boolean bReserved, boolean bUnion, ProgressTracker progressTracker);
+	abstract public GeometryCursor execute(
+			GeometryCursor inputGeometries,
+			SpatialReference sr,
+			int curveType,
+			double[] distancesMeters,
+			double maxDeviationMeters,
+			boolean bReserved,
+			boolean bUnion,
+			ProgressTracker progressTracker);
 
 	/**
 	 * Creates a geodesic buffer around the input geometry
@@ -58,7 +66,14 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	 * default deviation.
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
 	 */
-	abstract public Geometry execute(Geometry inputGeometry, SpatialReference sr, int curveType, double distanceMeters, double maxDeviationMeters, boolean bReserved, ProgressTracker progressTracker);
+	abstract public Geometry execute(
+			Geometry inputGeometry,
+			SpatialReference sr,
+			int curveType,
+			double distanceMeters,
+			double maxDeviationMeters,
+			boolean bReserved,
+			ProgressTracker progressTracker);
 
 	public static OperatorGeodesicBuffer local() {
 		return (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Type.GeodesicBuffer);

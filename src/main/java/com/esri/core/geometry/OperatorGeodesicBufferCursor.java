@@ -30,7 +30,7 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
         }
         m_index = -1;
         m_inputGeoms = inputGeoms;
-        m_spatialReference = (SpatialReferenceImpl) (sr);
+        m_spatialReference = (SpatialReferenceImpl)sr;
         m_distances = distances;
         m_maxDeviation = maxDeviation;
         m_bUnion = b_union;

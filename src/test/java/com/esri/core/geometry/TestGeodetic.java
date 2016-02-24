@@ -83,6 +83,41 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
+	public void testDensifyPolyline() {
+		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0, 0);
+			polyline.lineTo(4, 4);
+			polyline.lineTo(4, 8);
+			polyline.lineTo(8, 20);
+			SpatialReference sr = SpatialReference.create(4326);
+			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+			Polyline polylineDense = (Polyline) op.execute(polyline, sr, 5000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polyline.calculateLength2D(), polylineDense.calculateLength2D(), .001);
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getX(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getX());
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getY(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getY());
+			assertEquals(polyline.getPoint(0).getX(), polylineDense.getPoint(0).getX());
+			assertEquals(polyline.getPoint(0).getY(), polylineDense.getPoint(0).getY());
+
+			polyline.startPath(-2, -2);
+			polyline.lineTo(-4, -4);
+			polyline.lineTo(-8, -8);
+			polylineDense = (Polyline) op.execute(polyline, sr, 5000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polyline.calculateLength2D(), polylineDense.calculateLength2D(), .001);
+			assertEquals(polyline.calculatePathLength2D(0), polylineDense.calculatePathLength2D(0), .001);
+			assertEquals(polyline.calculatePathLength2D(1), polylineDense.calculatePathLength2D(1), .001);
+		}
+
+		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0,0);
+			polyline.lineTo(0,1);
+
+		}
+
+	}
+
+	@Test
 	public void testVicenty() {
 		// test data from
 		// http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
@@ -168,13 +203,14 @@ public class TestGeodetic extends TestCase {
 		{
 			Polyline polyline = new Polyline();
 			polyline.startPath(0,0);
-			polyline.lineTo(0, 4);
+			polyline.lineTo(4, 4);
 			polyline.lineTo(4, 8);
+			polyline.lineTo(8, 20);
 			SpatialReference sr = SpatialReference.create(4326);
 
-			double distance = 25000;
+			double distance = 55000;
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 200.0, false, null);
+			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 300.0, false, null);
 
 			String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);

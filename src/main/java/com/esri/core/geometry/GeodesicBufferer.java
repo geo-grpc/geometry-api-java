@@ -477,7 +477,7 @@ class GeodesicBufferer {
 
         // geodesic densify here
         OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
-        Geometry geometryDense = opGLength.execute(m_geometry, m_abs_distance / 3.5, m_spatialReference, 0, m_progress_tracker);
+        Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
 
         ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
         for (int ipath = 0; ipath < ((Polyline)geometryDense).getPathCount(); ipath++) {
