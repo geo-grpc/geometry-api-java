@@ -84,13 +84,14 @@ public class TestGeodetic extends TestCase {
 
 	@Test
 	public void testDensifyPolyline() {
+		SpatialReference sr = SpatialReference.create(4326);
 		{
 			Polyline polyline = new Polyline();
 			polyline.startPath(0, 0);
 			polyline.lineTo(4, 4);
 			polyline.lineTo(4, 8);
 			polyline.lineTo(8, 20);
-			SpatialReference sr = SpatialReference.create(4326);
+
 			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
 			Polyline polylineDense = (Polyline) op.execute(polyline, sr, 5000, GeodeticCurveType.Geodesic, null);
 			assertEquals(polyline.calculateLength2D(), polylineDense.calculateLength2D(), .001);
@@ -112,7 +113,54 @@ public class TestGeodetic extends TestCase {
 			Polyline polyline = new Polyline();
 			polyline.startPath(0,0);
 			polyline.lineTo(0,1);
+			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+			Polyline polylineDense = (Polyline) op.execute(polyline, sr, 100000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getX(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getX());
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getY(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getY());
+			assertEquals(polyline.getPoint(0).getX(), polylineDense.getPoint(0).getX());
+			assertEquals(polyline.getPoint(0).getY(), polylineDense.getPoint(0).getY());
+			assertEquals(3, polylineDense.getPointCount());
 
+			assertEquals(
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polyline.getPoint(0),
+							polylineDense.getPoint(1)) +
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polylineDense.getPoint(1),
+							polyline.getPoint(1)),
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polyline.getPoint(0),
+							polyline.getPoint(1))
+			);
+		}
+
+		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0,0);
+			polyline.lineTo(1,0);
+			polyline.lineTo(2,0);
+			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+			Polyline polylineDense = (Polyline) op.execute(polyline, sr, 100000, GeodeticCurveType.Geodesic, null);
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getX(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getX());
+			assertEquals(polyline.getPoint(polyline.getPointCount() - 1).getY(), polylineDense.getPoint(polylineDense.getPointCount() - 1).getY());
+			assertEquals(polyline.getPoint(0).getX(), polylineDense.getPoint(0).getX());
+			assertEquals(polyline.getPoint(0).getY(), polylineDense.getPoint(0).getY());
+			assertEquals(5, polylineDense.getPointCount());
+
+			assertEquals(polyline.getPoint(1).getX(), polylineDense.getPoint(2).getX());
+			assertEquals(polyline.getPoint(1).getY(), polylineDense.getPoint(2).getY());
+			assertEquals(
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polyline.getPoint(0),
+							polylineDense.getPoint(1)) +
+							GeometryEngine.geodesicDistanceOnWGS84(
+									polylineDense.getPoint(1),
+									polyline.getPoint(1)),
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polyline.getPoint(0),
+							polyline.getPoint(1)),
+					.0000001
+			);
 		}
 	}
 
