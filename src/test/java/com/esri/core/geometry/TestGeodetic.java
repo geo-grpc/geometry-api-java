@@ -348,6 +348,29 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
+	public void testGeodeticBufferSegment() {
+		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0,0);
+			polyline.lineTo(4, 4);
+			SegmentIterator segmentIterator = polyline.querySegmentIterator();
+			segmentIterator.nextPath();
+			Segment segment = segmentIterator.nextSegment();
+			SpatialReference sr = SpatialReference.create(4326);
+
+			double distance = 55000;
+			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+			Polygon poly = (Polygon)opBuf.execute(segment, sr, GeodeticCurveType.Geodesic, distance, 300.0, false, null);
+
+			String words = GeometryEngine.geometryToWkt(poly, 0);
+			assertNotNull(poly);
+			assertTrue(poly.getType() == Geometry.Type.Polygon);
+			double area = poly.calculateArea2D();
+			assertEquals(6.339559300944052, area);
+		}
+	}
+
+	@Test
 	public void testLengthAccurateCR191313() {
 		/*
 		 * // random_test(); OperatorFactoryLocal engine =

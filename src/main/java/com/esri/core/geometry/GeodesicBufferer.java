@@ -38,10 +38,7 @@ class GeodesicBufferer {
         geodesicBufferer.m_geometry = geometry;
         geodesicBufferer.m_tolerance = InternalUtils.calculateToleranceFromGeometry(sr, env2D, true);// conservative to have same effect as simplify
         geodesicBufferer.m_small_tolerance = InternalUtils.calculateToleranceFromGeometry(null, env2D, true);// conservative
-        // to have
-        // same
-        // effect as
-        // simplify
+        // to have same effect as simplify
         geodesicBufferer.m_distance = distance;
         geodesicBufferer.m_original_geom_type = geometry.getType().value();
         if (max_vertex_in_complete_circle <= 0) {
@@ -153,51 +150,14 @@ class GeodesicBufferer {
     private double m_a;
     private double m_e2;
 
-    //TODO delete the below template as they don't work with geodesics
-//    private ArrayList<Point2D> m_circle_template;
-
     //    private ArrayList<Point2D> m_left_stack;
-//    private ArrayList<Point2D> m_middle_stack;
+    //    private ArrayList<Point2D> m_middle_stack;
     private Line m_helper_line_1;
     private Line m_helper_line_2;
     private Point2D[] m_helper_array;
     private int m_progress_counter;
 
-    //TODO delete the below template as they don't work with geodesics
-//    private void generateCircleTemplate_() {
-//        if (m_circle_template == null) {
-//            m_circle_template = new ArrayList<Point2D>(0);
-//        } else if (!m_circle_template.isEmpty()) {
-//            return;
-//        }
-//
-//        int N = calcN_(4);
-//
-//        assert (N >= 4);
-//        int real_size = (N + 3) / 4;
-//        double dA = (Math.PI * 0.5) / real_size;
-//        m_dA = dA;
-//
-//        for (int i = 0; i < real_size * 4; i++)
-//            m_circle_template.add(null);
-//
-//        double dcos = Math.cos(dA);
-//        double dsin = Math.sin(dA);
-//        Point2D pt = new Point2D(0.0, 1.0);
-//
-//        for (int i = 0; i < real_size; i++) {
-//            m_circle_template.set(i + real_size * 0, new Point2D(pt.y, -pt.x));
-//            m_circle_template.set(i + real_size * 1, new Point2D(-pt.x, -pt.y));
-//            m_circle_template.set(i + real_size * 2, new Point2D(-pt.y, pt.x));
-//            m_circle_template.set(i + real_size * 3, pt);
-//            pt = new Point2D(pt.x, pt.y);
-//            pt.rotateReverse(dcos, dsin);
-//        }
-//        // the template is filled with the index 0 corresponding to the point
-//        // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
-//    }
-
-      private static final class GeometryCursorForMultiPoint extends GeometryCursor {
+    private static final class GeometryCursorForMultiPoint extends GeometryCursor {
         private int m_index;
         private MultiPoint m_mp;
         private SpatialReference m_spatialReference;
@@ -290,8 +250,7 @@ class GeodesicBufferer {
                     // if there is only one path
                     return m_bufferer.bufferPolylinePath_((Polyline) (m_bufferer.m_geometry), ind, m_bfilter);
                 } else {
-//                    Polyline tmp_polyline = new Polyline(
-//                            m_bufferer.m_geometry.getDescription());
+                    Polyline tmp_polyline = new Polyline(m_bufferer.m_geometry.getDescription());
 //                    tmp_polyline.addPath((Polyline) (m_bufferer.m_geometry),
 //                            ind, true);
 //                    for (int i = ind + 1; i < m_index; i++) {
@@ -303,11 +262,10 @@ class GeodesicBufferer {
 //                    }
 //                    // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_ppp.txt",
 //                    // tmp_polyline, nullptr);
-//                    Polygon res = m_bufferer.bufferPolylinePath_(tmp_polyline,
-//                            0, m_bfilter);
+                    Polygon res = m_bufferer.bufferPolylinePath_(tmp_polyline, 0, m_bfilter);
 //                    // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_ppp_res.txt",
 //                    // *res, nullptr);
-//                    return res;
+                    return res;
                 }
             }
 
@@ -384,13 +342,13 @@ class GeodesicBufferer {
 
     private Geometry buffer_() {
         int gt = m_geometry.getType().value();
-//        if (Geometry.isSegment(gt)) {// convert segment to a polyline and repeat
-//            // the call
-//            Polyline polyline = new Polyline(m_geometry.getDescription());
-//            polyline.addSegment((Segment) (m_geometry), true);
-//            m_geometry = polyline;
-//            return buffer_();
-//        }
+        if (Geometry.isSegment(gt)) {// convert segment to a polyline and repeat
+            // the call
+            Polyline polyline = new Polyline(m_geometry.getDescription());
+            polyline.addSegment((Segment) (m_geometry), true);
+            m_geometry = polyline;
+            return buffer_();
+        }
 //
 //        if (m_distance <= m_tolerance) {
 //            if (Geometry.isArea(gt)) {
