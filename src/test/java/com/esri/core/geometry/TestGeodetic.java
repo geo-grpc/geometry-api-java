@@ -162,6 +162,27 @@ public class TestGeodetic extends TestCase {
 					.0000001
 			);
 		}
+
+		{
+			Polyline polyline = new Polyline();
+			polyline.startPath(0,0);
+			polyline.lineTo(4, 4);
+			polyline.lineTo(4, 8);
+			polyline.lineTo(8, 20);
+			double max_distance = 55000 / 3.5;
+			OperatorGeodeticDensifyByLength op = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+			Polyline polylineDense = (Polyline) op.execute(polyline, sr, max_distance, GeodeticCurveType.Geodesic, null);
+			String words = GeometryEngine.geometryToWkt(polylineDense, 0);
+			assertEquals(
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polyline.getPoint(0),
+							polyline.getPoint(polyline.getPointCount() - 1)),
+					GeometryEngine.geodesicDistanceOnWGS84(
+							polylineDense.getPoint(0),
+							polylineDense.getPoint(polylineDense.getPointCount() - 1)),
+					.0000001
+			);
+		}
 	}
 
 	@Test
@@ -178,10 +199,6 @@ public class TestGeodetic extends TestCase {
 			Polygon polygonDense = (Polygon) op.execute(polygon, sr, 5000, GeodeticCurveType.Geodesic, null);
 			assertEquals(polygon.calculateLength2D(), polygonDense.calculateLength2D(), .005);
 			assertEquals(polygon.calculateArea2D(), polygonDense.calculateArea2D(), 0.007);
-//			assertEquals(polygon.getPoint(polygon.getPointCount() - 1).getX(), polygonDense.getPoint(polygonDense.getPointCount() - 1).getX());
-//			assertEquals(polygon.getPoint(polygon.getPointCount() - 1).getY(), polygonDense.getPoint(polygonDense.getPointCount() - 1).getY());
-//			assertEquals(polygon.getPoint(0).getX(), polygonDense.getPoint(0).getX());
-//			assertEquals(polygon.getPoint(0).getY(), polygonDense.getPoint(0).getY());
 
 			polygon.startPath(-2, -2);
 			polygon.lineTo(-4, -4);
@@ -190,15 +207,6 @@ public class TestGeodetic extends TestCase {
 			polygonDense = (Polygon) op.execute(polygon, sr, 5000, GeodeticCurveType.Geodesic, null);
 			assertEquals(polygon.calculateLength2D(), polygonDense.calculateLength2D(), .004);
 			assertEquals(polygon.calculateArea2D(), polygonDense.calculateArea2D(), 0.1);
-//			assertEquals(polygon.calculatePathLength2D(0), polygonDense.calculatePathLength2D(0), .004);
-//			assertEquals(polygon.calculatePathLength2D(1), polygonDense.calculatePathLength2D(1), .004);
-		}
-
-		{
-			Polygon polygon = new Polygon();
-			polygon.startPath(0,0);
-			polygon.lineTo(0,1);
-
 		}
 	}
 
@@ -303,6 +311,7 @@ public class TestGeodetic extends TestCase {
 			assertEquals( 96 * 2, poly.getPointCount());
 		}
 	}
+	
 
 	@Test
 	public void testGeodeticBufferPolyline() {
@@ -322,8 +331,7 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			double diff = Math.abs(2.550450219554701E-4 - area);
-			assertEquals(2.550450219554701E-4, area);
+			assertEquals(23.098768294977518, area);
 		}
 	}
 

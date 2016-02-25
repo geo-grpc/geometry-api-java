@@ -447,19 +447,21 @@ class GeodesicBufferer {
         }
 
         // TODO no idea what this does?
-        m_geometry = preparePolyline_((Polyline) (m_geometry));
+        // TODO cannot use preparePolyline until there is a Geodetic Generalize
+        //m_geometry = preparePolyline_((Polyline) (m_geometry));
+
 
         // geodesic densify here
         OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
         Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
 
-        ListeningGeometryCursor listeningGeometryCursor = new ListeningGeometryCursor();
+        MultiPoint mp = new MultiPoint();
         for (int ipath = 0; ipath < ((Polyline)geometryDense).getPathCount(); ipath++) {
             int pathStart = ((Polyline)geometryDense).getPathStart(ipath);
             int pathEnd = ((Polyline)geometryDense).getPathEnd(ipath);
             for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
                 Point pt = ((Polyline)geometryDense).getPoint(ipoint);
-                listeningGeometryCursor.tick(pt);
+                mp.add(pt);
             }
         }
 
@@ -467,18 +469,7 @@ class GeodesicBufferer {
         distances[0] = m_distance;
 
         OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-        GeometryCursor buffCursor = opBuf.execute((GeometryCursor)listeningGeometryCursor, m_spatialReference, GeodeticCurveType.Geodesic, distances, m_densify_dist, false, true, m_progress_tracker);
-
-//        assert (m_distance > 0);
-
-//
-//        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
-//        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
-//                cursor,
-//                m_spatialReference,
-//                m_progress_tracker);
-        Geometry result = buffCursor.next();
-        return result;
+        return opBuf.execute(mp, m_spatialReference, GeodeticCurveType.Geodesic, m_distance, m_densify_dist, false, m_progress_tracker);
     }
 
 
@@ -1484,7 +1475,7 @@ class GeodesicBufferer {
     private Polyline preparePolyline_(Polyline input_geom) {
         // Generalize it firstly using 25% of the densification deviation as a
         // criterion.
-        //TODO create geodetic densify
+        //TODO create geodetic Geodetic Generalize
         Polyline generalized_polyline = (Polyline) ((OperatorGeneralize) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Generalize)).execute(
                 input_geom,
                 m_densify_dist * 0.25,
