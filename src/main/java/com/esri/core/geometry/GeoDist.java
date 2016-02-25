@@ -31,6 +31,8 @@ final class GeoDist {
 	private static final double PE_PI2 = 1.57079632679489661923132;
 	private static final double PE_2PI = 6.283185307179586476925287;
 	private static final double PE_EPS = 3.55271367880050092935562e-15;
+	private static final double RAD_TO_DEG = 180.0 / PE_PI;
+	private static final double DEG_TO_RAD = PE_PI / 180.0;
 
 	/** Get the absolute value of a number */
 	static private double PE_ABS(double a) {
@@ -90,6 +92,36 @@ final class GeoDist {
 		return a / (1.0 + n)
 				* (1.0 + n2 * (1.0 / 4.0 + n2 * (1.0 / 64.0 + n2 * (1.0 / 256.0))))
 				* PE_PI2;
+	}
+
+	// This should be a method within Envelop2D
+	public static void inflateEnv2D(
+			double a,
+			double e2,
+			Envelope2D env2D,
+			double dxMeters,
+			double dyMeters) {
+		if (env2D.isEmpty())
+			return;
+
+		PeDouble lam2 = new PeDouble();
+		PeDouble phi2 = new PeDouble();
+		// new ymin
+		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymin * DEG_TO_RAD, dxMeters, Math.PI, lam2, phi2);
+		env2D.ymin = phi2.val * RAD_TO_DEG;
+		// new xmin
+		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dxMeters, 3 * Math.PI / 2, lam2, phi2);
+		env2D.xmin = lam2.val * RAD_TO_DEG;
+		// new yMAX
+		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dxMeters, 0, lam2, phi2);
+		env2D.ymax = phi2.val * RAD_TO_DEG;
+		// new xmax
+		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymin, dxMeters, Math.PI / 2, lam2, phi2);
+		env2D.xmax = lam2.val * RAD_TO_DEG;
+
+//		if (xmin > xmax || ymin > ymax)
+//			setEmpty();
+
 	}
 
 	static public void geodesic_forward(double a,

@@ -25,12 +25,15 @@ class GeodesicBufferer {
         if (geometry.isEmpty())
             return new Polygon(geometry.getDescription());
 
+        GeodesicBufferer geodesicBufferer = new GeodesicBufferer(progress_tracker);
+
         Envelope2D env2D = new Envelope2D();
         geometry.queryLooseEnvelope2D(env2D);
         if (distance > 0)
-            env2D.inflate(distance, distance);
+            //         env2D.inflate(distance, distance);
+            GeoDist.inflateEnv2D(geodesicBufferer.m_a, geodesicBufferer.m_e2, env2D, distance, distance);
 
-        GeodesicBufferer geodesicBufferer = new GeodesicBufferer(progress_tracker);
+
         geodesicBufferer.m_spatialReference = sr;
         geodesicBufferer.m_geometry = geometry;
         geodesicBufferer.m_tolerance = InternalUtils.calculateToleranceFromGeometry(sr, env2D, true);// conservative to have same effect as simplify
@@ -52,19 +55,16 @@ class GeodesicBufferer {
 
         if (NumberUtils.isNaN(densify_dist) || densify_dist == 0) {
             densify_dist = geodesicBufferer.m_abs_distance * 1e-5;
-        } else {
-            if (densify_dist > geodesicBufferer.m_abs_distance * 0.5)
-                densify_dist = geodesicBufferer.m_abs_distance * 0.5;// do not allow too
-            // large densify
-            // distance (the
-            // value will be
-            // adjusted
-            // anyway later)
+        } else if (densify_dist > geodesicBufferer.m_abs_distance * 0.5) {
+            //TODO put a break point here to see if this is ever a problem
+            // do not allow too large densify distance (the value will be adjusted anyway later)
+            densify_dist = geodesicBufferer.m_abs_distance * 0.5;
         }
 
         if (max_vertex_in_complete_circle < 12)
             max_vertex_in_complete_circle = 12;
 
+        // TODO I don't know what max_dd is for. decimal degrees?
         double max_dd = Math.abs(distance) * (1 - Math.cos(Math.PI / max_vertex_in_complete_circle));
 
         if (max_dd > densify_dist) {

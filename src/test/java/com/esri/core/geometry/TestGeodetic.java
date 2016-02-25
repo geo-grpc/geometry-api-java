@@ -211,6 +211,18 @@ public class TestGeodetic extends TestCase {
 	}
 
 	@Test
+	public void testInflateEnv2D() {
+		Envelope2D env2D = new Envelope2D(0, -4, 4, 8);
+
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+
+		GeoDist.inflateEnv2D(a, e2, env2D, 1000, 2000);
+		assertTrue(env2D.xmin == 0);
+		assertTrue(env2D.ymax > 8);
+	}
+
+	@Test
 	public void testVicenty() {
 		// test data from
 		// http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
@@ -311,7 +323,7 @@ public class TestGeodetic extends TestCase {
 			assertEquals( 96 * 2, poly.getPointCount());
 		}
 	}
-	
+
 
 	@Test
 	public void testGeodeticBufferPolyline() {
