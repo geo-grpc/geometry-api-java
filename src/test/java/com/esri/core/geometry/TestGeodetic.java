@@ -331,7 +331,7 @@ public class TestGeodetic extends TestCase {
 			polyline.startPath(0,0);
 			polyline.lineTo(4, 4);
 			polyline.lineTo(4, 8);
-//			polyline.lineTo(8, 20);
+			polyline.lineTo(8, 20);
 			SpatialReference sr = SpatialReference.create(4326);
 
 			OperatorBuffer opBufNorm = (OperatorBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
@@ -347,8 +347,114 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(23.098768294977518, area);
+			assertEquals(23.286092329052902, area);
 		}
+	}
+
+	@Test
+	public void testBufferGeodeticPolyline2() {
+		SpatialReference sr = SpatialReference.create(4326);
+		Polyline inputGeom = new Polyline();
+		OperatorGeodesicBuffer buffer = (OperatorGeodesicBuffer) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Simplify);
+		inputGeom.startPath(0, 0);
+		inputGeom.lineTo(50, 50);
+		inputGeom.lineTo(50, 0);
+		inputGeom.lineTo(0, 50);
+
+		{
+			Geometry result = buffer.execute(inputGeom, sr, 0, 0, 0, false, null);
+			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+			assertTrue(result.isEmpty());
+		}
+
+		{
+			Geometry result = buffer.execute(inputGeom, sr, 0, -1, 0, false, null);
+			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+			assertTrue(result.isEmpty());
+		}
+
+		{
+			String words = GeometryEngine.geometryToWkt(inputGeom, 0);
+			Geometry result = buffer.execute(inputGeom, sr, 0, 40.0, 50, false, null);
+			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+			Polygon poly = (Polygon) (result);
+
+			words = GeometryEngine.geometryToWkt(poly, 0);
+//			Envelope2D env2D = new Envelope2D();
+//			result.queryEnvelope2D(env2D);
+//			assertTrue(Math.abs(env2D.getWidth() - 80 - 50) < 0.1
+//					&& Math.abs(env2D.getHeight() - 80 - 50) < 0.1);
+//			assertTrue(Math.abs(env2D.getCenterX() - 25) < 0.1
+//					&& Math.abs(env2D.getCenterY() - 25) < 0.1);
+			int pathCount = poly.getPathCount();
+			// should have a hole in it
+			assertEquals(pathCount, 2);
+
+			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
+		}
+
+		{
+			String words = GeometryEngine.geometryToWkt(inputGeom, 0);
+			Geometry result = buffer.execute(inputGeom, sr, 0, 3000000.0, 50, false, null);
+			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+			Polygon poly = (Polygon) (result);
+
+			words = GeometryEngine.geometryToWkt(poly, 0);
+//			Envelope2D env2D = new Envelope2D();
+//			result.queryEnvelope2D(env2D);
+//			assertTrue(Math.abs(env2D.getWidth() - 80 - 50) < 0.1
+//					&& Math.abs(env2D.getHeight() - 80 - 50) < 0.1);
+//			assertTrue(Math.abs(env2D.getCenterX() - 25) < 0.1
+//					&& Math.abs(env2D.getCenterY() - 25) < 0.1);
+			int pathCount = poly.getPathCount();
+			// should have a hole in it
+			assertEquals(pathCount, 1);
+
+			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
+		}
+//
+//		{
+//			Geometry result = buffer.execute(inputGeom, sr, 4.0, null);
+//			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+//			Polygon poly = (Polygon) (result);
+//			Envelope2D env2D = new Envelope2D();
+//			result.queryEnvelope2D(env2D);
+//			assertTrue(Math.abs(env2D.getWidth() - 8 - 50) < 0.1
+//					&& Math.abs(env2D.getHeight() - 8 - 50) < 0.1);
+//			assertTrue(Math.abs(env2D.getCenterX() - 25) < 0.1
+//					&& Math.abs(env2D.getCenterY() - 25) < 0.1);
+//			int pathCount = poly.getPathCount();
+//			assertTrue(pathCount == 2);
+//			int pointCount = poly.getPointCount();
+//			assertTrue(Math.abs(pointCount - 186.0) < 10);
+//			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
+//		}
+//
+//		{
+//			inputGeom = new Polyline();
+//			inputGeom.startPath(0, 0);
+//			inputGeom.lineTo(50, 50);
+//			inputGeom.startPath(50, 0);
+//			inputGeom.lineTo(0, 50);
+//
+//			Geometry result = buffer.execute(inputGeom, sr, 4.0, null);
+//			assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
+//			Polygon poly = (Polygon) (result);
+//			Envelope2D env2D = new Envelope2D();
+//			result.queryEnvelope2D(env2D);
+//			assertTrue(Math.abs(env2D.getWidth() - 8 - 50) < 0.1
+//					&& Math.abs(env2D.getHeight() - 8 - 50) < 0.1);
+//			assertTrue(Math.abs(env2D.getCenterX() - 25) < 0.1
+//					&& Math.abs(env2D.getCenterY() - 25) < 0.1);
+//			int pathCount = poly.getPathCount();
+//			assertTrue(pathCount == 1);
+//			int pointCount = poly.getPointCount();
+//			assertTrue(Math.abs(pointCount - 208.0) < 10);
+//			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
+//		}
 	}
 
 	@Test
