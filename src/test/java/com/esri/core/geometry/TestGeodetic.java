@@ -331,9 +331,12 @@ public class TestGeodetic extends TestCase {
 			Polyline polyline = new Polyline();
 			polyline.startPath(0,0);
 			polyline.lineTo(4, 4);
-			polyline.lineTo(4, 8);
-			polyline.lineTo(8, 20);
+//			polyline.lineTo(4, 8);
+//			polyline.lineTo(8, 20);
 			SpatialReference sr = SpatialReference.create(4326);
+
+			OperatorBuffer opBufNorm = (OperatorBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
+			Polygon polyNorm = (Polygon)opBufNorm.execute(polyline, sr, .7, null);
 
 			double distance = 55000;
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);

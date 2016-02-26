@@ -1,5 +1,6 @@
 package com.esri.core.geometry;
 
+import java.io.Console;
 import java.util.ArrayList;
 
 /**
@@ -149,6 +150,8 @@ class GeodesicBufferer {
     private boolean m_bfilter;
     private double m_a;
     private double m_e2;
+    private static final double RAD_TO_DEG = 180.0 / Math.PI;
+    private static final double DEG_TO_RAD = Math.PI / 180.0;
 
     //    private ArrayList<Point2D> m_left_stack;
     //    private ArrayList<Point2D> m_middle_stack;
@@ -251,15 +254,15 @@ class GeodesicBufferer {
                     return m_bufferer.bufferPolylinePath_((Polyline) (m_bufferer.m_geometry), ind, m_bfilter);
                 } else {
                     Polyline tmp_polyline = new Polyline(m_bufferer.m_geometry.getDescription());
-//                    tmp_polyline.addPath((Polyline) (m_bufferer.m_geometry),
-//                            ind, true);
-//                    for (int i = ind + 1; i < m_index; i++) {
-//                        ((MultiPathImpl) tmp_polyline._getImpl())
-//                                .addSegmentsFromPath(
-//                                        (MultiPathImpl) m_bufferer.m_geometry
-//                                                ._getImpl(), i, 0, mp
-//                                                .getSegmentCount(i), false);
-//                    }
+                    tmp_polyline.addPath((Polyline)m_bufferer.m_geometry, ind, true);
+                    for (int i = ind + 1; i < m_index; i++) {
+                        ((MultiPathImpl) tmp_polyline._getImpl()).addSegmentsFromPath(
+                                (MultiPathImpl)m_bufferer.m_geometry._getImpl(),
+                                i,
+                                0,
+                                mp.getSegmentCount(i),
+                                false);
+                    }
 //                    // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_ppp.txt",
 //                    // tmp_polyline, nullptr);
                     Polygon res = m_bufferer.bufferPolylinePath_(tmp_polyline, 0, m_bfilter);
@@ -349,9 +352,10 @@ class GeodesicBufferer {
             m_geometry = polyline;
             return buffer_();
         }
-//
-//        if (m_distance <= m_tolerance) {
-//            if (Geometry.isArea(gt)) {
+
+        if (m_distance <= m_tolerance) {
+            if (Geometry.isArea(gt)) {
+                //TODO add geodetic getWidth and getHeight for Envelope
 //                if (m_distance <= 0) {
 //                    // if the geometry is area type, then the negative distance
 //                    // may produce a degenerate shape. Check for this and return
@@ -362,18 +366,15 @@ class GeodesicBufferer {
 //                            || env.getHeight() <= m_distance * 2)
 //                        return new Polygon(m_geometry.getDescription());
 //                }
-//            } else {
-//                return new Polygon(m_geometry.getDescription());// return an
-//                // empty polygon
-//                // for distance
-//                // <=
-//                // m_tolerance
-//                // and any input
-//                // other than
-//                // polygon.
-//            }
-//        }
-//
+
+                return null;
+            } else {
+                return new Polygon(m_geometry.getDescription());
+                // return an empty polygon for distance <= m_tolerance
+                // and any input other than polygon.
+            }
+        }
+
 //        // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_input.txt",
 //        // *m_geometry, nullptr);
 //
@@ -394,6 +395,8 @@ class GeodesicBufferer {
         }
     }
 
+    private static boolean USE_POINT_UNION = false;
+
     private Geometry bufferPolyline_() {
         if (isDegenerateGeometry_(m_geometry)) {
             Point point = new Point();
@@ -404,30 +407,39 @@ class GeodesicBufferer {
             return bufferPoint_(point);
         }
 
-        // TODO no idea what this does?
         // TODO cannot use preparePolyline until there is a Geodetic Generalize
         //m_geometry = preparePolyline_((Polyline) (m_geometry));
 
 
-        // geodesic densify here
-        OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
-        Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
+        if (!USE_POINT_UNION) {
+            GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
+            GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
+                    cursor,
+                    m_spatialReference,
+                    m_progress_tracker);
+            Geometry result = union_cursor.next();
+            return result;
+        } else {
+            // geodesic densify here
+            OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
+            Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
 
-        MultiPoint mp = new MultiPoint();
-        for (int ipath = 0; ipath < ((Polyline)geometryDense).getPathCount(); ipath++) {
-            int pathStart = ((Polyline)geometryDense).getPathStart(ipath);
-            int pathEnd = ((Polyline)geometryDense).getPathEnd(ipath);
-            for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
-                Point pt = ((Polyline)geometryDense).getPoint(ipoint);
-                mp.add(pt);
+            MultiPoint mp = new MultiPoint();
+            for (int ipath = 0; ipath < ((Polyline) geometryDense).getPathCount(); ipath++) {
+                int pathStart = ((Polyline) geometryDense).getPathStart(ipath);
+                int pathEnd = ((Polyline) geometryDense).getPathEnd(ipath);
+                for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
+                    Point pt = ((Polyline) geometryDense).getPoint(ipoint);
+                    mp.add(pt);
+                }
             }
+
+            double[] distances = new double[1];
+            distances[0] = m_distance;
+
+            OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+            return opBuf.execute(mp, m_spatialReference, GeodeticCurveType.Geodesic, m_distance, m_densify_dist, false, m_progress_tracker);
         }
-
-        double[] distances = new double[1];
-        distances[0] = m_distance;
-
-        OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-        return opBuf.execute(mp, m_spatialReference, GeodeticCurveType.Geodesic, m_distance, m_densify_dist, false, m_progress_tracker);
     }
 
 
@@ -799,15 +811,18 @@ class GeodesicBufferer {
         boolean b_closed = mp_impl.isClosedPathInXYPlane(ipath);
 
         if (b_closed) {
-//            bufferClosedPath_(input_multi_path, ipath, result_mp, bfilter, 1);
-//            bufferClosedPath_(input_multi_path, ipath, result_mp, bfilter, -1);
+            bufferClosedPath_(input_multi_path, ipath, result_mp, bfilter, 1);
+            bufferClosedPath_(input_multi_path, ipath, result_mp, bfilter, -1);
         } else {
-//            Polyline tmpPoly = new Polyline(input_multi_path.getDescription());
-//            tmpPoly.addPath(input_multi_path, ipath, false);
-//            ((MultiPathImpl) tmpPoly._getImpl()).addSegmentsFromPath(
-//                    (MultiPathImpl) input_multi_path._getImpl(), ipath, 0,
-//                    input_multi_path.getSegmentCount(ipath), false);
-//            bufferClosedPath_(tmpPoly, 0, result_mp, bfilter, 1);
+            Polyline tmpPoly = new Polyline(input_multi_path.getDescription());
+            tmpPoly.addPath(input_multi_path, ipath, false);
+            ((MultiPathImpl) tmpPoly._getImpl()).addSegmentsFromPath(
+                    (MultiPathImpl)input_multi_path._getImpl(),
+                    ipath,
+                    0,
+                    input_multi_path.getSegmentCount(ipath),
+                    false);
+            bufferClosedPath_(tmpPoly, 0, result_mp, bfilter, 1);
 //            // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_prepare.txt",
 //            // *result_polyline, nullptr);
         }
@@ -828,12 +843,10 @@ class GeodesicBufferer {
 
     private Polygon bufferCleanup_(MultiPath multi_path, boolean simplify_result) {
         double tol = simplify_result ? m_tolerance : m_small_tolerance;
-        Polygon resultPolygon = (Polygon) (TopologicalOperations.planarSimplify(
-                multi_path,
-                tol,
-                true,
-                !simplify_result,
-                m_progress_tracker));
+        String words = GeometryEngine.geometryToWkt((Polyline)multi_path, 0);
+        Polygon resultPolygon = (Polygon) (TopologicalOperations
+                .planarSimplify(multi_path, tol, true, !simplify_result,
+                        m_progress_tracker));
         assert (InternalUtils.isWeakSimple(resultPolygon, 0.0));
         return resultPolygon;
     }
@@ -861,13 +874,12 @@ class GeodesicBufferer {
 
     private void addJoin_(MultiPathImpl dst,
                           Point2D center,
-                          Point2D fromPt,
-                          Point2D toPt,
+                          Point2D arcStartPt,
+                          Point2D arcEndPt,
                           boolean bStartPath,
                           boolean bFinishAtToPt) {
-//        generateCircleTemplate_();
+        addArc_(dst, center, arcStartPt, arcEndPt, bStartPath, bFinishAtToPt);
 
-        Point2D v_1 = new Point2D();
 //        v_1.sub(fromPt, center);
 //        v_1.scale(m_abs_distance_reversed);
 //        Point2D v_2 = new Point2D();
@@ -926,9 +938,9 @@ class GeodesicBufferer {
 //            progress_();
 //        }
 
-        if (bFinishAtToPt) {
-            dst.lineTo(toPt);
-        }
+//        if (bFinishAtToPt) {
+//            dst.lineTo(toPt);
+//        }
     }
 
     private int bufferClosedPath_(Geometry input_geom,
@@ -936,14 +948,15 @@ class GeodesicBufferer {
                                   MultiPathImpl result_mp,
                                   boolean bfilter,
                                   int dir) {
-        ListeningGeometryCursor listGeomCursor = new ListeningGeometryCursor();
-
         // Use temporary polyline for the path buffering.
         EditShape edit_shape = new EditShape();
         int geom = edit_shape.addPathFromMultiPath((MultiPath) input_geom, ipath, true);
+
         //TODO not sure what filtering does
         edit_shape.filterClosePoints(m_filter_tolerance, false, false);
-        if (edit_shape.getPointCount(geom) < 2) {// Got degenerate output.
+
+        if (edit_shape.getPointCount(geom) < 2) {
+            // Got degenerate output.
             // Wither bail out or
             // produce a circle.
             if (dir < 0)
@@ -991,11 +1004,31 @@ class GeodesicBufferer {
         m_buffer_commands.clear();
         int path = edit_shape.getFirstPath(geom);
         int ivert = edit_shape.getFirstVertex(path);
-//        int iprev = dir == 1 ? edit_shape.getPrevVertex(ivert) : edit_shape.getNextVertex(ivert);
+        int iprev = dir == 1 ? edit_shape.getPrevVertex(ivert) : edit_shape.getNextVertex(ivert);
         int inext = dir == 1 ? edit_shape.getNextVertex(ivert) : edit_shape.getPrevVertex(ivert);
         boolean b_first = true;
-        Point2D pt_current = new Point2D(), pt_after = new Point2D(), pt_before = new Point2D(), pt_left_prev = new Point2D(), pt = new Point2D(), pt1 = new Point2D();
-        Point2D v_after = new Point2D(), v_before = new Point2D(), v_left = new Point2D(), v_left_prev = new Point2D();
+
+        // current point
+        Point2D pt_current = new Point2D();
+        // next point
+        Point2D pt_after = new Point2D();
+        // previous point
+        Point2D pt_before = new Point2D();
+
+
+        Point2D pt_left_prev = new Point2D();
+        Point2D pt = new Point2D();
+        Point2D pt1 = new Point2D();
+
+        Point2D v_after = new Point2D();
+        Point2D v_before = new Point2D();
+//        Point2D v_left = new Point2D();
+//        Point2D v_left_prev = new Point2D();
+
+        PeDouble az12 = new PeDouble();
+        PeDouble lam2 = new PeDouble();
+        PeDouble phi2 = new PeDouble();
+
         double abs_d = m_abs_distance;
         int ncount = edit_shape.getPathSize(path);
 
@@ -1004,76 +1037,109 @@ class GeodesicBufferer {
         // fill rule, we'd get the buffered result.
         for (int index = 0; index < ncount; index++) {
             edit_shape.getXY(inext, pt_after);
-//
+
             if (b_first) {
-//                edit_shape.getXY(ivert, pt_current);
-//                edit_shape.getXY(iprev, pt_before);
-//                v_before.sub(pt_current, pt_before);
-//                v_before.normalize();
+                // grab the first point
+                edit_shape.getXY(ivert, pt_current);
+                // get the previous point (TODO if polygon?!?)
+                edit_shape.getXY(iprev, pt_before);
+
+                // not sure is this is the right direction. might want before to current
+                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, null, az12, null);
+                // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
+                GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val + Math.PI / 2.0, lam2, phi2);
+                pt_left_prev.x = lam2.val * RAD_TO_DEG;
+                pt_left_prev.y = phi2.val * RAD_TO_DEG;
+
+                // move v_before position as if pt_current was origin
+                v_before.sub(pt_current, pt_before);
+                // change v_before into unit vector
+                v_before.normalize();
+//                // create unit vector that is 90 degree counter-clockwise of v_before
 //                v_left_prev.leftPerpendicular(v_before);
+//                // scale the left perpendicular vector by the distance
 //                v_left_prev.scale(abs_d);
-                pt_left_prev.add(v_left_prev, pt_current);
+//                // create the pt left previous by shifting the left perpendicular vector by the current point
+//                pt_left_prev.add(v_left_prev, pt_current);
             }
-//
-//            v_after.sub(pt_after, pt_current);
-//            v_after.normalize();
-//
+
+            // not sure is this is the right direction. might want before to current
+            GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, null, az12, null);
+            // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
+            GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
+            pt.x = lam2.val * RAD_TO_DEG;
+            pt.y = phi2.val * RAD_TO_DEG;
+
+            // v_after is the vector of pt_after with the pt_center at origin
+            v_after.sub(pt_after, pt_current);
+            // v_after is normalized to be a unit vector
+            v_after.normalize();
+//            // v_left is a perpendicular to the left of v_after vector, centered at pt_current
 //            v_left.leftPerpendicular(v_after);
+//            // scale v_left by the buffer distance
 //            v_left.scale(abs_d);
+//            // shift the vector back relative to pt_current
 //            pt.add(pt_current, v_left);
-//            double cross = v_before.crossProduct(v_after);
-//            double dot = v_before.dotProduct(v_after);
-//            boolean bDoJoin = cross < 0 || (dot < 0 && cross == 0);
-//            if (bDoJoin) {
-//                m_buffer_commands.add(
-//                        new GeodesicBufferCommand(
-//                                pt_left_prev,
-//                                pt,
-//                                pt_current,
-//                                GeodesicBufferCommand.Flags.enum_arc,
-//                                m_buffer_commands.size() + 1,
-//                                m_buffer_commands.size() - 1));
-//            } else if (!pt_left_prev.isEqual(pt)) {
-//                m_buffer_commands.add(
-//                        new GeodesicBufferCommand(
-//                                pt_left_prev,
-//                                pt_current,
-//                                m_buffer_commands.size() + 1,
-//                                m_buffer_commands.size() - 1,
-//                                "dummy"));
-//                m_buffer_commands.add(
-//                        new GeodesicBufferCommand(
-//                                pt_current,
-//                                pt,
-//                                m_buffer_commands.size() + 1,
-//                                m_buffer_commands.size() - 1,
-//                                "dummy"));
-//            }
-//
+            // Use these two calculations to determine if the angle is concave or convex
+            double cross = v_before.crossProduct(v_after);
+            double dot = v_before.dotProduct(v_after);
+            boolean bDoJoin = cross < 0 || (dot < 0 && cross == 0);
+
+            if (bDoJoin) {
+                // create an arc
+                m_buffer_commands.add(
+                        new GeodesicBufferCommand(
+                                pt_left_prev,
+                                pt,
+                                pt_current,
+                                GeodesicBufferCommand.Flags.enum_arc,
+                                m_buffer_commands.size() + 1,
+                                m_buffer_commands.size() - 1));
+            } else if (!pt_left_prev.isEqual(pt)) {
+                // create straight edge?
+                m_buffer_commands.add(
+                        new GeodesicBufferCommand(
+                                pt_left_prev,
+                                pt_current,
+                                m_buffer_commands.size() + 1,
+                                m_buffer_commands.size() - 1,
+                                "dummy"));
+                m_buffer_commands.add(
+                        new GeodesicBufferCommand(
+                                pt_current,
+                                pt,
+                                m_buffer_commands.size() + 1,
+                                m_buffer_commands.size() - 1,
+                                "dummy"));
+            }
+
+            GeoDist.geodesic_forward(m_a, m_e2, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
+            pt1.x = lam2.val * RAD_TO_DEG;
+            pt1.y = phi2.val * RAD_TO_DEG;
 //            pt1.add(pt_after, v_left);
-//            m_buffer_commands.add(
-//                    new GeodesicBufferCommand(
-//                        pt,
-//                        pt1,
-//                        pt_current,
-//                        GeodesicBufferCommand.Flags.enum_line,
-//                        m_buffer_commands.size() + 1,
-//                        m_buffer_commands.size() - 1));
-//
-//            pt_left_prev.setCoords(pt1);
+            m_buffer_commands.add(
+                    new GeodesicBufferCommand(
+                        pt,
+                        pt1,
+                        pt_current,
+                        GeodesicBufferCommand.Flags.enum_line,
+                        m_buffer_commands.size() + 1,
+                        m_buffer_commands.size() - 1));
+
+            pt_left_prev.setCoords(pt1);
 //            v_left_prev.setCoords(v_left);
-//            pt_before.setCoords(pt_current);
-//            pt_current.setCoords(pt_after);
-//            v_before.setCoords(v_after);
-//            iprev = ivert;
-//            ivert = inext;
+            pt_before.setCoords(pt_current);
+            pt_current.setCoords(pt_after);
+            v_before.setCoords(v_after);
+            iprev = ivert;
+            ivert = inext;
             b_first = false;
-//            inext = dir == 1 ? edit_shape.getNextVertex(ivert) : edit_shape.getPrevVertex(ivert);
+            inext = dir == 1 ? edit_shape.getNextVertex(ivert) : edit_shape.getPrevVertex(ivert);
         }
-//
-//        m_buffer_commands.get(m_buffer_commands.size() - 1).m_next = 0;
-//        m_buffer_commands.get(0).m_prev = m_buffer_commands.size() - 1;
-//        processBufferCommands_(result_mp);
+
+        m_buffer_commands.get(m_buffer_commands.size() - 1).m_next = 0;
+        m_buffer_commands.get(0).m_prev = m_buffer_commands.size() - 1;
+        processBufferCommands_(result_mp);
 //        tr.setShift(origin.x, origin.y);// move the path to improve precision.
 //        result_mp.applyTransformation(tr, result_mp.getPathCount() - 1);
         return 1;
@@ -1102,6 +1168,9 @@ class GeodesicBufferer {
             }
             first = false;
         }
+        if (result_mp.getPoint(0).getX() != result_mp.getPoint(result_mp.getPointCount() - 1).getX() &&
+                result_mp.getPoint(0).getY() != result_mp.getPoint(result_mp.getPointCount() - 1).getY())
+            result_mp.lineTo(result_mp.getPoint(0));
     }
 
     //TODO this seems to be fine for Geodesic vs Planar. The intersect test might be a little off, but this should work?
@@ -1143,7 +1212,8 @@ class GeodesicBufferer {
             if (count == 1) {
                 // Next segment starts where this one ends. Skip this case as it
                 // is simple.
-                assert (command.m_to.isEqual(command_next.m_from));
+                assert (command.m_to.isEqual(command_next.m_from, 0.01));
+//                assert (command.m_to.isEqual(command_next.m_from));
                 continue;
             }
 
@@ -1463,55 +1533,76 @@ class GeodesicBufferer {
         }
     }
 
-    private void addCircle_(MultiPathImpl result_mp, Point point) {
-        // Uses same calculations for each of the quadrants, generating a
-        // symmetric distribution of points.
-        Point2D center = point.getXY();
-//        if (m_circle_template != null && !m_circle_template.isEmpty()) {// use
-//            // template
-//            // if
-//            // available.
-//            Point2D p = new Point2D();
-//            p.setCoords(m_circle_template.get(0));
-//            p.scaleAdd(m_abs_distance, center);
-//            result_mp.startPath(p);
-//            for (int i = 1, n = (int) m_circle_template.size(); i < n; i++) {
-//                p.setCoords(m_circle_template.get(i));
-//                p.scaleAdd(m_abs_distance, center);
-//                result_mp.lineTo(p);
-//            }
-//            return;
-//        }
 
-        // avoid unnecessary memory allocation for the circle template. Just do
-        // the point here.
-
+    private void addArc_(MultiPathImpl dst,
+                         Point2D center,
+                         Point2D arcStartPt,
+                         Point2D arcEndPt,
+                         boolean bStartPath,
+                         boolean bFinishArcEndPt) {
+        // TODO move this logic into the constructor, eh?
         int N = calcN_(4);
         int real_size = (N + 3) / 4;
         double dA = (Math.PI * 0.5) / real_size;
+
+        //TODO this might be good for memory allocations?
         // result_mp.reserve(real_size * 4);
 
-        double dcos = Math.cos(dA);
-        double dsin = Math.sin(dA);
-        double degToRad = Math.PI / 180.0;
-        double radToDeg = 180.0 / Math.PI;
-        double lam1 = point.getX() * degToRad;
-        double phi1 = point.getY() * degToRad;
+        // center point
+        double lamCenter = center.x * DEG_TO_RAD;
+        double phiCenter = center.y * DEG_TO_RAD;
+
+        double startAzimuth = 0.0;
+
+        if (arcStartPt != null && arcEndPt != null) {
+            PeDouble az12 = new PeDouble();
+            GeoDist.geodesic_distance_ngs(
+                    m_a, m_e2, lamCenter, phiCenter,
+                    arcStartPt.x * DEG_TO_RAD, arcStartPt.y * DEG_TO_RAD,
+                    null, az12, null);
+            startAzimuth = az12.val;
+
+            GeoDist.geodesic_distance_ngs(
+                    m_a, m_e2, lamCenter, phiCenter,
+                    arcEndPt.x * DEG_TO_RAD, arcEndPt.y * DEG_TO_RAD,
+                    null, az12, null);
+            double endAzimuth = az12.val;
+
+            if (startAzimuth < 0)
+                startAzimuth = Math.PI * 2 + startAzimuth;
+            if (endAzimuth < 0)
+                endAzimuth = Math.PI * 2 + endAzimuth;
+            double angleDifference = endAzimuth - startAzimuth;
+            if (endAzimuth < startAzimuth)
+                angleDifference = 2 * Math.PI - startAzimuth + endAzimuth;
+
+            double ratio = angleDifference / (2 * Math.PI);
+            real_size = (int) Math.floor(real_size * ratio);
+        }
 
         PeDouble lam2 = new PeDouble();
         PeDouble phi2 = new PeDouble();
-        double az12 = 0;
 
-        Point2D pt = new Point2D();
-        GeoDist.geodesic_forward(m_a, m_e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-
-        result_mp.startPath(lam2.val * radToDeg, phi2.val * radToDeg);// we
-        // start at the quadrant 3.
-        for (int i = 1; i < real_size * 4; i++) {
-            az12 += dA;
-            GeoDist.geodesic_forward(m_a, m_e2, lam1, phi1, m_abs_distance, az12,lam2, phi2);
-            result_mp.lineTo(lam2.val * radToDeg, phi2.val * radToDeg);
+        if (bStartPath) {
+            GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
+            dst.startPath(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
         }
+        startAzimuth += dA;
+
+        for (int i = 1; i < real_size * 4 - 1; i++) {
+            GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
+            dst.lineTo(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
+            startAzimuth += dA;
+        }
+
+        if (bFinishArcEndPt) {
+            dst.lineTo(arcEndPt);
+        }
+    }
+
+
+    private void addCircle_(MultiPathImpl dst, Point point) {
+        addArc_(dst, point.getXY(), null, null, true, true);
     }
 
     // Planar and Geodesic are equivalent
