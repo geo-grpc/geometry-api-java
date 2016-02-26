@@ -218,7 +218,7 @@ public class TestGeodetic extends TestCase {
 		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
 
 		GeoDist.inflateEnv2D(a, e2, env2D, 1000, 2000);
-		assertTrue(env2D.xmin == 0);
+		assertTrue(env2D.xmin < 0);
 		assertTrue(env2D.ymax > 8);
 	}
 
@@ -298,8 +298,7 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			double diff = Math.abs(2.550450219554701E-4 - area);
-			assertEquals(2.550450219554701E-4, area);
+			assertEquals(2.4973153599304893E-4, area);
 			assertEquals(poly.getPointCount(), 96);
 		}
 	}
@@ -319,7 +318,7 @@ public class TestGeodetic extends TestCase {
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			assertEquals(2, poly.getPathCount());
 			double area = poly.calculateArea2D();
-			assertEquals(2.550450219554701E-4 * 2, area, 0.0000000001);
+			assertEquals(2.4973153599304893E-4 * 2, area, 0.0000000001);
 			assertEquals( 96 * 2, poly.getPointCount());
 		}
 	}
@@ -331,18 +330,20 @@ public class TestGeodetic extends TestCase {
 			Polyline polyline = new Polyline();
 			polyline.startPath(0,0);
 			polyline.lineTo(4, 4);
-//			polyline.lineTo(4, 8);
+			polyline.lineTo(4, 8);
 //			polyline.lineTo(8, 20);
 			SpatialReference sr = SpatialReference.create(4326);
 
 			OperatorBuffer opBufNorm = (OperatorBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
 			Polygon polyNorm = (Polygon)opBufNorm.execute(polyline, sr, .7, null);
 
+
+			String words = GeometryEngine.geometryToWkt(polyline, 0);
 			double distance = 55000;
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 300.0, false, null);
+			Polygon poly = (Polygon)opBuf.execute(polyline, sr, GeodeticCurveType.Geodesic, distance, 150.0, false, null);
 
-			String words = GeometryEngine.geometryToWkt(poly, 0);
+			words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
@@ -369,7 +370,7 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(6.339559300944052, area);
+			assertEquals(6.348996116947051, area, .0001);
 		}
 	}
 

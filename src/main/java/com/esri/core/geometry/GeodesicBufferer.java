@@ -980,7 +980,9 @@ class GeodesicBufferer {
 //        // move the path to origin for better accuracy in calculations.
 //        edit_shape.applyTransformation(tr);
 
-        if (bfilter) {
+        //TODO prepare filter for geodesics
+        //if (bfilter) {
+        if (false) {
             // try removing the noise that does not contribute to the buffer.
             int res_filter = filterPath_(edit_shape, geom, dir, true);
             assert (res_filter == 1);
@@ -1045,9 +1047,9 @@ class GeodesicBufferer {
                 edit_shape.getXY(iprev, pt_before);
 
                 // not sure is this is the right direction. might want before to current
-                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, null, az12, null);
+                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, null, az12, null);
                 // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
-                GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val + Math.PI / 2.0, lam2, phi2);
+                GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
                 pt_left_prev.x = lam2.val * RAD_TO_DEG;
                 pt_left_prev.y = phi2.val * RAD_TO_DEG;
 
@@ -1298,17 +1300,17 @@ class GeodesicBufferer {
             if (!closed)
                 edit_shape.getNextVertex(ivert);
 
-            int iprev = dir > 0 ? edit_shape.getPrevVertex(ivert) : edit_shape
-                    .getNextVertex(ivert);
-            int inext = dir > 0 ? edit_shape.getNextVertex(ivert) : edit_shape
-                    .getPrevVertex(ivert);
+            int iprev = dir > 0 ? edit_shape.getPrevVertex(ivert) : edit_shape.getNextVertex(ivert);
+            int inext = dir > 0 ? edit_shape.getNextVertex(ivert) : edit_shape.getPrevVertex(ivert);
             int ibefore = iprev;
             boolean reload = true;
+
             Point2D pt_current = new Point2D(), pt_after = new Point2D(), pt_before = new Point2D(), pt_before_before = new Point2D(), pt_middle = new Point2D(), pt_gap_last = new Point2D(
                     0, 0);
             Point2D v_after = new Point2D(), v_before = new Point2D(), v_gap = new Point2D();
             Point2D temp = new Point2D();
             double abs_d = m_abs_distance;
+
             // When the path is open we cannot process the first and the last
             // vertices, so we process size - 2.
             // When the path is closed, we can process all vertices.
@@ -1602,7 +1604,7 @@ class GeodesicBufferer {
 
 
     private void addCircle_(MultiPathImpl dst, Point point) {
-        addArc_(dst, point.getXY(), null, null, true, true);
+        addArc_(dst, point.getXY(), null, point.getXY(), true, true);
     }
 
     // Planar and Geodesic are equivalent
