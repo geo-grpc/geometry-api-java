@@ -508,7 +508,7 @@ public class TestGeodetic extends TestCase {
 		 * //[6097817.59407673
 		 * ,17463475.2931517],[-1168053.34617516,11199801.3734424
 		 * ]]],"spatialReference":{"wkid":102631}
-		 * 
+		 *
 		 * Polyline polyline = new Polyline();
 		 * polyline.startPath(6097817.59407673, 17463475.2931517);
 		 * polyline.lineTo(-1168053.34617516, 11199801.3734424); double length =
