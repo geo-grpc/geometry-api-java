@@ -297,8 +297,10 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(2.4973153599304893E-4, area);
+			assertEquals(2.550336450473457E-4, area);
 			assertEquals(poly.getPointCount(), 96);
+
+			assertTrue(OperatorContains.local().execute(poly, p1, sr, null));
 		}
 	}
 
@@ -310,15 +312,17 @@ public class TestGeodetic extends TestCase {
 			mp.add(0.0,0.0);
 			mp.add(20.0,0.0);
 			OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-			double distance = 1000;
-			Polygon poly = (Polygon)opBuf.execute(mp, sr, GeodeticCurveType.Geodesic, distance, 0.1, false, null);
-			//String words = GeometryEngine.geometryToWkt(poly, 0);
+			double distance = 100000;
+			Polygon poly = (Polygon)opBuf.execute(mp, sr, GeodeticCurveType.Geodesic, distance, 150, false, null);
+			String words = GeometryEngine.geometryToWkt(poly, 0);
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			assertEquals(2, poly.getPathCount());
 			double area = poly.calculateArea2D();
-			assertEquals(2.4973153599304893E-4 * 2, area, 0.0000000001);
-			assertEquals( 96 * 2, poly.getPointCount());
+			assertEquals(5.094338299127333, area, 0.0000000001);
+			assertEquals( 118, poly.getPointCount());
+
+			assertTrue(OperatorContains.local().execute(poly, mp, sr, null));
 		}
 	}
 

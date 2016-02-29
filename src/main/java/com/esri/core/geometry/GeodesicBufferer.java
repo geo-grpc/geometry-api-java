@@ -1588,6 +1588,8 @@ class GeodesicBufferer {
         if (bStartPath) {
             GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.startPath(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
+            if (arcEndPt == null)
+                arcEndPt = new Point2D(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
         }
         startAzimuth += dA;
 
@@ -1604,7 +1606,7 @@ class GeodesicBufferer {
 
 
     private void addCircle_(MultiPathImpl dst, Point point) {
-        addArc_(dst, point.getXY(), null, point.getXY(), true, true);
+        addArc_(dst, point.getXY(), null, null, true, true);
     }
 
     // Planar and Geodesic are equivalent
