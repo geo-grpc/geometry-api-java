@@ -313,7 +313,7 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(2.550336450473457E-4, area);
+			assertEquals(2.550336450473457E-4, area, 0.0000000001);
 			assertEquals(poly.getPointCount(), 96);
 
 			assertTrue(OperatorContains.local().execute(poly, p1, sr, null));
