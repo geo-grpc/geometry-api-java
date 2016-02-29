@@ -89,8 +89,8 @@ class GeodesicBufferer {
 
     private Geometry m_geometry;
 
-    private static final class GeodesicBufferCommand {
-        private interface Flags {
+    protected static final class GeodesicBufferCommand {
+        protected interface Flags {
             static final int enum_line = 1;
             static final int enum_arc = 2;
             static final int enum_dummy = 4;
@@ -98,14 +98,14 @@ class GeodesicBufferer {
             static final int enum_connection = enum_arc | enum_line;
         }
 
-        private Point2D m_from;
-        private Point2D m_to;
-        private Point2D m_center;
-        private int m_next;
-        private int m_prev;
-        private int m_type;
+        protected Point2D m_from;
+        protected Point2D m_to;
+        protected Point2D m_center;
+        protected int m_next;
+        protected int m_prev;
+        protected int m_type;
 
-        private GeodesicBufferCommand(Point2D from, Point2D to, Point2D center,
+        protected GeodesicBufferCommand(Point2D from, Point2D to, Point2D center,
                                       int type, int next, int prev) {
             m_from = new Point2D();
             m_to = new Point2D();
@@ -118,7 +118,7 @@ class GeodesicBufferer {
             m_prev = prev;
         }
 
-        private GeodesicBufferCommand(Point2D from, Point2D to, int next, int prev,
+        protected GeodesicBufferCommand(Point2D from, Point2D to, int next, int prev,
                                       String dummy) {
             m_from = new Point2D();
             m_to = new Point2D();
