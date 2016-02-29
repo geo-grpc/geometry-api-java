@@ -28,7 +28,7 @@ package com.esri.core.geometry;
  * 
 * Use this operator to construct geodetic curves.
  */
-abstract class OperatorGeodeticDensifyByLength extends Operator {
+public abstract class OperatorGeodeticDensifyByLength extends Operator {
 
 	@Override
 	public Type getType() {
