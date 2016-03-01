@@ -313,8 +313,8 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(2.550336450473457E-4, area, 0.0000000001);
-			assertEquals(poly.getPointCount(), 96);
+			assertEquals(2.550450219554701E-4, area, 0.0000000001);
+			assertEquals(97, poly.getPointCount());
 
 			assertTrue(OperatorContains.local().execute(poly, p1, sr, null));
 		}
@@ -335,8 +335,8 @@ public class TestGeodetic extends TestCase {
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			assertEquals(2, poly.getPathCount());
 			double area = poly.calculateArea2D();
-			assertEquals(5.094338299127333, area, 0.0000000001);
-			assertEquals( 118, poly.getPointCount());
+			assertEquals(5.095268886272399, area, 0.0000000001);
+			assertEquals(120, poly.getPointCount());
 
 			assertTrue(OperatorContains.local().execute(poly, mp, sr, null));
 		}
@@ -365,7 +365,7 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(23.286092329052902, area, 0.00000000001);
+			assertEquals(23.295997596696886, area, 0.00000000001);
 		}
 	}
 
@@ -495,8 +495,20 @@ public class TestGeodetic extends TestCase {
 			assertNotNull(poly);
 			assertTrue(poly.getType() == Geometry.Type.Polygon);
 			double area = poly.calculateArea2D();
-			assertEquals(6.348996116947051, area, .0001);
+			assertEquals(6.3791373860749925, area, .0001);
 		}
+	}
+
+	@Test
+	public void testBufferArcs() {
+		Polyline polyline = new Polyline();
+		polyline.startPath(5, 25);
+		polyline.lineTo(10, 32);
+		SpatialReference sr = SpatialReference.create(4326);
+		OperatorGeodesicBuffer op = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		Polygon poly = (Polygon)op.execute(polyline, sr, 0, 3000, 500, false, null);
+		String words = GeometryEngine.geometryToWkt(poly, 0);
+		assertEquals(13, poly.getPointCount());
 	}
 
 	@Test

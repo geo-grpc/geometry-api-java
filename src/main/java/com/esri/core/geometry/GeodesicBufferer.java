@@ -1544,8 +1544,8 @@ class GeodesicBufferer {
                          boolean bFinishArcEndPt) {
         // TODO move this logic into the constructor, eh?
         int N = calcN_(4);
-        int real_size = (N + 3) / 4;
-        double dA = (Math.PI * 0.5) / real_size;
+        int real_size = ((N + 3) / 4) * 4;
+        double dA = (2 * Math.PI) / real_size;
 
         //TODO this might be good for memory allocations?
         // result_mp.reserve(real_size * 4);
@@ -1582,6 +1582,7 @@ class GeodesicBufferer {
             real_size = (int) Math.floor(real_size * ratio);
         }
 
+
         PeDouble lam2 = new PeDouble();
         PeDouble phi2 = new PeDouble();
 
@@ -1593,7 +1594,7 @@ class GeodesicBufferer {
         }
         startAzimuth += dA;
 
-        for (int i = 1; i < real_size * 4 - 1; i++) {
+        for (int i = 1; i < real_size; i++) {
             GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.lineTo(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
             startAzimuth += dA;
