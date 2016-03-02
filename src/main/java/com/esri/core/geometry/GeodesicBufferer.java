@@ -1580,6 +1580,8 @@ class GeodesicBufferer {
 
             double ratio = angleDifference / (2 * Math.PI);
             real_size = (int) Math.floor(real_size * ratio);
+            // change the angle to be distributed about the real_size interval
+            dA = angleDifference / ((double)real_size);
         }
 
 
