@@ -386,8 +386,8 @@ class GeodesicBufferer {
                 return bufferMultiPoint_();
             case Geometry.GeometryType.Polyline:
                 return bufferPolyline_();
-//            case Geometry.GeometryType.Polygon:
-//                return bufferPolygon_();
+            case Geometry.GeometryType.Polygon:
+                return bufferPolygon_();
 //            case Geometry.GeometryType.Envelope:
 //                return bufferEnvelope_();
             default:
@@ -443,33 +443,43 @@ class GeodesicBufferer {
     }
 
 
-//    private Geometry bufferPolygon_() {
-//        if (m_distance == 0)
-//            return m_geometry;// return input to the output.
-//
-//        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
-//                .getInstance().getOperator(Operator.Type.Simplify);
-//
-//        generateCircleTemplate_();
-//        m_geometry = simplify.execute(m_geometry, null, false,
-//                m_progress_tracker);
-//
-//        if (m_distance < 0) {
-//            Polygon poly = (Polygon) (m_geometry);
+    private Geometry bufferPolygon_() {
+        if (m_distance == 0)
+            return m_geometry;// return input to the output.
+
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.Simplify);
+
+        m_geometry = simplify.execute(m_geometry, null, false,
+                m_progress_tracker);
+
+        Polygon poly = (Polygon) (m_geometry);
+        OperatorBoundary boundaryOp = (OperatorBoundary) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Boundary);
+        SimpleGeometryCursor inputPolygonCursor = new SimpleGeometryCursor(m_geometry);
+        GeometryCursor boundaryLocalCursor = boundaryOp.execute(inputPolygonCursor, null);
+        OperatorGeodesicBuffer geodesicOp = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+        double[] distances = new double[1];
+        distances[0] = m_abs_distance;
+        GeometryCursor bufferedBoundaryCursor = geodesicOp.execute(boundaryLocalCursor, m_spatialReference, 0, distances, m_densify_dist, false, true, m_progress_tracker);
+        if (m_distance < 0) {
+            OperatorDifference differenceOp = (OperatorDifference) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Difference);
+            GeometryCursor negativeBufferedGeom = differenceOp.execute(inputPolygonCursor, bufferedBoundaryCursor, m_spatialReference, m_progress_tracker);
 //            Polygon buffered_result = bufferPolygonImpl_(poly, 0,
 //                    poly.getPathCount());
 //            return simplify.execute(buffered_result, m_spatialReference, false,
 //                    m_progress_tracker);
-//        } else {
-//            if (isDegenerateGeometry_(m_geometry)) {
-//                Point point = new Point();
-//                ((MultiVertexGeometry) m_geometry).getPointByVal(0, point);
-//                Envelope2D env2D = new Envelope2D();
-//                m_geometry.queryEnvelope2D(env2D);
-//                point.setXY(env2D.getCenter());
-//                return bufferPoint_(point);
-//            }
-//
+            return negativeBufferedGeom.next();
+        } else {
+            if (isDegenerateGeometry_(m_geometry)) {
+                Point point = new Point();
+                ((MultiVertexGeometry) m_geometry).getPointByVal(0, point);
+                Envelope2D env2D = new Envelope2D();
+                m_geometry.queryEnvelope2D(env2D);
+                // TODO get center Geodesic
+                point.setXY(env2D.getCenter());
+                return bufferPoint_(point);
+            }
+            return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferedBoundaryCursor.next(), m_geometry, m_spatialReference, null);
 //            // For the positive distance we need to process polygon in the parts
 //            // such that each exterior ring with holes is processed separatelly.
 //            GeometryCursorForPolygon cursor = new GeometryCursorForPolygon(this);
@@ -478,8 +488,8 @@ class GeodesicBufferer {
 //                    cursor, m_spatialReference, m_progress_tracker);
 //            Geometry result = union_cursor.next();
 //            return result;
-//        }
-//    }
+        }
+    }
 //
 //    private Polygon bufferPolygonImpl_(Polygon input_geom, int ipath_begin,
 //                                       int ipath_end) {
@@ -1170,9 +1180,9 @@ class GeodesicBufferer {
             }
             first = false;
         }
-        if (result_mp.getPoint(0).getX() != result_mp.getPoint(result_mp.getPointCount() - 1).getX() &&
-                result_mp.getPoint(0).getY() != result_mp.getPoint(result_mp.getPointCount() - 1).getY())
-            result_mp.lineTo(result_mp.getPoint(0));
+//        if (result_mp.getPoint(0).getX() != result_mp.getPoint(result_mp.getPointCount() - 1).getX() &&
+//                result_mp.getPoint(0).getY() != result_mp.getPoint(result_mp.getPointCount() - 1).getY())
+//            result_mp.lineTo(result_mp.getPoint(0));
     }
 
     //TODO this seems to be fine for Geodesic vs Planar. The intersect test might be a little off, but this should work?
