@@ -1,5 +1,7 @@
 package com.esri.core.geometry;
 
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+
 import java.util.ArrayList;
 
 /**
@@ -1466,16 +1468,10 @@ class GeodesicBufferer {
     }
 
     private boolean isDegenerateEnv2D(Envelope2D env2D) {
-        Point upperLeftPt = new Point(env2D.getUpperLeft());
-        Point upperRightPt = new Point(env2D.getUpperRight());
-        Point lowerLeftPt = new Point(env2D.getLowerLeft());
-        Point lowerRightPt = new Point(env2D.getLowerRight());
+        double width = GeoDist.getEnvWidth(m_a, m_e2, env2D);
+        double height = GeoDist.getEnvHeight(m_a, m_e2, env2D);
 
-        double wTop = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, upperRightPt);
-        double wBottom = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(lowerLeftPt, lowerRightPt);
-        double height = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, lowerLeftPt); // same as height on right
-
-        if (wTop < m_densify_dist * 0.5 || wBottom < m_densify_dist * 0.5 || height < m_densify_dist * 0.5)
+        if (Math.max(width, height) < m_densify_dist * 0.5)
             return true;
 
         return false;

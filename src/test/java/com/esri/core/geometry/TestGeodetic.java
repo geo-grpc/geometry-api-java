@@ -641,6 +641,22 @@ public class TestGeodetic extends TestCase {
 		assertTrue(opContains.execute(poly, envOrig, sr, null));
 	}
 
+
+	@Test
+	public void testDegeneratePolyline() {
+		String wkt = "LINESTRING (0 0, 0 80)";
+		SpatialReference sr = SpatialReference.create(4326);
+		OperatorImportFromWkt opWKT = (OperatorImportFromWkt) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
+		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		Geometry geom = opWKT.execute(0, Geometry.Type.Unknown, wkt, null);
+		double distance = 30000;
+		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 500, false, null);
+		OperatorContains opContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
+		String words = GeometryEngine.geometryToWkt(poly, 0);
+		assertTrue(opContains.execute(poly, geom, sr, null));
+	}
+
+
 	@Test
 	public void testLengthAccurateCR191313() {
 		/*
