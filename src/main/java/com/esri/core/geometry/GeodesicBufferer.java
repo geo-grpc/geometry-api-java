@@ -356,18 +356,17 @@ class GeodesicBufferer {
         if (m_distance <= m_tolerance) {
             if (Geometry.isArea(gt)) {
                 //TODO add geodetic getWidth and getHeight for Envelope
-//                if (m_distance <= 0) {
-//                    // if the geometry is area type, then the negative distance
-//                    // may produce a degenerate shape. Check for this and return
-//                    // empty geometry.
-//                    Envelope2D env = new Envelope2D();
-//                    m_geometry.queryEnvelope2D(env);
-//                    if (env.getWidth() <= -m_distance * 2
-//                            || env.getHeight() <= m_distance * 2)
-//                        return new Polygon(m_geometry.getDescription());
-//                }
+                if (m_distance <= 0) {
+                    // if the geometry is area type, then the negative distance
+                    // may produce a degenerate shape. Check for this and return
+                    // empty geometry.
+                    Envelope2D env = new Envelope2D();
+                    m_geometry.queryEnvelope2D(env);
 
-                return null;
+                    if (GeoDist.getEnvWidth(m_a, m_e2, env) <= -m_distance * 2 ||
+                        GeoDist.getEnvHeight(m_a, m_e2, env) <=  m_distance * 2)
+                        return new Polygon(m_geometry.getDescription());
+                }
             } else {
                 return new Polygon(m_geometry.getDescription());
                 // return an empty polygon for distance <= m_tolerance
@@ -377,8 +376,8 @@ class GeodesicBufferer {
 
 //        // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_input.txt",
 //        // *m_geometry, nullptr);
-//
-//        // Complex cases:
+
+        // Complex cases:
         switch (m_geometry.getType().value()) {
             case Geometry.GeometryType.Point:
                 return bufferPoint_();
@@ -388,8 +387,8 @@ class GeodesicBufferer {
                 return bufferPolyline_();
             case Geometry.GeometryType.Polygon:
                 return bufferPolygon_();
-//            case Geometry.GeometryType.Envelope:
-//                return bufferEnvelope_();
+            case Geometry.GeometryType.Envelope:
+                return bufferEnvelope_();
             default:
                 throw GeometryException.GeometryInternalError();
         }
@@ -463,7 +462,8 @@ class GeodesicBufferer {
         GeometryCursor bufferedBoundaryCursor = geodesicOp.execute(boundaryLocalCursor, m_spatialReference, 0, distances, m_densify_dist, false, true, m_progress_tracker);
         if (m_distance < 0) {
             OperatorDifference differenceOp = (OperatorDifference) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Difference);
-            GeometryCursor negativeBufferedGeom = differenceOp.execute(inputPolygonCursor, bufferedBoundaryCursor, m_spatialReference, m_progress_tracker);
+            SimpleGeometryCursor subtractee = new SimpleGeometryCursor(m_geometry);
+            GeometryCursor negativeBufferedGeom = differenceOp.execute(subtractee, bufferedBoundaryCursor, m_spatialReference, m_progress_tracker);
 //            Polygon buffered_result = bufferPolygonImpl_(poly, 0,
 //                    poly.getPathCount());
 //            return simplify.execute(buffered_result, m_spatialReference, false,
@@ -714,27 +714,28 @@ class GeodesicBufferer {
                 m_progress_tracker);
         return c.next();
     }
-//
-//    private Geometry bufferEnvelope_() {
-//        Polygon polygon = new Polygon(m_geometry.getDescription());
-//        if (m_distance <= 0) {
-//            if (m_distance == 0)
-//                polygon.addEnvelope((Envelope) (m_geometry), false);
-//            else {
-//                Envelope env = new Envelope();
-//                m_geometry.queryEnvelope(env);
+
+    private Geometry bufferEnvelope_() {
+        Polygon polygon = new Polygon(m_geometry.getDescription());
+        if (m_distance <= 0) {
+            if (m_distance == 0)
+                polygon.addEnvelope((Envelope) (m_geometry), false);
+            else {
+                Envelope2D env = new Envelope2D();
+                m_geometry.queryEnvelope2D(env);
+                GeoDist.inflateEnv2D(m_a, m_e2, env, m_distance, m_distance);
 //                env.inflate(m_distance, m_distance);
-//                polygon.addEnvelope(env, false);
-//            }
-//
-//            return polygon;// nothing is easier than negative buffer on the
-//            // envelope.
-//        }
-//
-//        polygon.addEnvelope((Envelope) (m_geometry), false);
-//        m_geometry = polygon;
-//        return bufferConvexPath_(polygon, 0);
-//    }
+                polygon.addEnvelope(env, false);
+            }
+
+            return polygon;// nothing is easier than negative buffer on the envelope.
+        }
+
+        polygon.addEnvelope((Envelope) (m_geometry), false);
+        m_geometry = polygon;
+        return bufferPolygon_();
+        //return bufferConvexPath_(polygon, 0);
+    }
 //
 //    private Polygon bufferConvexPath_(MultiPath src, int ipath) {
 //        generateCircleTemplate_();

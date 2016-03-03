@@ -1,5 +1,6 @@
 package com.esri.core.geometry;
 
+import com.sun.tools.doclint.Env;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -227,14 +228,32 @@ public class TestGeodetic extends TestCase {
 
 	@Test
 	public void testInflateEnv2D() {
+		Envelope2D envOrig = new Envelope2D(0, -4, 4, 8);
 		Envelope2D env2D = new Envelope2D(0, -4, 4, 8);
 
 		double a = 6378137.0; // radius of spheroid for WGS_1984
 		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
 
 		GeoDist.inflateEnv2D(a, e2, env2D, 1000, 2000);
-		assertTrue(env2D.xmin < 0);
-		assertTrue(env2D.ymax > 8);
+		assertTrue(env2D.xmin < envOrig.xmin);
+		assertTrue(env2D.ymax > envOrig.ymax);
+		assertTrue(env2D.xmax > envOrig.xmax);
+		assertTrue(env2D.ymin < envOrig.ymin);
+	}
+
+	@Test
+	public void testDeflateEnv2D() {
+		Envelope2D envOrig = new Envelope2D(0, -4, 4, 8);
+		Envelope2D env2D = new Envelope2D(0, -4, 4, 8);
+
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+
+		GeoDist.inflateEnv2D(a, e2, env2D, -100, 2000);
+		assertTrue(env2D.xmin > envOrig.xmin);
+		assertTrue(env2D.ymax > envOrig.ymax);
+		assertTrue(env2D.xmax < envOrig.xmax);
+		assertTrue(env2D.ymin < envOrig.ymin);
 	}
 
 	@Test
@@ -514,21 +533,50 @@ public class TestGeodetic extends TestCase {
 	@Test
 	public void testPolygonBoundaryBug() {
 		SpatialReference sr = SpatialReference.create(4326);
-		String wkt = "MULTILINESTRING ((5 0,3 38,3.9 37.7,4 40,30 10,5 0))";
-		OperatorImportFromWkt opWKT = (OperatorImportFromWkt)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
-		Geometry geom = opWKT.execute(0, Geometry.Type.Polyline, wkt, null);
-		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		OperatorImportFromWkt opWKT = (OperatorImportFromWkt) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
+		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
 		double distance = 59000;
-		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 2000, false, null);
-		String words = GeometryEngine.geometryToWkt(poly, 0);
-		Envelope2D env2D = new Envelope2D();
-		poly.queryEnvelope2D(env2D);
-		assertTrue(env2D.xmin < 3);
-		assertTrue(env2D.ymin < 0);
-		assertTrue(env2D.xmax > 30);
-		assertTrue(env2D.ymax > 40);
-		assertEquals(Geometry.Type.Polygon, poly.getType());
-		assertEquals(24, poly.getPointCount());
+		{
+			String wkt = "MULTILINESTRING ((5 0,3 38,3.9 37.7,4 40,30 10,5 0))";
+			Geometry geom = opWKT.execute(0, Geometry.Type.Polyline, wkt, null);
+			Polygon poly = (Polygon) opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 2000, false, null);
+			String words = GeometryEngine.geometryToWkt(poly, 0);
+			Envelope2D env2D = new Envelope2D();
+			poly.queryEnvelope2D(env2D);
+			assertTrue(env2D.xmin < 3);
+			assertTrue(env2D.ymin < 0);
+			assertTrue(env2D.xmax > 30);
+			assertTrue(env2D.ymax > 40);
+			assertEquals(Geometry.Type.Polygon, poly.getType());
+			assertEquals(24, poly.getPointCount());
+		}
+		{
+			String wkt = "MULTILINESTRING ((15 5, 5 10, 10 20, 10 30, 16.666666666666664 33.333333333333329, 10 40, 20 40, 28.333333333333339 40, 20 45, 40 40, 45 40, 42 36, 45 30, 39.827586206896555 33.103448275862071, 36 28, 35.277777777777779 25.833333333333332, 45 20, 36.25 11.25, 40 10, 33.75 8.7500000000000018, 30 5, 23.333333333333336 6.6666666666666661, 15 5))";
+			Geometry geom = opWKT.execute(0, Geometry.Type.Polyline, wkt, null);
+			Polygon poly = (Polygon) opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 2000, false, null);
+			Envelope2D env2D = new Envelope2D();
+			poly.queryEnvelope2D(env2D);
+			assertTrue(env2D.xmin < 5);
+			assertTrue(env2D.ymin < 5);
+			assertTrue(env2D.xmax > 45);
+			assertTrue(env2D.ymax > 45);
+			distance = 200000;
+			poly = (Polygon) opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 2000, false, null);
+			env2D = new Envelope2D();
+			poly.queryEnvelope2D(env2D);
+			assertTrue(env2D.xmin < 5);
+			assertTrue(env2D.ymin < 5);
+			assertTrue(env2D.xmax > 45);
+			assertTrue(env2D.ymax > 45);
+			distance = 20045;
+			poly = (Polygon) opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 200, false, null);
+			env2D = new Envelope2D();
+			poly.queryEnvelope2D(env2D);
+			assertTrue(env2D.xmin < 5);
+			assertTrue(env2D.ymin < 5);
+			assertTrue(env2D.xmax > 45);
+			assertTrue(env2D.ymax > 45);
+		}
 	}
 
 	@Test
@@ -546,6 +594,50 @@ public class TestGeodetic extends TestCase {
 		String words = GeometryEngine.geometryToWkt(poly, 0);
 		assertEquals(Geometry.Type.Polygon, poly.getType());
 		assertEquals(21, poly.getPointCount());
+	}
+
+	@Test
+	public void testPolygon() {
+		SpatialReference sr = SpatialReference.create(4326);
+		OperatorImportFromWkt opWKT = (OperatorImportFromWkt) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
+		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		String wkt = "MULTIPOLYGON (((15 5, 23.333333333333336 6.6666666666666661, 30 5, 33.75 8.7500000000000018, 40 10, 36.25 11.25, 45 20, 35.277777777777779 25.833333333333332, 36 28, 39.827586206896555 33.103448275862071, 45 30, 42 36, 45 40, 40 40, 20 45, 28.333333333333339 40, 20 40, 10 40, 16.666666666666664 33.333333333333329, 10 30, 10 20, 5 10, 15 5)))";
+		Geometry geom = opWKT.execute(0, Geometry.Type.Polygon, wkt, null);
+		Envelope2D env2DOrig = new Envelope2D();
+		geom.queryEnvelope2D(env2DOrig);
+		double distance = 300;
+		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 5, false, null);
+		Envelope2D env2DPositiveBuff = new Envelope2D();
+		poly.queryEnvelope2D(env2DPositiveBuff);
+		assertTrue(env2DPositiveBuff.xmax > env2DOrig.xmax);
+		assertTrue(env2DPositiveBuff.ymax > env2DOrig.ymax);
+		assertTrue(env2DPositiveBuff.xmin < env2DOrig.xmin);
+		assertTrue(env2DPositiveBuff.ymin < env2DOrig.ymin);
+
+		distance = -300;
+		poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 5, false, null);
+		Envelope2D env2DNegativeBuff = new Envelope2D();
+		poly.queryEnvelope2D(env2DNegativeBuff);
+		assertTrue(env2DNegativeBuff.xmax < env2DOrig.xmax);
+		assertTrue(env2DNegativeBuff.ymax < env2DOrig.ymax);
+		assertTrue(env2DNegativeBuff.xmin > env2DOrig.xmin);
+		assertTrue(env2DNegativeBuff.ymin > env2DOrig.ymin);
+	}
+
+	@Test
+	public void testEnvelop() {
+		SpatialReference sr = SpatialReference.create(4326);
+		OperatorImportFromWkt opWKT = (OperatorImportFromWkt) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
+		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		String wkt = "MULTIPOLYGON (((15 5, 23.333333333333336 6.6666666666666661, 30 5, 33.75 8.7500000000000018, 40 10, 36.25 11.25, 45 20, 35.277777777777779 25.833333333333332, 36 28, 39.827586206896555 33.103448275862071, 45 30, 42 36, 45 40, 40 40, 20 45, 28.333333333333339 40, 20 40, 10 40, 16.666666666666664 33.333333333333329, 10 30, 10 20, 5 10, 15 5)))";
+		Geometry geom = opWKT.execute(0, Geometry.Type.Polygon, wkt, null);
+		Envelope envOrig = new Envelope();
+		geom.queryEnvelope(envOrig);
+		double distance = 300;
+		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 5, false, null);
+		OperatorContains opContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
+		assertTrue(opContains.execute(poly, geom, sr, null));
+		assertTrue(opContains.execute(poly, envOrig, sr, null));
 	}
 
 	@Test
