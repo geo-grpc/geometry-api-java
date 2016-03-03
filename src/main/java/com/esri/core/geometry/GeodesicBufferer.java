@@ -1,6 +1,5 @@
 package com.esri.core.geometry;
 
-import java.io.Console;
 import java.util.ArrayList;
 
 /**
@@ -394,8 +393,6 @@ class GeodesicBufferer {
         }
     }
 
-    private static boolean USE_POINT_UNION = false;
-
     private Geometry bufferPolyline_() {
         if (isDegenerateGeometry_(m_geometry)) {
             Point point = new Point();
@@ -409,36 +406,13 @@ class GeodesicBufferer {
         // TODO cannot use preparePolyline until there is a Geodetic Generalize
         //m_geometry = preparePolyline_((Polyline) (m_geometry));
 
-
-        if (!USE_POINT_UNION) {
-            GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
-            GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
-                    cursor,
-                    m_spatialReference,
-                    m_progress_tracker);
-            Geometry result = union_cursor.next();
-            return result;
-        } else {
-            // geodesic densify here
-            OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
-            Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
-
-            MultiPoint mp = new MultiPoint();
-            for (int ipath = 0; ipath < ((Polyline) geometryDense).getPathCount(); ipath++) {
-                int pathStart = ((Polyline) geometryDense).getPathStart(ipath);
-                int pathEnd = ((Polyline) geometryDense).getPathEnd(ipath);
-                for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
-                    Point pt = ((Polyline) geometryDense).getPoint(ipoint);
-                    mp.add(pt);
-                }
-            }
-
-            double[] distances = new double[1];
-            distances[0] = m_distance;
-
-            OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-            return opBuf.execute(mp, m_spatialReference, GeodeticCurveType.Geodesic, m_distance, m_densify_dist, false, m_progress_tracker);
-        }
+        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
+        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
+                cursor,
+                m_spatialReference,
+                m_progress_tracker);
+        Geometry result = union_cursor.next();
+        return result;
     }
 
 
