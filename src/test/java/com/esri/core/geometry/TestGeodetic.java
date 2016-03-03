@@ -658,6 +658,21 @@ public class TestGeodetic extends TestCase {
 
 
 	@Test
+	public void testInwardSpikesBug() {
+		String wkt = "MULTIPOLYGON (((0.92559027418805195 -45.599676354983472, 2.2649850283358415 -45.48147830753507, 46.534530341779551 -43.413080539546634, 11.22755121895433 -31.61421433801998, -1.401557702671544 -38.899575885915091, -1.6611345760810066 -39.024502078460699, -2.3748527669947075 -39.472397720083308, 0.92559027418805195 -45.599676354983472)))";
+		SpatialReference sr = SpatialReference.create(4326);
+		OperatorImportFromWkt opWKT = (OperatorImportFromWkt) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromWkt);
+		OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+		Geometry geom = opWKT.execute(0, Geometry.Type.Unknown, wkt, null);
+		double distance = 300000;
+		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 50, false, null);
+		OperatorContains opContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
+		String words = GeometryEngine.geometryToWkt(poly, 0);
+		assertTrue(opContains.execute(poly, geom, sr, null));
+
+	}
+
+	@Test
 	public void testLengthAccurateCR191313() {
 		/*
 		 * // random_test(); OperatorFactoryLocal engine =
