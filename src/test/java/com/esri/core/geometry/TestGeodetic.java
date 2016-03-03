@@ -634,10 +634,11 @@ public class TestGeodetic extends TestCase {
 		Envelope envOrig = new Envelope();
 		geom.queryEnvelope(envOrig);
 		double distance = 300;
-		Polygon poly = (Polygon)opBuf.execute(geom, sr, GeodeticCurveType.Geodesic, distance, 5, false, null);
+		Polygon poly = (Polygon)opBuf.execute(envOrig, sr, GeodeticCurveType.Geodesic, distance, 5, false, null);
 		OperatorContains opContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
 		assertTrue(opContains.execute(poly, geom, sr, null));
-//		assertTrue(opContains.execute(poly, envOrig, sr, null));
+		String words = GeometryEngine.geometryToWkt(poly, 0);
+		assertTrue(opContains.execute(poly, envOrig, sr, null));
 	}
 
 	@Test
