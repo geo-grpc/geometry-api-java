@@ -24,7 +24,6 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
     @Override
     public Geometry next() {
-        // TODO Auto-generated method stub
         Geometry geom = m_geoms.next();
         if (geom == null)
             return null;
@@ -33,11 +32,42 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
     @Override
     public int getGeometryID() {
-        // TODO Auto-generated method stub
         return m_geoms.getGeometryID();
     }
 
     private Geometry GeneralizeArea(Geometry geom) {
-        return null;
+        Geometry.Type gt = geom.getType();
+
+        if (Geometry.isPoint(gt.value()))
+            return geom;
+
+        if (gt == Geometry.Type.Envelope) {
+            Polygon poly = new Polygon(geom.getDescription());
+            poly.addEnvelope((Envelope) geom, false);
+            return GeneralizeArea(poly);
+        }
+
+        if (geom.isEmpty())
+            return geom;
+
+        MultiPath mp = (MultiPath) geom;
+        MultiPath dstmp = (MultiPath) geom.createInstance();
+        Line line = new Line();
+
+        for (int ipath = 0, npath = mp.getPathCount(); ipath < npath; ipath++) {
+            GeneralizeAreaPath((MultiPathImpl) mp._getImpl(),
+                                ipath,
+                                (MultiPathImpl) dstmp._getImpl(),
+                                line);
+        }
+
+        return dstmp;
+    }
+
+    private void GeneralizeAreaPath(MultiPathImpl mpsrc,
+                                    int ipath,
+                                    MultiPathImpl mpdst,
+                                    Line lineHelper) {
+
     }
 }
