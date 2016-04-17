@@ -136,9 +136,9 @@ public class TestGeneralize extends TestCase {
 		poly.lineTo(0, 10);
 		Geometry geom = op.execute(poly, 2, true, GeneralizeAreaType.Neither, null);
 		assertNotNull(geom);
-//		Polygon p = (Polygon) geom;
-//		Point2D[] points = p.getCoordinates2D();
-//		assertTrue(points.length == 4);
+		Polygon p = (Polygon) geom;
+		Point2D[] points = p.getCoordinates2D();
+		assertTrue(points.length == 4);
 //		assertTrue(points[0].x == 0 && points[0].y == 0);
 //		assertTrue(points[1].x == 5 && points[1].y == 0);
 //		assertTrue(points[2].x == 5 && points[2].y == 10);
