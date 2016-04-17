@@ -120,7 +120,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
         st_supportedOperators.put(Type.ExportToGeoJson,
                 new OperatorExportToGeoJsonLocal());
 		st_supportedOperators.put(Type.Union, new OperatorUnionLocal());
-
+		st_supportedOperators.put(Type.GeneralizeArea, new OperatorGeneralizeAreaLocal());
 		st_supportedOperators.put(Type.Generalize,
 				new OperatorGeneralizeLocal());
 		st_supportedOperators.put(Type.ConvexHull,

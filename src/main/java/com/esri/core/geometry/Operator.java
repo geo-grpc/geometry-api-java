@@ -50,7 +50,7 @@ public abstract class Operator {
 
 		GeodesicBuffer, GeodeticDensifyByLength, ShapePreservingDensify, GeodeticLength, GeodeticArea,
 
-		Simplify, SimplifyOGC, Offset, Generalize,
+		Simplify, SimplifyOGC, Offset, Generalize, GeneralizeArea,
 
 		ExportToWkb, ImportFromWkb, ExportToWkt, ImportFromWkt, ImportFromGeoJson, ExportToGeoJson, SymmetricDifference, ConvexHull, Boundary
 
