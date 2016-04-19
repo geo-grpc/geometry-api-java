@@ -480,4 +480,7 @@ public final class Point2D implements Serializable{
 		return NumberUtils.hash(NumberUtils.hash(x), y);
 	}
 
+	public double calculateTriangleArea2D(Point2D pt1, Point2D pt2) {
+		return 0.5 * Math.abs((x - pt2.x)*(pt1.y - y) - (x - pt1.x)*(pt2.y - y));
+	}
 }
