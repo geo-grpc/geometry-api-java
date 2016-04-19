@@ -56,17 +56,10 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
         if (geom.isEmpty())
             return geom;
 
-        MultiPath mp = (MultiPath) geom;
-//        MultiPath dstmp = (MultiPath) geom.createInstance();
-//        geom.copyTo(dstmp);
         EditShape editShape = new EditShape();
-        editShape.addGeometry(mp);
+        editShape.addGeometry(geom);
 
         GeneralizeAreaPath(editShape);
-
-//        for (int ipath = 0, npath = mp.getPathCount(); ipath < npath; ipath++) {
-// GeneralizeAreaPath(dstmp);
-//        }
 
         return editShape.getGeometry(editShape.getFirstGeometry());
     }
@@ -294,28 +287,32 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 //        }
 
         public int compare(TriangleNode tri1, TriangleNode tri2) {
-            int orientation1 = tri1.queryOrientation();
-            int orientation2 = tri2.queryOrientation();
 
-            if (m_generalizeAreaType == GeneralizeAreaType.ResultContainsOriginal) {
-                if (orientation1 > 0 && orientation2 > 0) {
-                    // calculate size only if both orientations are correct
-                } else if (orientation1 < 0 && orientation2 < 0) {
-                    return 0;
-                } else if (orientation1 < 0) {
-                    return -1;
-                } else if (orientation2 < 0) {
-                    return 1;
-                }
-            } else if (m_generalizeAreaType == GeneralizeAreaType.ResultWithinOriginal) {
-                if (orientation1 < 0 && orientation2 < 0) {
-                    // calculate size only if both orientations are correct
-                } else if (orientation1 > 0 && orientation2 > 0) {
-                    return 0;
-                } else if (orientation1 > 0) {
-                    return -1;
-                } else if (orientation2 > 0) {
-                    return 1;
+            if (m_generalizeAreaType != GeneralizeAreaType.Neither) {
+                // 1 for obtuse angle counter-clockwise,
+                // -1 for obtuse angle clockwise
+                // 0 for collinear
+                int orientation1 = tri1.queryOrientation();
+                int orientation2 = tri2.queryOrientation();
+
+                if (m_generalizeAreaType == GeneralizeAreaType.ResultContainsOriginal) {
+                    // if the result contains the original no vertices with a
+                    // counter clockwise obtuse angle rotation (1) can be removed
+                    if (orientation1 > 0 && orientation2 > 0) {
+                        return 0;
+                    } else if (orientation1 < 0 && orientation2 > 0) {
+                        return -1;
+                    } else if (orientation2 < 0 && orientation1 > 1) {
+                        return 1;
+                    }
+                } else if (m_generalizeAreaType == GeneralizeAreaType.ResultWithinOriginal) {
+                    if (orientation1 < 0 && orientation2 < 0) {
+                        return 0;
+                    } else if (orientation1 < 0 && orientation2 > 0) {
+                        return 1;
+                    } else if (orientation2 < 0 && orientation1 > 1) {
+                        return -1;
+                    }
                 }
             }
 
