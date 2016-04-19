@@ -147,29 +147,11 @@ public class TestGeneralize extends TestCase {
 		assertTrue(points[3].x == 0 && points[3].y == 10);
 
 		OperatorContains operatorContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
+
 		Geometry geomContainer = op.execute(poly, 10, true, GeneralizeAreaType.ResultContainsOriginal, null);
-		String words4 = GeometryEngine.geometryToWkt(geomContainer, 0);
 		assertTrue(operatorContains.execute(geomContainer, poly, null, null));
 
 		Geometry geomContained = op.execute(poly, 5, true, GeneralizeAreaType.ResultWithinOriginal, null);
-		String words3 = GeometryEngine.geometryToWkt(geomContained, 0);
-
 		assertTrue(operatorContains.execute(poly, geomContained, null, null));
-
-
-
-//
-//		Geometry geom1 = op.execute(geom, 5, false, null);
-//		p = (Polygon) geom1;
-//		points = p.getCoordinates2D();
-//		assertTrue(points.length == 3);
-//		assertTrue(points[0].x == 0 && points[0].y == 0);
-//		assertTrue(points[1].x == 5 && points[1].y == 10);
-//		assertTrue(points[2].x == 5 && points[2].y == 10);
-//
-//		geom1 = op.execute(geom, 5, true, null);
-//		p = (Polygon) geom1;
-//		points = p.getCoordinates2D();
-//		assertTrue(points.length == 0);
 	}
 }
