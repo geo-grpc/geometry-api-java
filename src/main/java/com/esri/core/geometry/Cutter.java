@@ -227,29 +227,22 @@ class Cutter {
 		// Sort CutEvents
 		int icutEvent;
 		int icutEventTemp;
-		for (int igeometry = editShape.getFirstGeometry(); igeometry != -1; igeometry = editShape
-				.getNextGeometry(igeometry)) {
-			for (int ipath = editShape.getFirstPath(igeometry); ipath != -1; ipath = editShape
-					.getNextPath(ipath)) {
-				for (int iv = editShape.getFirstVertex(ipath), i = 0, n = editShape
-						.getPathSize(ipath); i < n; iv = editShape
-						.getNextVertex(iv), i++) {
+		for (int igeometry = editShape.getFirstGeometry(); igeometry != -1; igeometry = editShape.getNextGeometry(igeometry)) {
+			for (int ipath = editShape.getFirstPath(igeometry); ipath != -1; ipath = editShape.getNextPath(ipath)) {
+				for (int iv = editShape.getFirstVertex(ipath), i = 0, n = editShape.getPathSize(ipath); i < n; iv = editShape.getNextVertex(iv), i++) {
 					icutEventTemp = editShape.getUserIndex(iv, eventIndexTemp);
 					if (icutEventTemp >= 0) {
 						// _ASSERT(cutEventsTemp.get(icutEventTemp).m_ivertexCuttee
 						// == iv);
-						while (icutEventTemp < cutEventsTemp.size()
-								&& cutEventsTemp.get(icutEventTemp).m_ivertexCuttee == iv)
-							cutEventsSorted.add(cutEventsTemp
-									.get(icutEventTemp++));
+						while (icutEventTemp < cutEventsTemp.size() && cutEventsTemp.get(icutEventTemp).m_ivertexCuttee == iv)
+							cutEventsSorted.add(cutEventsTemp.get(icutEventTemp++));
 					}
 
 					icutEvent = editShape.getUserIndex(iv, eventIndex);
 					if (icutEvent >= 0) {
 						// _ASSERT(cutEvents->Get(icutEvent)->m_ivertexCuttee ==
 						// iv);
-						while (icutEvent < cutEvents.size()
-								&& cutEvents.get(icutEvent).m_ivertexCuttee == iv)
+						while (icutEvent < cutEvents.size() && cutEvents.get(icutEvent).m_ivertexCuttee == iv)
 							cutEventsSorted.add(cutEvents.get(icutEvent++));
 					}
 				}
