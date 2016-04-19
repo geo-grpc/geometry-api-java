@@ -183,5 +183,16 @@ public class TestPoint extends TestCase {
 		assertTrue(env.queryInterval(VertexDescription.Semantics.Z, 0).isEmpty());
 		env.replaceNaNs(VertexDescription.Semantics.Z, 5);
 		assertTrue(env.queryInterval(VertexDescription.Semantics.Z, 0).equals(new Envelope1D(5, 5)));
-	}	
+	}
+
+	@Test
+	public void testTriangleArea() {
+		Point2D pt = new Point2D(0,0);
+		Point2D pt2 = new Point2D(2, 2);
+		Point2D pt1 = new Point2D(0, 2);
+		double area  = pt.calculateTriangleArea2D(pt1, pt2);
+		assertEquals(2.0, area);
+		double area2 = pt.calculateTriangleArea2D(pt2, pt1);
+		assertEquals(area, area2);
+	}
 }
