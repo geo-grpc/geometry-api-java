@@ -202,6 +202,7 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
                     m_triangle_nodes_recycle.remove(m_triangle_nodes_recycle.size() - 1);
                     tn.setTriangle(m_editShape, value);
                 }
+
                 m_triangle_nodes_cache.set(ind, tn);
                 return tn;
             } else {
@@ -360,6 +361,9 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
                     TriangleNode tn = areaComparator.tryGetCachedTriangle_(element);
                     if (tn == null) {
                         tn = areaComparator.tryCreateCachedTriangle_(element);
+                        if (tn == null) {
+                            tn = new TriangleNode(editShape, element);
+                        }
                     }
 
                     double area = tn.queryArea();
