@@ -7,13 +7,13 @@ final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
 
     @Override
     public GeometryCursor execute(GeometryCursor geoms,
-                                  double maxDeviation,
+                                  double areaThreshold,
                                   boolean bRemoveDegenerateParts,
                                   GeneralizeAreaType generalizeAreaType,
                                   ProgressTracker progressTracker) {
 
         return new OperatorGeneralizeAreaCursor(geoms,
-                                                maxDeviation,
+                                                areaThreshold,
                                                 bRemoveDegenerateParts,
                                                 generalizeAreaType,
                                                 progressTracker);
@@ -21,7 +21,7 @@ final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
 
     @Override
     public Geometry execute(Geometry geom,
-                            double maxDeviation,
+                            double areaThreshold,
                             boolean bRemoveDegenerateParts,
                             GeneralizeAreaType generalizeAreaType,
                             ProgressTracker progressTracker) {
@@ -29,7 +29,7 @@ final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
         SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
 
         GeometryCursor geometryCursor = execute(inputGeomCurs,
-                                                maxDeviation,
+                                                areaThreshold,
                                                 bRemoveDegenerateParts,
                                                 generalizeAreaType,
                                                 progressTracker);

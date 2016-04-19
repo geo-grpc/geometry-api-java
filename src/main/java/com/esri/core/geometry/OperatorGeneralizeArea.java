@@ -17,7 +17,7 @@ public abstract class OperatorGeneralizeArea extends Operator {
      *
      */
     public abstract GeometryCursor execute(GeometryCursor geoms,
-                                           double maxDeviation,
+                                           double areaThreshold,
                                            boolean bRemoveDegenerateParts,
                                            GeneralizeAreaType generalizeAreaType,
                                            ProgressTracker progressTracker);
@@ -28,7 +28,7 @@ public abstract class OperatorGeneralizeArea extends Operator {
      * polygon.
      */
     public abstract Geometry execute(Geometry geom,
-                                     double maxDeviation,
+                                     double areaThreshold,
                                      boolean bRemoveDegenerateParts,
                                      GeneralizeAreaType generalizeAreaType,
                                      ProgressTracker progressTracker);
