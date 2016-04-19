@@ -336,16 +336,13 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
         //treap.disableBalancing();
         AreaComparator areaComparator = new AreaComparator(editShape);
         //treap.setComparator(areaComparator);
-        PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(areaComparator);
-
-        int[] arr = new int[8];
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(8, areaComparator);
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
             //treap.setCapacity(editShape.getPointCount(iGeometry));
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0, n = editShape.getPathSize(iPath); i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
                     priorityQueue.add(iVertex);
                     //treap.addElement(iVertex, -1);
-                    arr[i]  = iVertex;
                 }
 
                 double testArea = 0.0;
