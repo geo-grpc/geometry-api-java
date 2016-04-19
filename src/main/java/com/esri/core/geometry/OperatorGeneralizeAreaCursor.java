@@ -131,7 +131,7 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
         }
     }
 
-    class AreaComparator extends Treap.Comparator {
+    class AreaComparator implements Comparator<Integer> {//extends Treap.Comparator {
 
         private EditShape m_editShape;
         private int m_currentNode;
@@ -145,7 +145,8 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
         ArrayList<TriangleNode> m_triangle_nodes_cache;
 
         AreaComparator(EditShape editShape) {
-            super(true);
+            // TODO
+            //super(true);
             m_editShape = editShape;
 
             m_triangle_nodes_buffer = new ArrayList<TriangleNode>();
@@ -212,10 +213,9 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
         }
 
         @Override
-        public int compare(Treap treap, int left, int node) {
-            int right = treap.getElement(node);
-            m_currentNode = node;
-
+        public int compare(Integer left, Integer right) {//(Treap treap, int left, int node) {
+//            int right = treap.getElement(node);
+//            m_currentNode = node;
             return compareTriangles(left, left, right, right);
         }
 
@@ -256,42 +256,42 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
             return compare(triangleLeft, triangleRight);
         }
 
-        @Override
-        void onDelete(int elm) {
-//            TriangleNode tn = tryGetCachedTriangle_(elm);
-//            if (tn == null) {
-//                tn = tryCreateCachedTriangle_(elm);
-//            }
+//        @Override
+//        void onDelete(int elm) {
+////            TriangleNode tn = tryGetCachedTriangle_(elm);
+////            if (tn == null) {
+////                tn = tryCreateCachedTriangle_(elm);
+////            }
+////
+////            int prevVertexIndex = tn.m_prevVertexIndex;
+////            int nextVertexIndex = tn.m_nextVertexIndex;
 //
-//            int prevVertexIndex = tn.m_prevVertexIndex;
-//            int nextVertexIndex = tn.m_nextVertexIndex;
-
-            tryDeleteCachedTriangle_(elm);
-
-//            TriangleNode tnPrev = tryGetCachedTriangle_(prevVertexIndex);
-//            if (tnPrev == null) {
-//                tnPrev = tryCreateCachedTriangle_(prevVertexIndex);
-//            }
-//            TriangleNode tnNext = tryGetCachedTriangle_(nextVertexIndex);
-//            if (tnNext == null) {
-//                tnNext = tryCreateCachedTriangle_(nextVertexIndex);
-//            }
-        }
-
-        @Override
-        void onSet(int oldelm) {
-            tryDeleteCachedTriangle_(oldelm);
-        }
-
-        @Override
-        void onEndSearch(int elm) {
-            tryDeleteCachedTriangle_(elm);
-        }
-
-        @Override
-        void onAddUniqueElementFailed(int elm) {
-            tryDeleteCachedTriangle_(elm);
-        }
+//            tryDeleteCachedTriangle_(elm);
+//
+////            TriangleNode tnPrev = tryGetCachedTriangle_(prevVertexIndex);
+////            if (tnPrev == null) {
+////                tnPrev = tryCreateCachedTriangle_(prevVertexIndex);
+////            }
+////            TriangleNode tnNext = tryGetCachedTriangle_(nextVertexIndex);
+////            if (tnNext == null) {
+////                tnNext = tryCreateCachedTriangle_(nextVertexIndex);
+////            }
+//        }
+//
+//        @Override
+//        void onSet(int oldelm) {
+//            tryDeleteCachedTriangle_(oldelm);
+//        }
+//
+//        @Override
+//        void onEndSearch(int elm) {
+//            tryDeleteCachedTriangle_(elm);
+//        }
+//
+//        @Override
+//        void onAddUniqueElementFailed(int elm) {
+//            tryDeleteCachedTriangle_(elm);
+//        }
 
         public int compare(TriangleNode tri1, TriangleNode tri2) {
             int orientation1 = tri1.queryOrientation();
@@ -335,26 +335,28 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
     private void GeneralizeAreaPath(EditShape editShape) {
 
-        Treap treap = new Treap();
-        treap.disableBalancing();
+        //Treap treap = new Treap();
+        //treap.disableBalancing();
         AreaComparator areaComparator = new AreaComparator(editShape);
-        treap.setComparator(areaComparator);
-        
+        //treap.setComparator(areaComparator);
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(areaComparator);
 
         int[] arr = new int[8];
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
-            treap.setCapacity(editShape.getPointCount(iGeometry));
+            //treap.setCapacity(editShape.getPointCount(iGeometry));
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0, n = editShape.getPathSize(iPath); i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
-                    treap.addElement(iVertex, -1);
+                    priorityQueue.add(iVertex);
+                    //treap.addElement(iVertex, -1);
                     arr[i]  = iVertex;
                 }
 
                 double testArea = 0.0;
                 while (testArea < m_minArea) {
-                    int nodeIndex = treap.getFirst(-1);
-                    int element = treap.getElement(nodeIndex);
-                    // TODO no idea on this boolean
+
+                    Integer element = priorityQueue.peek();
+//                    int nodeIndex = treap.getFirst(-1);
+//                    int element = treap.getElement(nodeIndex);
 
                     TriangleNode tn = areaComparator.tryGetCachedTriangle_(element);
                     if (tn == null) {
@@ -362,25 +364,34 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
                     }
 
                     double area = tn.queryArea();
+                    // if the area is larger than the threshold exit
                     if (area > m_minArea)
                         break;
 
+                    priorityQueue.poll();
+
                     editShape.removeVertex(element, false);
-                    treap.deleteNode(nodeIndex, -1);
+                    areaComparator.tryDeleteCachedTriangle_(element);
+//                    treap.deleteNode(nodeIndex, -1);
 
                     int prevElement = tn.m_prevVertexIndex;
                     int nextElement = tn.m_nextVertexIndex;
+//                    int prevNodeIndex = treap.search(prevElement, -1);
+//                    int nextNodeIndex = treap.search(nextElement, -1);
+//                    prevElement = treap.getElement(prevNodeIndex);
+//                    nextElement = treap.getElement(nextNodeIndex);
 
-                    int prevNodeIndex = treap.search(prevElement, -1);
-                    int nextNodeIndex = treap.search(nextElement, -1);
-                    prevElement = treap.getElement(prevNodeIndex);
-                    nextElement = treap.getElement(nextNodeIndex);
+                    priorityQueue.remove(prevElement);
+                    priorityQueue.remove(nextElement);
+                    areaComparator.tryDeleteCachedTriangle_(prevElement);
+                    areaComparator.tryDeleteCachedTriangle_(nextElement);
+//                    treap.deleteNode(prevNodeIndex, -1);
+//                    treap.deleteNode(nextNodeIndex, -1);
 
-                    treap.deleteNode(prevNodeIndex, -1);
-                    treap.deleteNode(nextNodeIndex, -1);
-
-                    treap.addElement(prevElement, -1);
-                    treap.addElement(nextElement, -1);
+                    priorityQueue.add(prevElement);
+                    priorityQueue.add(nextElement);
+//                    treap.addElement(prevElement, -1);
+//                    treap.addElement(nextElement, -1);
                 }
             }
         }
