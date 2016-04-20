@@ -64,11 +64,11 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
     private void GeneralizeAreaPath(EditShape editShape) {
 
-        //Treap treap = new Treap();
-        //treap.disableBalancing();
+//        Treap treap = new Treap();
+//        treap.disableBalancing();
         GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeAreaType);
+//        treap.setComparator(areaComparator);
 
-        //treap.setComparator(areaComparator);
         PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(8, areaComparator);
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
             //treap.setCapacity(editShape.getPointCount(iGeometry));

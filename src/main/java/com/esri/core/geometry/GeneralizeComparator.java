@@ -7,27 +7,27 @@ import java.util.Comparator;
  * Created by davidraleigh on 4/19/16.
  */
 public class GeneralizeComparator implements Comparator<Integer> {//extends Treap.Comparator {
-    public class EditShapeTriangle {
-        public int m_prevVertexIndex;
-        public int m_nextVertexIndex;
+    class EditShapeTriangle {
+        int m_prevVertexIndex;
+        int m_nextVertexIndex;
         private Point2D m_point;
         private Point2D m_prevPoint;
         private Point2D m_nextPoint;
-        public int m_vertexIndex;
+        int m_vertexIndex;
         private double m_area;
         private int m_orientation;
 
-        public EditShapeTriangle() {
+        EditShapeTriangle() {
 
         }
 
-        public EditShapeTriangle(EditShape editShape,
+        EditShapeTriangle(EditShape editShape,
                             int iVertex) {
             setTriangle(editShape, iVertex);
         }
 
 
-        public void setTriangle(EditShape editShape, int iVertex) {
+        void setTriangle(EditShape editShape, int iVertex) {
             int prevVertex = editShape.getPrevVertex(iVertex);
             int nextVertex = editShape.getNextVertex(iVertex);
             Point2D prevPoint = editShape.getXY(prevVertex);
@@ -44,23 +44,23 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
             updateOrientation();
         }
 
-        public int getIndex() {
+        int getIndex() {
             return m_vertexIndex;
         }
 
-        public double queryArea() {
+        double queryArea() {
             return m_area;
         }
 
-        public int queryOrientation() {
+        int queryOrientation() {
             return m_orientation;
         }
 
-        public void updateArea() {
+        void updateArea() {
             m_area = m_prevPoint.calculateTriangleArea2D(m_point, m_nextPoint);
         }
 
-        public void updateOrientation() {
+        void updateOrientation() {
             m_orientation = Point2D.orientationRobust(m_prevPoint, m_point, m_nextPoint);
         }
     }
@@ -102,13 +102,13 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
         }
     }
 
-    public EditShapeTriangle createTriangle(int value) {
+    EditShapeTriangle createTriangle(int value) {
         EditShapeTriangle triangle = new EditShapeTriangle(m_editShape, value);
         return triangle;
     }
 
     // Returns a cached edge for the given value. May return NULL.
-    public EditShapeTriangle tryGetCachedTriangle_(int value) {
+    EditShapeTriangle tryGetCachedTriangle_(int value) {
         EditShapeTriangle triangle = m_triangle_nodes_cache.get((value & NumberUtils.intMax()) % m_triangle_nodes_cache.size());
         if (triangle != null) {
             if (triangle.m_vertexIndex == value)
@@ -122,7 +122,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
     }
 
     // Removes cached edge from the cache for the given value.
-    public void tryDeleteCachedTriangle_(int value) {
+    void tryDeleteCachedTriangle_(int value) {
         int ind = (value & NumberUtils.intMax()) % m_triangle_nodes_cache.size();
         EditShapeTriangle se = m_triangle_nodes_cache.get(ind);
         if (se != null && se.m_vertexIndex == value) {// this value is cached
@@ -133,7 +133,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
         }
     }
 
-    public EditShapeTriangle tryCreateCachedTriangle_(int value) {
+    EditShapeTriangle tryCreateCachedTriangle_(int value) {
         int ind = (value & NumberUtils.intMax()) % m_triangle_nodes_cache.size();
         EditShapeTriangle triangle = m_triangle_nodes_cache.get(ind);
         if (triangle == null) {
@@ -157,8 +157,9 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
 
     @Override
     public int compare(Integer left, Integer right) {//(Treap treap, int left, int node) {
-//            int right = treap.getElement(node);
-//            m_currentNode = node;
+//        int right = treap.getElement(node);
+//        m_currentNode = node;
+
         return compareTriangles(left, left, right, right);
     }
 
@@ -236,7 +237,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
 //            tryDeleteCachedTriangle_(elm);
 //        }
 
-    public int compare(EditShapeTriangle tri1, EditShapeTriangle tri2) {
+    int compare(EditShapeTriangle tri1, EditShapeTriangle tri2) {
 
         if (m_generalizeAreaType != GeneralizeAreaType.Neither) {
             // 1 for obtuse angle counter-clockwise,
