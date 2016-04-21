@@ -84,27 +84,28 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                     int element = treap.getElement(nodeIndex);
 
 
-                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(element);
-                    if (triangle == null) {
-                        triangle = areaComparator.tryCreateCachedTriangle_(element);
-                        if (triangle == null) {
-                            triangle = areaComparator.createTriangle(element);
-                        }
-                    }
+//                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(element);
+//                    if (triangle == null) {
+//                        triangle = areaComparator.tryCreateCachedTriangle_(element);
+//                        if (triangle == null) {
+//                            triangle = areaComparator.createTriangle(element);
+//                        }
+//                    }
 
-                    int prevElement = triangle.m_prevVertexIndex;
-                    int nextElement = triangle.m_nextVertexIndex;
-                    int prevNodeIndex = treap.search(prevElement, -1);
-                    int nextNodeIndex = treap.search(nextElement, -1);
+//                    int prevElement = triangle.m_prevVertexIndex;
+//                    int nextElement = triangle.m_nextVertexIndex;
+//                    int prevNodeIndex = treap.search(prevElement, -1);
+//                    int nextNodeIndex = treap.search(nextElement, -1);
 
-                    treap.deleteNode(prevNodeIndex, -1);
-                    treap.deleteNode(nextNodeIndex, -1);
+
+//                    treap.deleteNode(prevNodeIndex, -1);
+//                    treap.deleteNode(nextNodeIndex, -1);
 
                     treap.deleteNode(nodeIndex, -1);
                     editShape.removeVertex(element, false);
 
-                    treap.addElement(prevElement, -1);
-                    treap.addElement(nextElement, -1);
+//                    treap.addElement(prevElement, -1);
+//                    treap.addElement(nextElement, -1);
                 }
             }
         }
