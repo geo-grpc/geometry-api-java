@@ -1,6 +1,8 @@
 package com.esri.core.geometry;
 
 
+import java.util.ArrayList;
+
 /**
  * Created by davidraleigh on 4/17/16.
  */
@@ -61,6 +63,35 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     }
 
 
+    private void _AdjustTreapTriangle(Treap treap,
+                                  GeneralizeComparator.EditShapeTriangle triangle,
+                                  EditShape editShape,
+                                  int vertexIndexNode) {
+        if (treap.size(-1) == 1) {
+            treap.deleteNode(vertexIndexNode, -1);
+            editShape.removeVertex(triangle.m_vertexIndex, false);
+        } else {
+            int prevElement = triangle.m_prevVertexIndex;
+            int nextElement = triangle.m_nextVertexIndex;
+
+            int prevNodeIndex = treap.search(prevElement, -1);
+            int nextNodeIndex = treap.search(nextElement, -1);
+
+            treap.deleteNode(vertexIndexNode, -1);
+            editShape.removeVertex(triangle.m_vertexIndex, false);
+
+            if (prevNodeIndex > -1)
+                treap.deleteNode(prevNodeIndex, -1);
+            if (nextNodeIndex > -1)
+                treap.deleteNode(nextNodeIndex, -1);
+            if (prevNodeIndex > -1)
+                treap.addElement(prevElement, -1);
+            if (nextNodeIndex > -1)
+                treap.addElement(nextElement, -1);
+        }
+    }
+
+
     private void GeneralizeAreaPath(EditShape editShape) {
 
         Treap treap = new Treap();
@@ -68,45 +99,60 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
         GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeType);
         treap.setComparator(areaComparator);
 
-        for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
-            int ptCountOriginal = editShape.getPointCount(iGeometry);
-            treap.setCapacity(ptCountOriginal);
-            int ptCountToRemove = (int)Math.floor(ptCountOriginal * m_percentReduction / 100.0);
+        // TODO fix this. path removal stuff. It's a messy solution to the whole treap cleanup problem
 
+
+        for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
-                for (int iVertex = editShape.getFirstVertex(iPath), i = 0, n = editShape.getPathSize(iPath); i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
+                int n = editShape.getPathSize(iPath);
+                treap.setCapacity(n);
+                int ptCountToRemove = (int)(n * m_percentReduction / 100.0);
+
+                // if there are points that will remain after removals, then first create the treap
+                for (int iVertex = editShape.getFirstVertex(iPath), i = 0; i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
                     treap.addElement(iVertex, -1);
                 }
 
                 while (0 < ptCountToRemove-- && treap.size(-1) > 0) {
 
-                    int nodeIndex = treap.getFirst(-1);
-                    int element = treap.getElement(nodeIndex);
+                    int vertexIndexNode = treap.getFirst(-1);
+                    int vertexIndexElm = treap.getElement(vertexIndexNode);
+
+                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(vertexIndexElm);
+                    if (triangle == null) {
+                        triangle = areaComparator.tryCreateCachedTriangle_(vertexIndexElm);
+                        if (triangle == null) {
+                            triangle = areaComparator.createTriangle(vertexIndexElm);
+                        }
+                    }
+
+                    // if the top of the heap only contains points of the incorrect direction exit
+                    if ((m_generalizeType == GeneralizeType.ResultContainsOriginal && triangle.queryOrientation() > 0) ||
+                            (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() < 0))
+                        return;
 
 
-//                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(element);
-//                    if (triangle == null) {
-//                        triangle = areaComparator.tryCreateCachedTriangle_(element);
-//                        if (triangle == null) {
-//                            triangle = areaComparator.createTriangle(element);
-//                        }
-//                    }
-
+                    _AdjustTreapTriangle(treap, triangle, editShape, vertexIndexNode);
+//                    // TODO push all this logic into a treap method
 //                    int prevElement = triangle.m_prevVertexIndex;
 //                    int nextElement = triangle.m_nextVertexIndex;
+//
 //                    int prevNodeIndex = treap.search(prevElement, -1);
 //                    int nextNodeIndex = treap.search(nextElement, -1);
-
-
-//                    treap.deleteNode(prevNodeIndex, -1);
-//                    treap.deleteNode(nextNodeIndex, -1);
-
-                    treap.deleteNode(nodeIndex, -1);
-                    editShape.removeVertex(element, false);
-
-//                    treap.addElement(prevElement, -1);
-//                    treap.addElement(nextElement, -1);
+//
+//                    treap.deleteNode(nodeIndex, -1);
+//                    editShape.removeVertex(element, false);
+//
+//                    if (prevNodeIndex > -1)
+//                        treap.deleteNode(prevNodeIndex, -1);
+//                    if (nextNodeIndex > -1)
+//                        treap.deleteNode(nextNodeIndex, -1);
+//                    if (prevNodeIndex > -1)
+//                        treap.addElement(prevElement, -1);
+//                    if (nextNodeIndex > -1)
+//                        treap.addElement(nextElement, -1);
                 }
+                treap.clear();
             }
         }
     }
