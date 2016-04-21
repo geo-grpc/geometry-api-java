@@ -77,7 +77,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                 int n = editShape.getPathSize(iPath);
                 treap.setCapacity(n);
                 int ptCountToRemove = (int)(n * m_percentReduction / 100.0);
-
+                areaComparator.setPathCount(n);
                 // if there are points that will remain after removals, then first create the treap
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0; i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
                     if (iVertex == 335)
@@ -106,24 +106,24 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                         treap.deleteNode(vertexNode, -1);
                         editShape.removeVertex(vertexElm, false);
                     } else {
-//                        int prevElement = triangle.m_prevVertexIndex;
-//                        int nextElement = triangle.m_nextVertexIndex;
-//
-//                        int prevNodeIndex = treap.search(prevElement, -1);
-//                        int nextNodeIndex = treap.search(nextElement, -1);
-//
-//                        if (prevNodeIndex > -1)
-//                            treap.deleteNode(prevNodeIndex, -1);
-//                        if (nextNodeIndex > -1)
-//                            treap.deleteNode(nextNodeIndex, -1);
+                        int prevElement = triangle.m_prevVertexIndex;
+                        int nextElement = triangle.m_nextVertexIndex;
+
+                        int prevNodeIndex = treap.search(prevElement, -1);
+                        int nextNodeIndex = treap.search(nextElement, -1);
+
+                        if (prevNodeIndex > -1)
+                            treap.deleteNode(prevNodeIndex, -1);
+                        if (nextNodeIndex > -1)
+                            treap.deleteNode(nextNodeIndex, -1);
 
                         treap.deleteNode(vertexNode, -1);
                         editShape.removeVertex(vertexElm, false);
 
-//                        if (prevNodeIndex > -1)
-//                            treap.addElement(prevElement, -1);
-//                        if (nextNodeIndex > -1)
-//                            treap.addElement(nextElement, -1);
+                        if (prevNodeIndex > -1)
+                            treap.addElement(prevElement, -1);
+                        if (nextNodeIndex > -1)
+                            treap.addElement(nextElement, -1);
                     }
                 }
                 treap.clear();

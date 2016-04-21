@@ -74,6 +74,8 @@ class GeneralizeComparator extends Treap.Comparator {
     EditShape m_editShape;
     int m_vertex_1 = -1;
     int m_vertex_2 = -1;
+    int m_modulus_distribution = 0;
+    int m_subDivisions = 8;
     GeneralizeType m_generalizeType;
 
     EditShapeTriangle m_temp_triangle_1 = null;
@@ -95,6 +97,8 @@ class GeneralizeComparator extends Treap.Comparator {
 
         m_temp_triangle_1 = new EditShapeTriangle();
         m_temp_triangle_2 = new EditShapeTriangle();
+
+        m_modulus_distribution = 0;
 
         int s = Math.min(editShape.getTotalPointCount() * 3 / 2, (int) (67 /* SIMPLEDGE_CACHESIZE */));
         int cache_size = Math.min((int) 7, s);
@@ -157,6 +161,14 @@ class GeneralizeComparator extends Treap.Comparator {
         }
 
         return null;
+    }
+
+    void setPathCount(int pathCount) {
+        if (pathCount < m_subDivisions)
+            m_modulus_distribution = pathCount;
+        else
+            m_modulus_distribution = pathCount / m_subDivisions;
+
     }
 
     @Override
@@ -259,7 +271,13 @@ class GeneralizeComparator extends Treap.Comparator {
                 } else if (orientation1 > 0 && orientation2 > 0) {
                     // Treap requires a unique definition of the positions in the case
                     // of deletions. no 0 returns allowed
-                    if (tri1.m_vertexIndex > tri2.m_vertexIndex)
+
+                    // for cases where there is a really even distribution of points this seperates the group
+                    if (tri1.m_vertexIndex % m_modulus_distribution > tri1.m_vertexIndex % m_modulus_distribution)
+                        return -1;
+                    else if (tri1.m_vertexIndex % m_modulus_distribution < tri1.m_vertexIndex % m_modulus_distribution)
+                        return 1;
+                    else if (tri1.m_vertexIndex > tri2.m_vertexIndex)
                         return -1;
                     else if (tri1.m_vertexIndex < tri2.m_vertexIndex)
                         return 1;
@@ -271,7 +289,11 @@ class GeneralizeComparator extends Treap.Comparator {
                 } else if (orientation2 < 0 && orientation1 > 0) {
                     return 1;
                 } else if (orientation1 < 0 && orientation2 < 0) {
-                    if (tri1.m_vertexIndex > tri2.m_vertexIndex)
+                    if (tri1.m_vertexIndex % m_modulus_distribution > tri1.m_vertexIndex % m_modulus_distribution)
+                        return -1;
+                    else if (tri1.m_vertexIndex % m_modulus_distribution < tri1.m_vertexIndex % m_modulus_distribution)
+                        return 1;
+                    else if (tri1.m_vertexIndex > tri2.m_vertexIndex)
                         return -1;
                     else if (tri1.m_vertexIndex < tri2.m_vertexIndex)
                         return 1;
@@ -288,7 +310,11 @@ class GeneralizeComparator extends Treap.Comparator {
             return -1;
         } else if (area2 < area1) {
             return 1;
-        } else if (tri1.m_vertexIndex > tri2.m_vertexIndex) {
+        } else if (tri1.m_vertexIndex % m_modulus_distribution > tri1.m_vertexIndex % m_modulus_distribution)
+            return -1;
+        else if (tri1.m_vertexIndex % m_modulus_distribution < tri1.m_vertexIndex % m_modulus_distribution)
+            return 1;
+        else if (tri1.m_vertexIndex > tri2.m_vertexIndex) {
             return -1;
         } else if(tri1.m_vertexIndex < tri2.m_vertexIndex) {
             return 1;
