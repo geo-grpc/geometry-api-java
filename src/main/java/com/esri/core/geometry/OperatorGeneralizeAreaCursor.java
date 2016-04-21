@@ -64,26 +64,26 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
     private void GeneralizeAreaPath(EditShape editShape) {
 
-//        Treap treap = new Treap();
-//        treap.disableBalancing();
+        Treap treap = new Treap();
+        treap.disableBalancing();
         GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeAreaType);
-//        treap.setComparator(areaComparator);
+        treap.setComparator(areaComparator);
 
-        PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(8, areaComparator);
+        //PriorityQueue<Integer> priorityQueue = new PriorityQueue<Integer>(8, areaComparator);
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
             //treap.setCapacity(editShape.getPointCount(iGeometry));
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0, n = editShape.getPathSize(iPath); i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
-                    priorityQueue.add(iVertex);
-                    //treap.addElement(iVertex, -1);
+                    //priorityQueue.add(iVertex);
+                    treap.addElement(iVertex, -1);
                 }
 
                 double testArea = 0.0;
                 while (testArea < m_minArea) {
 
-                    Integer element = priorityQueue.peek();
-//                    int nodeIndex = treap.getFirst(-1);
-//                    int element = treap.getElement(nodeIndex);
+                    //Integer element = priorityQueue.peek();
+                    int nodeIndex = treap.getFirst(-1);
+                    int element = treap.getElement(nodeIndex);
 
 
                     GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(element);
@@ -99,30 +99,30 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
                     if (area > m_minArea)
                         break;
 
-                    priorityQueue.poll();
+                    //priorityQueue.poll();
+                    treap.deleteNode(nodeIndex, -1);
 
                     editShape.removeVertex(element, false);
-                    areaComparator.tryDeleteCachedTriangle_(element);
-//                    treap.deleteNode(nodeIndex, -1);
+                    //areaComparator.tryDeleteCachedTriangle_(element);
 
                     int prevElement = triangle.m_prevVertexIndex;
                     int nextElement = triangle.m_nextVertexIndex;
-//                    int prevNodeIndex = treap.search(prevElement, -1);
-//                    int nextNodeIndex = treap.search(nextElement, -1);
-//                    prevElement = treap.getElement(prevNodeIndex);
-//                    nextElement = treap.getElement(nextNodeIndex);
+                    int prevNodeIndex = treap.search(prevElement, -1);
+                    int nextNodeIndex = treap.search(nextElement, -1);
+                    prevElement = treap.getElement(prevNodeIndex);
+                    nextElement = treap.getElement(nextNodeIndex);
 
-                    priorityQueue.remove(prevElement);
-                    priorityQueue.remove(nextElement);
-                    areaComparator.tryDeleteCachedTriangle_(prevElement);
-                    areaComparator.tryDeleteCachedTriangle_(nextElement);
-//                    treap.deleteNode(prevNodeIndex, -1);
-//                    treap.deleteNode(nextNodeIndex, -1);
+//                    priorityQueue.remove(prevElement);
+//                    priorityQueue.remove(nextElement);
+//                    areaComparator.tryDeleteCachedTriangle_(prevElement);
+//                    areaComparator.tryDeleteCachedTriangle_(nextElement);
+                    treap.deleteNode(prevNodeIndex, -1);
+                    treap.deleteNode(nextNodeIndex, -1);
 
-                    priorityQueue.add(prevElement);
-                    priorityQueue.add(nextElement);
-//                    treap.addElement(prevElement, -1);
-//                    treap.addElement(nextElement, -1);
+//                    priorityQueue.add(prevElement);
+//                    priorityQueue.add(nextElement);
+                    treap.addElement(prevElement, -1);
+                    treap.addElement(nextElement, -1);
                 }
             }
         }

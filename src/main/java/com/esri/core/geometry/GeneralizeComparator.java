@@ -6,7 +6,7 @@ import java.util.Comparator;
 /**
  * Created by davidraleigh on 4/19/16.
  */
-public class GeneralizeComparator implements Comparator<Integer> {//extends Treap.Comparator {
+public class GeneralizeComparator extends Treap.Comparator { //implements Comparator<Integer> {//extends Treap.Comparator {
     class EditShapeTriangle {
         int m_prevVertexIndex;
         int m_nextVertexIndex;
@@ -22,7 +22,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
         }
 
         EditShapeTriangle(EditShape editShape,
-                            int iVertex) {
+                          int iVertex) {
             setTriangle(editShape, iVertex);
         }
 
@@ -81,7 +81,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
 
     GeneralizeComparator(EditShape editShape, GeneralizeAreaType generalizeAreaType) {
         // TODO
-        //super(true);
+        super(true);
         m_editShape = editShape;
 
         m_generalizeAreaType = generalizeAreaType;
@@ -149,16 +149,16 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
             m_triangle_nodes_cache.set(ind, triangle);
             return triangle;
         } else {
-            assert(triangle.getIndex() != value);
+            assert (triangle.getIndex() != value);
         }
 
         return null;
     }
 
     @Override
-    public int compare(Integer left, Integer right) {//(Treap treap, int left, int node) {
-//        int right = treap.getElement(node);
-//        m_currentNode = node;
+    public int compare(Treap treap, int left, int node) {//(Integer left, Integer right) {//
+        int right = treap.getElement(node);
+        m_currentNode = node;
 
         return compareTriangles(left, left, right, right);
     }
@@ -200,8 +200,8 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
         return compare(triangleLeft, triangleRight);
     }
 
-//        @Override
-//        void onDelete(int elm) {
+        @Override
+        void onDelete(int elm) {
 ////            EditShapeTriangle triangle = tryGetCachedTriangle_(elm);
 ////            if (triangle == null) {
 ////                triangle = tryCreateCachedTriangle_(elm);
@@ -209,9 +209,9 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
 ////
 ////            int prevVertexIndex = triangle.m_prevVertexIndex;
 ////            int nextVertexIndex = triangle.m_nextVertexIndex;
-//
-//            tryDeleteCachedTriangle_(elm);
-//
+
+            tryDeleteCachedTriangle_(elm);
+
 ////            EditShapeTriangle trianglePrev = tryGetCachedTriangle_(prevVertexIndex);
 ////            if (trianglePrev == null) {
 ////                trianglePrev = tryCreateCachedTriangle_(prevVertexIndex);
@@ -220,7 +220,7 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
 ////            if (triangleNext == null) {
 ////                triangleNext = tryCreateCachedTriangle_(nextVertexIndex);
 ////            }
-//        }
+        }
 //
 //        @Override
 //        void onSet(int oldelm) {
@@ -249,20 +249,30 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
             if (m_generalizeAreaType == GeneralizeAreaType.ResultContainsOriginal) {
                 // if the result contains the original no vertices with a
                 // counter clockwise obtuse angle rotation (1) can be removed
-                if (orientation1 > 0 && orientation2 > 0) {
-                    return 0;
-                } else if (orientation1 < 0 && orientation2 > 0) {
+                if (orientation1 < 0 && orientation2 > 0) {
                     return -1;
                 } else if (orientation2 < 0 && orientation1 > 1) {
                     return 1;
+                } else if (orientation1 > 0 && orientation2 > 0) {
+                    // Treap requires a unique definition of the positions in the case
+                    // of deletions. no 0 returns allowed
+                    if (tri1.m_vertexIndex > tri2.m_vertexIndex)
+                        return -1;
+                    else if (tri1.m_vertexIndex < tri2.m_vertexIndex)
+                        return 1;
+                    return 0;
                 }
             } else if (m_generalizeAreaType == GeneralizeAreaType.ResultWithinOriginal) {
-                if (orientation1 < 0 && orientation2 < 0) {
-                    return 0;
-                } else if (orientation1 < 0 && orientation2 > 0) {
+                if (orientation1 < 0 && orientation2 > 0) {
                     return 1;
                 } else if (orientation2 < 0 && orientation1 > 1) {
                     return -1;
+                } else if (orientation1 < 0 && orientation2 < 0) {
+                    if (tri1.m_vertexIndex > tri2.m_vertexIndex)
+                        return -1;
+                    else if (tri1.m_vertexIndex < tri2.m_vertexIndex)
+                        return 1;
+                    return 0;
                 }
             }
         }
@@ -274,7 +284,12 @@ public class GeneralizeComparator implements Comparator<Integer> {//extends Trea
             return -1;
         } else if (area2 < area1) {
             return 1;
+        } else if (tri1.m_vertexIndex > tri2.m_vertexIndex) {
+            return -1;
+        } else if(tri1.m_vertexIndex < tri2.m_vertexIndex) {
+            return 1;
         }
+
         return 0;
     }
 }
