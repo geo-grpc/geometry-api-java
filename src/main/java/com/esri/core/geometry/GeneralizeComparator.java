@@ -112,7 +112,8 @@ class GeneralizeComparator extends Treap.Comparator {
 
     // Returns a cached edge for the given value. May return NULL.
     EditShapeTriangle tryGetCachedTriangle_(int value) {
-        EditShapeTriangle triangle = m_triangle_nodes_cache.get((value & NumberUtils.intMax()) % m_triangle_nodes_cache.size());
+        int ind = (value & NumberUtils.intMax()) % m_triangle_nodes_cache.size();
+        EditShapeTriangle triangle = m_triangle_nodes_cache.get(ind);
         if (triangle != null) {
             if (triangle.m_vertexIndex == value)
                 return triangle;
@@ -252,9 +253,9 @@ class GeneralizeComparator extends Treap.Comparator {
                 // if the result contains the original no vertices with a
                 // counter clockwise obtuse angle rotation (1) can be removed
                 if (orientation1 < 0 && orientation2 > 0) {
-                    return -1;
-                } else if (orientation2 < 0 && orientation1 > 1) {
                     return 1;
+                } else if (orientation2 < 0 && orientation1 > 0) {
+                    return -1;
                 } else if (orientation1 > 0 && orientation2 > 0) {
                     // Treap requires a unique definition of the positions in the case
                     // of deletions. no 0 returns allowed
@@ -266,9 +267,9 @@ class GeneralizeComparator extends Treap.Comparator {
                 }
             } else if (m_generalizeType == GeneralizeType.ResultWithinOriginal) {
                 if (orientation1 < 0 && orientation2 > 0) {
-                    return 1;
-                } else if (orientation2 < 0 && orientation1 > 1) {
                     return -1;
+                } else if (orientation2 < 0 && orientation1 > 0) {
+                    return 1;
                 } else if (orientation1 < 0 && orientation2 < 0) {
                     if (tri1.m_vertexIndex > tri2.m_vertexIndex)
                         return -1;

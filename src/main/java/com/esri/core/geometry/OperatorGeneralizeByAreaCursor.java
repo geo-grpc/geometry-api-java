@@ -63,39 +63,9 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     }
 
 
-    private void _AdjustTreapTriangle(Treap treap,
-                                  GeneralizeComparator.EditShapeTriangle triangle,
-                                  EditShape editShape,
-                                  int vertexIndexNode) {
-        if (treap.size(-1) == 1) {
-            treap.deleteNode(vertexIndexNode, -1);
-            editShape.removeVertex(triangle.m_vertexIndex, false);
-        } else {
-            int prevElement = triangle.m_prevVertexIndex;
-            int nextElement = triangle.m_nextVertexIndex;
-
-            int prevNodeIndex = treap.search(prevElement, -1);
-            int nextNodeIndex = treap.search(nextElement, -1);
-
-            treap.deleteNode(vertexIndexNode, -1);
-            editShape.removeVertex(triangle.m_vertexIndex, false);
-
-            if (prevNodeIndex > -1)
-                treap.deleteNode(prevNodeIndex, -1);
-            if (nextNodeIndex > -1)
-                treap.deleteNode(nextNodeIndex, -1);
-            if (prevNodeIndex > -1)
-                treap.addElement(prevElement, -1);
-            if (nextNodeIndex > -1)
-                treap.addElement(nextElement, -1);
-        }
-    }
-
-
     private void GeneralizeAreaPath(EditShape editShape) {
 
         Treap treap = new Treap();
-        treap.disableBalancing();
         GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeType);
         treap.setComparator(areaComparator);
 
@@ -110,47 +80,51 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
                 // if there are points that will remain after removals, then first create the treap
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0; i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
+                    if (iVertex == 335)
+                        iVertex +=0;
                     treap.addElement(iVertex, -1);
                 }
 
                 while (0 < ptCountToRemove-- && treap.size(-1) > 0) {
 
-                    int vertexIndexNode = treap.getFirst(-1);
-                    int vertexIndexElm = treap.getElement(vertexIndexNode);
+                    int vertexNode = treap.getFirst(-1);
+                    int vertexElm = treap.getElement(vertexNode);
 
-                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(vertexIndexElm);
+                    GeneralizeComparator.EditShapeTriangle triangle = areaComparator.tryGetCachedTriangle_(vertexElm);
                     if (triangle == null) {
-                        triangle = areaComparator.tryCreateCachedTriangle_(vertexIndexElm);
+                        triangle = areaComparator.tryCreateCachedTriangle_(vertexElm);
                         if (triangle == null) {
-                            triangle = areaComparator.createTriangle(vertexIndexElm);
+                            triangle = areaComparator.createTriangle(vertexElm);
                         }
                     }
 
-                    // if the top of the heap only contains points of the incorrect direction exit
-                    if ((m_generalizeType == GeneralizeType.ResultContainsOriginal && triangle.queryOrientation() > 0) ||
-                            (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() < 0))
-                        return;
+                    if ((m_generalizeType == GeneralizeType.ResultContainsOriginal && triangle.queryOrientation() < 0) ||
+                        (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() > 0))
+                        break;
 
+                    if (treap.size(-1) == 1) {
+                        treap.deleteNode(vertexNode, -1);
+                        editShape.removeVertex(vertexElm, false);
+                    } else {
+//                        int prevElement = triangle.m_prevVertexIndex;
+//                        int nextElement = triangle.m_nextVertexIndex;
+//
+//                        int prevNodeIndex = treap.search(prevElement, -1);
+//                        int nextNodeIndex = treap.search(nextElement, -1);
+//
+//                        if (prevNodeIndex > -1)
+//                            treap.deleteNode(prevNodeIndex, -1);
+//                        if (nextNodeIndex > -1)
+//                            treap.deleteNode(nextNodeIndex, -1);
 
-                    _AdjustTreapTriangle(treap, triangle, editShape, vertexIndexNode);
-//                    // TODO push all this logic into a treap method
-//                    int prevElement = triangle.m_prevVertexIndex;
-//                    int nextElement = triangle.m_nextVertexIndex;
-//
-//                    int prevNodeIndex = treap.search(prevElement, -1);
-//                    int nextNodeIndex = treap.search(nextElement, -1);
-//
-//                    treap.deleteNode(nodeIndex, -1);
-//                    editShape.removeVertex(element, false);
-//
-//                    if (prevNodeIndex > -1)
-//                        treap.deleteNode(prevNodeIndex, -1);
-//                    if (nextNodeIndex > -1)
-//                        treap.deleteNode(nextNodeIndex, -1);
-//                    if (prevNodeIndex > -1)
-//                        treap.addElement(prevElement, -1);
-//                    if (nextNodeIndex > -1)
-//                        treap.addElement(nextElement, -1);
+                        treap.deleteNode(vertexNode, -1);
+                        editShape.removeVertex(vertexElm, false);
+
+//                        if (prevNodeIndex > -1)
+//                            treap.addElement(prevElement, -1);
+//                        if (nextNodeIndex > -1)
+//                            treap.addElement(nextElement, -1);
+                    }
                 }
                 treap.clear();
             }
