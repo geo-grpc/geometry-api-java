@@ -94,15 +94,15 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
                     if (area > m_minArea)
                         break;
 
-                    treap.deleteNode(nodeIndex, -1);
-                    editShape.removeVertex(element, false);
-
                     int prevElement = triangle.m_prevVertexIndex;
                     int nextElement = triangle.m_nextVertexIndex;
                     int prevNodeIndex = treap.search(prevElement, -1);
                     int nextNodeIndex = treap.search(nextElement, -1);
+
                     treap.deleteNode(prevNodeIndex, -1);
                     treap.deleteNode(nextNodeIndex, -1);
+                    treap.deleteNode(nodeIndex, -1);
+                    editShape.removeVertex(element, false);
 
                     treap.addElement(prevElement, -1);
                     treap.addElement(nextElement, -1);
