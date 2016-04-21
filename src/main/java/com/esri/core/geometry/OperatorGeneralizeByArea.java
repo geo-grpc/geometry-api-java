@@ -7,7 +7,7 @@ package com.esri.core.geometry;
 public abstract class OperatorGeneralizeByArea extends Operator {
     @Override
     public Operator.Type getType() {
-        return Operator.Type.GeneralizeArea;
+        return Operator.Type.GeneralizeByArea;
     }
 
     /**
@@ -17,7 +17,7 @@ public abstract class OperatorGeneralizeByArea extends Operator {
      *
      */
     public abstract GeometryCursor execute(GeometryCursor geoms,
-                                           double areaThreshold,
+                                           double percentReduction,
                                            boolean bRemoveDegenerateParts,
                                            GeneralizeType generalizeType,
                                            ProgressTracker progressTracker);
@@ -28,12 +28,12 @@ public abstract class OperatorGeneralizeByArea extends Operator {
      * polygon.
      */
     public abstract Geometry execute(Geometry geom,
-                                     double areaThreshold,
+                                     double percentReduction,
                                      boolean bRemoveDegenerateParts,
                                      GeneralizeType generalizeType,
                                      ProgressTracker progressTracker);
 
     public static OperatorGeneralizeByArea local() {
-        return (OperatorGeneralizeByArea) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeneralizeArea);
+        return (OperatorGeneralizeByArea) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeneralizeByArea);
     }
 }

@@ -7,13 +7,13 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
 
     @Override
     public GeometryCursor execute(GeometryCursor geoms,
-                                  double areaThreshold,
+                                  double percentReduction,
                                   boolean bRemoveDegenerateParts,
                                   GeneralizeType generalizeType,
                                   ProgressTracker progressTracker) {
 
         return new OperatorGeneralizeByAreaCursor(geoms,
-                                                areaThreshold,
+                percentReduction,
                                                 bRemoveDegenerateParts,
                 generalizeType,
                                                 progressTracker);
@@ -21,17 +21,15 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
 
     @Override
     public Geometry execute(Geometry geom,
-                            double areaThreshold,
+                            double percentReduction,
                             boolean bRemoveDegenerateParts,
                             GeneralizeType generalizeType,
                             ProgressTracker progressTracker) {
 
         SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
 
-        GeometryCursor geometryCursor = execute(inputGeomCurs,
-                                                areaThreshold,
-                                                bRemoveDegenerateParts,
-                generalizeType,
+        GeometryCursor geometryCursor = execute(inputGeomCurs, percentReduction,
+                                                bRemoveDegenerateParts, generalizeType,
                                                 progressTracker);
 
         return geometryCursor.next();

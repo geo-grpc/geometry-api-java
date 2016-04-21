@@ -9,10 +9,11 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     GeometryCursor m_geoms;
     boolean m_bRemoveDegenerateParts;
     GeneralizeType m_generalizeType;
-    double m_minArea;
+    double m_percentReduction;
+    int m_ptRemovalGoal;
 
     public OperatorGeneralizeByAreaCursor(GeometryCursor geoms,
-                                          double areaThreshold,
+                                          double percentReduction,
                                           boolean bRemoveDegenerateParts,
                                           GeneralizeType generalizeType,
                                           ProgressTracker progressTracker) {
@@ -20,7 +21,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
         m_progressTracker = progressTracker;
         m_bRemoveDegenerateParts = bRemoveDegenerateParts;
         m_generalizeType = generalizeType;
-        m_minArea = areaThreshold;
+        m_percentReduction = percentReduction;
     }
 
     @Override
@@ -68,14 +69,16 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
         treap.setComparator(areaComparator);
 
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {
-            treap.setCapacity(editShape.getPointCount(iGeometry));
+            int ptCountOriginal = editShape.getPointCount(iGeometry);
+            treap.setCapacity(ptCountOriginal);
+            int ptCountToRemove = (int)Math.floor(ptCountOriginal * m_percentReduction / 100.0);
+
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 for (int iVertex = editShape.getFirstVertex(iPath), i = 0, n = editShape.getPathSize(iPath); i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
                     treap.addElement(iVertex, -1);
                 }
 
-                double testArea = 0.0;
-                while (testArea < m_minArea) {
+                while (0 < ptCountToRemove-- && treap.size(-1) > 0) {
 
                     int nodeIndex = treap.getFirst(-1);
                     int element = treap.getElement(nodeIndex);
@@ -89,11 +92,6 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                         }
                     }
 
-                    double area = triangle.queryArea();
-                    // if the area is larger than the threshold exit
-                    if (area > m_minArea)
-                        break;
-
                     int prevElement = triangle.m_prevVertexIndex;
                     int nextElement = triangle.m_nextVertexIndex;
                     int prevNodeIndex = treap.search(prevElement, -1);
@@ -101,6 +99,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
                     treap.deleteNode(prevNodeIndex, -1);
                     treap.deleteNode(nextNodeIndex, -1);
+
                     treap.deleteNode(nodeIndex, -1);
                     editShape.removeVertex(element, false);
 
