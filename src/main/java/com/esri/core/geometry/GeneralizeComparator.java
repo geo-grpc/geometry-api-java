@@ -1,28 +1,29 @@
 package com.esri.core.geometry;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * Created by davidraleigh on 4/19/16.
  */
-public class GeneralizeComparator extends Treap.Comparator { //implements Comparator<Integer> {//extends Treap.Comparator {
+class GeneralizeComparator extends Treap.Comparator {
     class EditShapeTriangle {
         int m_prevVertexIndex;
         int m_nextVertexIndex;
+        int m_vertexIndex;
+
         private Point2D m_point;
         private Point2D m_prevPoint;
         private Point2D m_nextPoint;
-        int m_vertexIndex;
         private double m_area;
         private int m_orientation;
+
 
         EditShapeTriangle() {
 
         }
 
-        EditShapeTriangle(EditShape editShape,
-                          int iVertex) {
+
+        EditShapeTriangle(EditShape editShape, int iVertex) {
             setTriangle(editShape, iVertex);
         }
 
@@ -44,33 +45,36 @@ public class GeneralizeComparator extends Treap.Comparator { //implements Compar
             updateOrientation();
         }
 
+
         int getIndex() {
             return m_vertexIndex;
         }
+
 
         double queryArea() {
             return m_area;
         }
 
+
         int queryOrientation() {
             return m_orientation;
         }
 
+
         void updateArea() {
             m_area = m_prevPoint.calculateTriangleArea2D(m_point, m_nextPoint);
         }
+
 
         void updateOrientation() {
             m_orientation = Point2D.orientationRobust(m_prevPoint, m_point, m_nextPoint);
         }
     }
 
-    private EditShape m_editShape;
-    private int m_currentNode;
+    EditShape m_editShape;
     int m_vertex_1 = -1;
     int m_vertex_2 = -1;
-
-    private GeneralizeAreaType m_generalizeAreaType;
+    GeneralizeAreaType m_generalizeAreaType;
 
     EditShapeTriangle m_temp_triangle_1 = null;
     EditShapeTriangle m_temp_triangle_2 = null;
@@ -80,7 +84,6 @@ public class GeneralizeComparator extends Treap.Comparator { //implements Compar
     ArrayList<EditShapeTriangle> m_triangle_nodes_cache;
 
     GeneralizeComparator(EditShape editShape, GeneralizeAreaType generalizeAreaType) {
-        // TODO
         super(true);
         m_editShape = editShape;
 
@@ -156,9 +159,8 @@ public class GeneralizeComparator extends Treap.Comparator { //implements Compar
     }
 
     @Override
-    public int compare(Treap treap, int left, int node) {//(Integer left, Integer right) {//
+    public int compare(Treap treap, int left, int node) {
         int right = treap.getElement(node);
-        m_currentNode = node;
 
         return compareTriangles(left, left, right, right);
     }
@@ -277,6 +279,7 @@ public class GeneralizeComparator extends Treap.Comparator { //implements Compar
             }
         }
 
+        // else if GeneralizeAreaType.Neither
         double area1 = tri1.queryArea();
         double area2 = tri2.queryArea();
 
