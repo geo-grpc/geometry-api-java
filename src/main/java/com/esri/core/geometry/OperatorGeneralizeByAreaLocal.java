@@ -3,19 +3,19 @@ package com.esri.core.geometry;
 /**
  * Created by davidraleigh on 4/17/16.
  */
-final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
+final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByArea {
 
     @Override
     public GeometryCursor execute(GeometryCursor geoms,
                                   double areaThreshold,
                                   boolean bRemoveDegenerateParts,
-                                  GeneralizeAreaType generalizeAreaType,
+                                  GeneralizeType generalizeType,
                                   ProgressTracker progressTracker) {
 
-        return new OperatorGeneralizeAreaCursor(geoms,
+        return new OperatorGeneralizeByAreaCursor(geoms,
                                                 areaThreshold,
                                                 bRemoveDegenerateParts,
-                                                generalizeAreaType,
+                generalizeType,
                                                 progressTracker);
     }
 
@@ -23,7 +23,7 @@ final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
     public Geometry execute(Geometry geom,
                             double areaThreshold,
                             boolean bRemoveDegenerateParts,
-                            GeneralizeAreaType generalizeAreaType,
+                            GeneralizeType generalizeType,
                             ProgressTracker progressTracker) {
 
         SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
@@ -31,7 +31,7 @@ final public class OperatorGeneralizeAreaLocal extends OperatorGeneralizeArea {
         GeometryCursor geometryCursor = execute(inputGeomCurs,
                                                 areaThreshold,
                                                 bRemoveDegenerateParts,
-                                                generalizeAreaType,
+                generalizeType,
                                                 progressTracker);
 
         return geometryCursor.next();

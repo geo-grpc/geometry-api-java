@@ -4,7 +4,7 @@ package com.esri.core.geometry;
  * Created by davidraleigh on 4/17/16.
  * Generalizes geometries using Visvalingam algorithm
  */
-public abstract class OperatorGeneralizeArea extends Operator {
+public abstract class OperatorGeneralizeByArea extends Operator {
     @Override
     public Operator.Type getType() {
         return Operator.Type.GeneralizeArea;
@@ -19,7 +19,7 @@ public abstract class OperatorGeneralizeArea extends Operator {
     public abstract GeometryCursor execute(GeometryCursor geoms,
                                            double areaThreshold,
                                            boolean bRemoveDegenerateParts,
-                                           GeneralizeAreaType generalizeAreaType,
+                                           GeneralizeType generalizeType,
                                            ProgressTracker progressTracker);
 
     /**
@@ -30,10 +30,10 @@ public abstract class OperatorGeneralizeArea extends Operator {
     public abstract Geometry execute(Geometry geom,
                                      double areaThreshold,
                                      boolean bRemoveDegenerateParts,
-                                     GeneralizeAreaType generalizeAreaType,
+                                     GeneralizeType generalizeType,
                                      ProgressTracker progressTracker);
 
-    public static OperatorGeneralizeArea local() {
-        return (OperatorGeneralizeArea) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeneralizeArea);
+    public static OperatorGeneralizeByArea local() {
+        return (OperatorGeneralizeByArea) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeneralizeArea);
     }
 }

@@ -4,22 +4,22 @@ package com.esri.core.geometry;
 /**
  * Created by davidraleigh on 4/17/16.
  */
-public class OperatorGeneralizeAreaCursor extends GeometryCursor {
+public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     ProgressTracker m_progressTracker;
     GeometryCursor m_geoms;
     boolean m_bRemoveDegenerateParts;
-    GeneralizeAreaType m_generalizeAreaType;
+    GeneralizeType m_generalizeType;
     double m_minArea;
 
-    public OperatorGeneralizeAreaCursor(GeometryCursor geoms,
-                                        double areaThreshold,
-                                        boolean bRemoveDegenerateParts,
-                                        GeneralizeAreaType generalizeAreaType,
-                                        ProgressTracker progressTracker) {
+    public OperatorGeneralizeByAreaCursor(GeometryCursor geoms,
+                                          double areaThreshold,
+                                          boolean bRemoveDegenerateParts,
+                                          GeneralizeType generalizeType,
+                                          ProgressTracker progressTracker) {
         m_geoms = geoms;
         m_progressTracker = progressTracker;
         m_bRemoveDegenerateParts = bRemoveDegenerateParts;
-        m_generalizeAreaType = generalizeAreaType;
+        m_generalizeType = generalizeType;
         m_minArea = areaThreshold;
     }
 
@@ -64,7 +64,7 @@ public class OperatorGeneralizeAreaCursor extends GeometryCursor {
 
         Treap treap = new Treap();
         treap.disableBalancing();
-        GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeAreaType);
+        GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeType);
         treap.setComparator(areaComparator);
 
         for (int iGeometry = editShape.getFirstGeometry(); iGeometry != -1; iGeometry = editShape.getNextGeometry(iGeometry)) {

@@ -74,7 +74,7 @@ class GeneralizeComparator extends Treap.Comparator {
     EditShape m_editShape;
     int m_vertex_1 = -1;
     int m_vertex_2 = -1;
-    GeneralizeAreaType m_generalizeAreaType;
+    GeneralizeType m_generalizeType;
 
     EditShapeTriangle m_temp_triangle_1 = null;
     EditShapeTriangle m_temp_triangle_2 = null;
@@ -83,11 +83,11 @@ class GeneralizeComparator extends Treap.Comparator {
     ArrayList<EditShapeTriangle> m_triangle_nodes_recycle;
     ArrayList<EditShapeTriangle> m_triangle_nodes_cache;
 
-    GeneralizeComparator(EditShape editShape, GeneralizeAreaType generalizeAreaType) {
+    GeneralizeComparator(EditShape editShape, GeneralizeType generalizeType) {
         super(true);
         m_editShape = editShape;
 
-        m_generalizeAreaType = generalizeAreaType;
+        m_generalizeType = generalizeType;
 
         m_triangle_nodes_buffer = new ArrayList<EditShapeTriangle>();
         m_triangle_nodes_recycle = new ArrayList<EditShapeTriangle>();
@@ -241,14 +241,14 @@ class GeneralizeComparator extends Treap.Comparator {
 
     int compare(EditShapeTriangle tri1, EditShapeTriangle tri2) {
 
-        if (m_generalizeAreaType != GeneralizeAreaType.Neither) {
+        if (m_generalizeType != GeneralizeType.Neither) {
             // 1 for obtuse angle counter-clockwise,
             // -1 for obtuse angle clockwise
             // 0 for collinear
             int orientation1 = tri1.queryOrientation();
             int orientation2 = tri2.queryOrientation();
 
-            if (m_generalizeAreaType == GeneralizeAreaType.ResultContainsOriginal) {
+            if (m_generalizeType == GeneralizeType.ResultContainsOriginal) {
                 // if the result contains the original no vertices with a
                 // counter clockwise obtuse angle rotation (1) can be removed
                 if (orientation1 < 0 && orientation2 > 0) {
@@ -264,7 +264,7 @@ class GeneralizeComparator extends Treap.Comparator {
                         return 1;
                     return 0;
                 }
-            } else if (m_generalizeAreaType == GeneralizeAreaType.ResultWithinOriginal) {
+            } else if (m_generalizeType == GeneralizeType.ResultWithinOriginal) {
                 if (orientation1 < 0 && orientation2 > 0) {
                     return 1;
                 } else if (orientation2 < 0 && orientation1 > 1) {
@@ -279,7 +279,7 @@ class GeneralizeComparator extends Treap.Comparator {
             }
         }
 
-        // else if GeneralizeAreaType.Neither
+        // else if GeneralizeType.Neither
         double area1 = tri1.queryArea();
         double area2 = tri2.queryArea();
 
