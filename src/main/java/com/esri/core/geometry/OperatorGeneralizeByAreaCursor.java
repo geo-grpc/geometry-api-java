@@ -67,6 +67,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
         Treap treap = new Treap();
         GeneralizeComparator areaComparator = new GeneralizeComparator(editShape, m_generalizeType);
+        treap.disableBalancing();
         treap.setComparator(areaComparator);
 
         // TODO fix this. path removal stuff. It's a messy solution to the whole treap cleanup problem
@@ -77,13 +78,14 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                 int n = editShape.getPathSize(iPath);
                 treap.setCapacity(n);
                 int ptCountToRemove = (int)(n * m_percentReduction / 100.0);
-                areaComparator.setPathCount(n);
+
                 // if there are points that will remain after removals, then first create the treap
-                for (int iVertex = editShape.getFirstVertex(iPath), i = 0; i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
-                    if (iVertex == 335)
-                        iVertex +=0;
+                int iVertex = editShape.getFirstVertex(iPath);
+                areaComparator.setPathCount(n * 5);
+                for (int i = 0; i < n; iVertex = editShape.getNextVertex(iVertex), i++) {
                     treap.addElement(iVertex, -1);
                 }
+
 
                 while (0 < ptCountToRemove-- && treap.size(-1) > 0) {
 
@@ -99,8 +101,10 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                     }
 
                     if ((m_generalizeType == GeneralizeType.ResultContainsOriginal && triangle.queryOrientation() < 0) ||
-                        (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() > 0))
+                        (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() > 0)) {
                         break;
+                    }
+
 
                     if (treap.size(-1) == 1) {
                         treap.deleteNode(vertexNode, -1);

@@ -165,7 +165,7 @@ public class TestGeneralize extends TestCase {
 		OperatorGeneralizeByArea op = (OperatorGeneralizeByArea) engine.getOperator(Operator.Type.GeneralizeByArea);
 		OperatorContains operatorContains = (OperatorContains)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Contains);
 
-		Geometry geomContainer = op.execute(geom, 75, true, GeneralizeType.ResultContainsOriginal, null);
+		Geometry geomContainer = op.execute(geom, 15, true, GeneralizeType.ResultContainsOriginal, null);
 		String words = GeometryEngine.geometryToWkt(geomContainer, 0);
 		assertTrue(operatorContains.execute(geomContainer, geom, null, null));
 	}

@@ -164,11 +164,12 @@ class GeneralizeComparator extends Treap.Comparator {
     }
 
     void setPathCount(int pathCount) {
-        if (pathCount < m_subDivisions)
-            m_modulus_distribution = pathCount;
+        if (pathCount < m_subDivisions * 2)
+            m_modulus_distribution = pathCount / 2;
         else
             m_modulus_distribution = pathCount / m_subDivisions;
-
+        if (m_modulus_distribution == 5)
+            m_modulus_distribution *= 2;
     }
 
     @Override
