@@ -33,3 +33,6 @@ Icon?
 ehthumbs.db
 Thumbs.db
 target/*
+
+out/*
+src/test/resources/com/esri/core/geometry/shapes_v1c.json

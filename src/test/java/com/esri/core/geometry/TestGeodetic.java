@@ -27,6 +27,22 @@ public class TestGeodetic extends TestCase {
 		assertTrue(Math.abs(length - 3744719.4094597572) < 1e-13 * 3744719.4094597572);
 	}
 
+
+	@Test
+	public void testGeodesicForward() {
+		double latitude = 0;
+		double longitude = 0;
+		double distance = 1000;
+		double azimuth = 0;
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+		double rpu = Math.PI / 180.0;
+		PeDouble lam2 = new PeDouble();
+		PeDouble phi2 = new PeDouble();
+		GeoDist.geodesic_forward(a, e2, longitude, latitude, distance, azimuth, lam2, phi2);
+		assertEquals(longitude, lam2.val / rpu, 0.00001);
+	}
+
 	@Test
 	public void testRotationInvariance() {
 		Point pt_0 = new Point(10, 40);
