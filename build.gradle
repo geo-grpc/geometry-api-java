@@ -6,13 +6,11 @@ version = '1.2.1'
 
 description = """Esri Geometry API for Java"""
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
-
-
 
 repositories {
      maven { url "http://repo.maven.apache.org/maven2" }
