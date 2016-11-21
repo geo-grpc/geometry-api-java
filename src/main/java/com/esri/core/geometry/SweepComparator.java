@@ -80,8 +80,7 @@ class SweepComparator extends Treap.Comparator {
 
 	// Returns a cached edge for the given value. May return NULL.
 	SimpleEdge tryGetCachedEdge_(int value) {
-		SimpleEdge se = m_simple_edges_cache.get((value & NumberUtils.intMax())
-				% m_simple_edges_cache.size());
+		SimpleEdge se = m_simple_edges_cache.get((value & NumberUtils.intMax()) % m_simple_edges_cache.size());
 		if (se != null) {
 			if (se.m_value == value)
 				return se;

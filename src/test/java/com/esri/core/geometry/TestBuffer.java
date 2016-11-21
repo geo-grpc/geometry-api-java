@@ -15,6 +15,18 @@ public class TestBuffer extends TestCase {
 	}
 
 	@Test
+	public void testBufferPolytonWKT()
+	{
+		String wkt = "MULTIPOLYGON (((-98.42049 46.08456, -98.42052 46.08682, -98.40509 46.08681, -98.40511 46.08456, -98.42049 46.08456)))";
+		SpatialReference sr = SpatialReference.create(4326);
+		com.esri.core.geometry.Geometry geom = com.esri.core.geometry.OperatorImportFromWkt.local().execute(0, com.esri.core.geometry.Geometry.Type.Unknown, wkt, null);
+		com.esri.core.geometry.Geometry buffered = com.esri.core.geometry.OperatorBuffer.local().execute(geom, sr, 2.0, null);
+		String exportedGeom = com.esri.core.geometry.OperatorExportToWkt.local().execute(0, buffered, null);
+		int position = exportedGeom.indexOf('(');
+		assertEquals("MULTIPOLYGON", exportedGeom.substring(0, position - 1));
+	}
+
+	@Test
 	public void testBufferPoint() {
 		SpatialReference sr = SpatialReference.create(4326);
 		Point inputGeom = new Point(12, 120);

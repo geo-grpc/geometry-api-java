@@ -23,7 +23,7 @@
  */
 package com.esri.core.geometry;
 
-abstract class OperatorGeodesicBuffer extends Operator {
+public abstract class OperatorGeodesicBuffer extends Operator {
 
 	@Override
 	public Operator.Type getType() {
@@ -33,7 +33,7 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	/**
 	 * Creates a geodesic buffer around the input geometries
 	 *
-	 * @param input_geometries The geometries to buffer.
+	 * @param inputGeometries  The geometries to buffer.
 	 * @param sr The Spatial_reference of the Geometries.
 	 * @param curveType The geodetic curve type of the segments. If the curve_type is Geodetic_curve::shape_preserving, then the segments are densified in the projection where they are defined before
 	 * buffering.
@@ -44,7 +44,7 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
 	 * @param bUnion If True, the buffered geometries will be unioned, otherwise they wont be unioned.
 	 */
-	abstract public GeometryCursor execute(
+	public abstract GeometryCursor execute(
 			GeometryCursor inputGeometries,
 			SpatialReference sr,
 			int curveType,
@@ -57,7 +57,7 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	/**
 	 * Creates a geodesic buffer around the input geometry
 	 *
-	 * @param input_geometry The geometry to buffer.
+	 * @param inputGeometry The geometry to buffer.
 	 * @param sr The Spatial_reference of the Geometry.
 	 * @param curveType The geodetic curve type of the segments. If the curve_type is Geodetic_curve::shape_preserving, then the segments are densified in the projection where they are defined before
 	 * buffering.
@@ -66,7 +66,7 @@ abstract class OperatorGeodesicBuffer extends Operator {
 	 * default deviation.
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
 	 */
-	abstract public Geometry execute(
+	public abstract Geometry execute(
 			Geometry inputGeometry,
 			SpatialReference sr,
 			int curveType,

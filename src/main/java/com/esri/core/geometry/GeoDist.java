@@ -104,24 +104,100 @@ final class GeoDist {
 		if (env2D.isEmpty())
 			return;
 
-		PeDouble lam2 = new PeDouble();
-		PeDouble phi2 = new PeDouble();
+		double yMinAzimuth = dyMeters > 0 ? Math.PI : 0;
+		double yMaxAzimuth = dyMeters > 0 ? 0 : Math.PI;
+
+		double xMinAzimuth = dxMeters > 0 ? 3 * Math.PI / 2 : Math.PI / 2;
+		double xMaxAzimuth = dxMeters > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+
+		dxMeters = Math.abs(dxMeters);
+		dyMeters = Math.abs(dyMeters);
+
+		PeDouble lamMin = new PeDouble();
+		PeDouble phiMin = new PeDouble();
+		PeDouble lamMax = new PeDouble();
+		PeDouble phiMax = new PeDouble();
+		PeDouble dummyVar = new PeDouble();
+
+		// TODO this probably needs improvement. Maybe a check to see which hemisphere and then whether to measure the
+		// x values at ymin or ymax and measure the y values at the xmin or xmax
 		// new ymin
-		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymin * DEG_TO_RAD, dxMeters, Math.PI, lam2, phi2);
-		env2D.ymin = phi2.val * RAD_TO_DEG;
+		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymin * DEG_TO_RAD, dyMeters, yMinAzimuth, dummyVar, phiMin);
 		// new xmin
-		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dxMeters, 3 * Math.PI / 2, lam2, phi2);
-		env2D.xmin = lam2.val * RAD_TO_DEG;
+		geodesic_forward(a, e2, env2D.xmin * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dxMeters, xMinAzimuth, lamMin, dummyVar);
 		// new yMAX
-		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dxMeters, 0, lam2, phi2);
-		env2D.ymax = phi2.val * RAD_TO_DEG;
+		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymax * DEG_TO_RAD, dyMeters, yMaxAzimuth, dummyVar, phiMax);
 		// new xmax
-		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymin, dxMeters, Math.PI / 2, lam2, phi2);
-		env2D.xmax = lam2.val * RAD_TO_DEG;
+		geodesic_forward(a, e2, env2D.xmax * DEG_TO_RAD, env2D.ymin * DEG_TO_RAD, dxMeters, xMaxAzimuth, lamMax, dummyVar);
 
-//		if (xmin > xmax || ymin > ymax)
-//			setEmpty();
+		env2D.ymax = phiMax.val * RAD_TO_DEG;
+		env2D.xmin = lamMin.val * RAD_TO_DEG;
+		env2D.ymin = phiMin.val * RAD_TO_DEG;
+		env2D.xmax = lamMax.val * RAD_TO_DEG;
 
+		if (env2D.xmin > env2D.xmax || env2D.ymin > env2D.ymax)
+			env2D.setEmpty();
+	}
+
+	/**
+	 * Gets the max geodetic width of an envelope
+	 * @param a
+	 * @param e2
+	 * @param env2D
+     * @return
+     */
+	public static double getEnvWidth(double a,
+									 double e2,
+									 Envelope2D env2D) {
+		double rpu = Math.PI / 180.0;
+		PeDouble answer = new PeDouble();
+		GeoDist.geodesic_distance_ngs(
+				a,
+				e2,
+				env2D.xmin * rpu,
+				env2D.ymin * rpu,
+				env2D.xmax * rpu,
+				env2D.ymin * rpu,
+				answer, null, null);
+		double lowerWidth = answer.val;
+		GeoDist.geodesic_distance_ngs(
+				a,
+				e2,
+				env2D.xmin * rpu,
+				env2D.ymax * rpu,
+				env2D.xmax * rpu,
+				env2D.ymax * rpu,
+				answer, null, null);
+		if (lowerWidth > answer.val)
+			return lowerWidth;
+		return answer.val;
+	}
+
+	public static double getEnvHeight(double a,
+									 double e2,
+									 Envelope2D env2D) {
+		double rpu = Math.PI / 180.0;
+		PeDouble answer = new PeDouble();
+		GeoDist.geodesic_distance_ngs(
+				a,
+				e2,
+				env2D.xmin * rpu,
+				env2D.ymin * rpu,
+				env2D.xmin * rpu,
+				env2D.ymax * rpu,
+				answer, null, null);
+		double leftHeight = answer.val;
+		GeoDist.geodesic_distance_ngs(
+				a,
+				e2,
+				env2D.xmax * rpu,
+				env2D.ymin * rpu,
+				env2D.xmax * rpu,
+				env2D.ymax * rpu,
+				answer, null, null);
+		if (leftHeight > answer.val)
+			return leftHeight;
+		return answer.val;
 	}
 
 	static public void geodesic_forward(double a,

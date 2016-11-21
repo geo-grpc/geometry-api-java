@@ -1,6 +1,7 @@
 package com.esri.core.geometry;
 
-import java.io.Console;
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+
 import java.util.ArrayList;
 
 /**
@@ -89,8 +90,8 @@ class GeodesicBufferer {
 
     private Geometry m_geometry;
 
-    private static final class GeodesicBufferCommand {
-        private interface Flags {
+    protected static final class GeodesicBufferCommand {
+        protected interface Flags {
             static final int enum_line = 1;
             static final int enum_arc = 2;
             static final int enum_dummy = 4;
@@ -98,14 +99,14 @@ class GeodesicBufferer {
             static final int enum_connection = enum_arc | enum_line;
         }
 
-        private Point2D m_from;
-        private Point2D m_to;
-        private Point2D m_center;
-        private int m_next;
-        private int m_prev;
-        private int m_type;
+        protected Point2D m_from;
+        protected Point2D m_to;
+        protected Point2D m_center;
+        protected int m_next;
+        protected int m_prev;
+        protected int m_type;
 
-        private GeodesicBufferCommand(Point2D from, Point2D to, Point2D center,
+        protected GeodesicBufferCommand(Point2D from, Point2D to, Point2D center,
                                       int type, int next, int prev) {
             m_from = new Point2D();
             m_to = new Point2D();
@@ -118,7 +119,7 @@ class GeodesicBufferer {
             m_prev = prev;
         }
 
-        private GeodesicBufferCommand(Point2D from, Point2D to, int next, int prev,
+        protected GeodesicBufferCommand(Point2D from, Point2D to, int next, int prev,
                                       String dummy) {
             m_from = new Point2D();
             m_to = new Point2D();
@@ -356,18 +357,17 @@ class GeodesicBufferer {
         if (m_distance <= m_tolerance) {
             if (Geometry.isArea(gt)) {
                 //TODO add geodetic getWidth and getHeight for Envelope
-//                if (m_distance <= 0) {
-//                    // if the geometry is area type, then the negative distance
-//                    // may produce a degenerate shape. Check for this and return
-//                    // empty geometry.
-//                    Envelope2D env = new Envelope2D();
-//                    m_geometry.queryEnvelope2D(env);
-//                    if (env.getWidth() <= -m_distance * 2
-//                            || env.getHeight() <= m_distance * 2)
-//                        return new Polygon(m_geometry.getDescription());
-//                }
+                if (m_distance <= 0) {
+                    // if the geometry is area type, then the negative distance
+                    // may produce a degenerate shape. Check for this and return
+                    // empty geometry.
+                    Envelope2D env = new Envelope2D();
+                    m_geometry.queryEnvelope2D(env);
 
-                return null;
+                    if (GeoDist.getEnvWidth(m_a, m_e2, env) <= -m_distance * 2 ||
+                        GeoDist.getEnvHeight(m_a, m_e2, env) <=  m_distance * 2)
+                        return new Polygon(m_geometry.getDescription());
+                }
             } else {
                 return new Polygon(m_geometry.getDescription());
                 // return an empty polygon for distance <= m_tolerance
@@ -377,8 +377,8 @@ class GeodesicBufferer {
 
 //        // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_input.txt",
 //        // *m_geometry, nullptr);
-//
-//        // Complex cases:
+
+        // Complex cases:
         switch (m_geometry.getType().value()) {
             case Geometry.GeometryType.Point:
                 return bufferPoint_();
@@ -386,16 +386,14 @@ class GeodesicBufferer {
                 return bufferMultiPoint_();
             case Geometry.GeometryType.Polyline:
                 return bufferPolyline_();
-//            case Geometry.GeometryType.Polygon:
-//                return bufferPolygon_();
-//            case Geometry.GeometryType.Envelope:
-//                return bufferEnvelope_();
+            case Geometry.GeometryType.Polygon:
+                return bufferPolygon_();
+            case Geometry.GeometryType.Envelope:
+                return bufferEnvelope_();
             default:
                 throw GeometryException.GeometryInternalError();
         }
     }
-
-    private static boolean USE_POINT_UNION = false;
 
     private Geometry bufferPolyline_() {
         if (isDegenerateGeometry_(m_geometry)) {
@@ -410,66 +408,54 @@ class GeodesicBufferer {
         // TODO cannot use preparePolyline until there is a Geodetic Generalize
         //m_geometry = preparePolyline_((Polyline) (m_geometry));
 
-
-        if (!USE_POINT_UNION) {
-            GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
-            GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
-                    cursor,
-                    m_spatialReference,
-                    m_progress_tracker);
-            Geometry result = union_cursor.next();
-            return result;
-        } else {
-            // geodesic densify here
-            OperatorGeodeticDensifyByLength opGLength = (OperatorGeodeticDensifyByLength) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodeticDensifyByLength);
-            Geometry geometryDense = opGLength.execute(m_geometry, m_spatialReference, m_abs_distance / 3.5, 0, m_progress_tracker);
-
-            MultiPoint mp = new MultiPoint();
-            for (int ipath = 0; ipath < ((Polyline) geometryDense).getPathCount(); ipath++) {
-                int pathStart = ((Polyline) geometryDense).getPathStart(ipath);
-                int pathEnd = ((Polyline) geometryDense).getPathEnd(ipath);
-                for (int ipoint = pathStart; ipoint < pathEnd; ipoint++) {
-                    Point pt = ((Polyline) geometryDense).getPoint(ipoint);
-                    mp.add(pt);
-                }
-            }
-
-            double[] distances = new double[1];
-            distances[0] = m_distance;
-
-            OperatorGeodesicBuffer opBuf = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
-            return opBuf.execute(mp, m_spatialReference, GeodeticCurveType.Geodesic, m_distance, m_densify_dist, false, m_progress_tracker);
-        }
+        GeometryCursorForPolyline cursor = new GeometryCursorForPolyline(this, m_bfilter);
+        GeometryCursor union_cursor = ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(
+                cursor,
+                m_spatialReference,
+                m_progress_tracker);
+        Geometry result = union_cursor.next();
+        return result;
     }
 
 
-//    private Geometry bufferPolygon_() {
-//        if (m_distance == 0)
-//            return m_geometry;// return input to the output.
-//
-//        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
-//                .getInstance().getOperator(Operator.Type.Simplify);
-//
-//        generateCircleTemplate_();
-//        m_geometry = simplify.execute(m_geometry, null, false,
-//                m_progress_tracker);
-//
-//        if (m_distance < 0) {
-//            Polygon poly = (Polygon) (m_geometry);
+    private Geometry bufferPolygon_() {
+        if (m_distance == 0)
+            return m_geometry;// return input to the output.
+
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.Simplify);
+
+        m_geometry = simplify.execute(m_geometry, null, false,
+                m_progress_tracker);
+
+        Polygon poly = (Polygon) (m_geometry);
+        OperatorBoundary boundaryOp = (OperatorBoundary) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Boundary);
+        SimpleGeometryCursor inputPolygonCursor = new SimpleGeometryCursor(m_geometry);
+        GeometryCursor boundaryLocalCursor = boundaryOp.execute(inputPolygonCursor, null);
+        OperatorGeodesicBuffer geodesicOp = (OperatorGeodesicBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+        double[] distances = new double[1];
+        distances[0] = m_abs_distance;
+        GeometryCursor bufferedBoundaryCursor = geodesicOp.execute(boundaryLocalCursor, m_spatialReference, 0, distances, m_densify_dist, false, true, m_progress_tracker);
+        if (m_distance < 0) {
+            OperatorDifference differenceOp = (OperatorDifference) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Difference);
+            SimpleGeometryCursor subtractee = new SimpleGeometryCursor(m_geometry);
+            GeometryCursor negativeBufferedGeom = differenceOp.execute(subtractee, bufferedBoundaryCursor, m_spatialReference, m_progress_tracker);
 //            Polygon buffered_result = bufferPolygonImpl_(poly, 0,
 //                    poly.getPathCount());
 //            return simplify.execute(buffered_result, m_spatialReference, false,
 //                    m_progress_tracker);
-//        } else {
-//            if (isDegenerateGeometry_(m_geometry)) {
-//                Point point = new Point();
-//                ((MultiVertexGeometry) m_geometry).getPointByVal(0, point);
-//                Envelope2D env2D = new Envelope2D();
-//                m_geometry.queryEnvelope2D(env2D);
-//                point.setXY(env2D.getCenter());
-//                return bufferPoint_(point);
-//            }
-//
+            return negativeBufferedGeom.next();
+        } else {
+            if (isDegenerateGeometry_(m_geometry)) {
+                Point point = new Point();
+                ((MultiVertexGeometry) m_geometry).getPointByVal(0, point);
+                Envelope2D env2D = new Envelope2D();
+                m_geometry.queryEnvelope2D(env2D);
+                // TODO get center Geodesic
+                point.setXY(env2D.getCenter());
+                return bufferPoint_(point);
+            }
+            return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferedBoundaryCursor.next(), m_geometry, m_spatialReference, null);
 //            // For the positive distance we need to process polygon in the parts
 //            // such that each exterior ring with holes is processed separatelly.
 //            GeometryCursorForPolygon cursor = new GeometryCursorForPolygon(this);
@@ -478,8 +464,8 @@ class GeodesicBufferer {
 //                    cursor, m_spatialReference, m_progress_tracker);
 //            Geometry result = union_cursor.next();
 //            return result;
-//        }
-//    }
+        }
+    }
 //
 //    private Polygon bufferPolygonImpl_(Polygon input_geom, int ipath_begin,
 //                                       int ipath_end) {
@@ -704,27 +690,28 @@ class GeodesicBufferer {
                 m_progress_tracker);
         return c.next();
     }
-//
-//    private Geometry bufferEnvelope_() {
-//        Polygon polygon = new Polygon(m_geometry.getDescription());
-//        if (m_distance <= 0) {
-//            if (m_distance == 0)
-//                polygon.addEnvelope((Envelope) (m_geometry), false);
-//            else {
-//                Envelope env = new Envelope();
-//                m_geometry.queryEnvelope(env);
+
+    private Geometry bufferEnvelope_() {
+        Polygon polygon = new Polygon(m_geometry.getDescription());
+        if (m_distance <= 0) {
+            if (m_distance == 0)
+                polygon.addEnvelope((Envelope) (m_geometry), false);
+            else {
+                Envelope2D env = new Envelope2D();
+                m_geometry.queryEnvelope2D(env);
+                GeoDist.inflateEnv2D(m_a, m_e2, env, m_distance, m_distance);
 //                env.inflate(m_distance, m_distance);
-//                polygon.addEnvelope(env, false);
-//            }
-//
-//            return polygon;// nothing is easier than negative buffer on the
-//            // envelope.
-//        }
-//
-//        polygon.addEnvelope((Envelope) (m_geometry), false);
-//        m_geometry = polygon;
-//        return bufferConvexPath_(polygon, 0);
-//    }
+                polygon.addEnvelope(env, false);
+            }
+
+            return polygon;// nothing is easier than negative buffer on the envelope.
+        }
+
+        polygon.addEnvelope((Envelope) (m_geometry), false);
+        m_geometry = polygon;
+        return bufferPolygon_();
+        //return bufferConvexPath_(polygon, 0);
+    }
 //
 //    private Polygon bufferConvexPath_(MultiPath src, int ipath) {
 //        generateCircleTemplate_();
@@ -1170,9 +1157,9 @@ class GeodesicBufferer {
             }
             first = false;
         }
-        if (result_mp.getPoint(0).getX() != result_mp.getPoint(result_mp.getPointCount() - 1).getX() &&
-                result_mp.getPoint(0).getY() != result_mp.getPoint(result_mp.getPointCount() - 1).getY())
-            result_mp.lineTo(result_mp.getPoint(0));
+//        if (result_mp.getPoint(0).getX() != result_mp.getPoint(result_mp.getPointCount() - 1).getX() &&
+//                result_mp.getPoint(0).getY() != result_mp.getPoint(result_mp.getPointCount() - 1).getY())
+//            result_mp.lineTo(result_mp.getPoint(0));
     }
 
     //TODO this seems to be fine for Geodesic vs Planar. The intersect test might be a little off, but this should work?
@@ -1481,16 +1468,10 @@ class GeodesicBufferer {
     }
 
     private boolean isDegenerateEnv2D(Envelope2D env2D) {
-        Point upperLeftPt = new Point(env2D.getUpperLeft());
-        Point upperRightPt = new Point(env2D.getUpperRight());
-        Point lowerLeftPt = new Point(env2D.getLowerLeft());
-        Point lowerRightPt = new Point(env2D.getLowerRight());
+        double width = GeoDist.getEnvWidth(m_a, m_e2, env2D);
+        double height = GeoDist.getEnvHeight(m_a, m_e2, env2D);
 
-        double wTop = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, upperRightPt);
-        double wBottom = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(lowerLeftPt, lowerRightPt);
-        double height = SpatialReferenceImpl.geodesicDistanceOnWGS84Impl(upperLeftPt, lowerLeftPt); // same as height on right
-
-        if (wTop < m_densify_dist * 0.5 || wBottom < m_densify_dist * 0.5 || height < m_densify_dist * 0.5)
+        if (Math.max(width, height) < m_densify_dist * 0.5)
             return true;
 
         return false;
@@ -1544,8 +1525,8 @@ class GeodesicBufferer {
                          boolean bFinishArcEndPt) {
         // TODO move this logic into the constructor, eh?
         int N = calcN_(4);
-        int real_size = (N + 3) / 4;
-        double dA = (Math.PI * 0.5) / real_size;
+        int real_size = ((N + 3) / 4) * 4;
+        double dA = (2 * Math.PI) / real_size;
 
         //TODO this might be good for memory allocations?
         // result_mp.reserve(real_size * 4);
@@ -1580,7 +1561,10 @@ class GeodesicBufferer {
 
             double ratio = angleDifference / (2 * Math.PI);
             real_size = (int) Math.floor(real_size * ratio);
+            // change the angle to be distributed about the real_size interval
+            dA = angleDifference / ((double)real_size);
         }
+
 
         PeDouble lam2 = new PeDouble();
         PeDouble phi2 = new PeDouble();
@@ -1588,10 +1572,12 @@ class GeodesicBufferer {
         if (bStartPath) {
             GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.startPath(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
+            if (arcEndPt == null)
+                arcEndPt = new Point2D(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
         }
         startAzimuth += dA;
 
-        for (int i = 1; i < real_size * 4 - 1; i++) {
+        for (int i = 1; i < real_size; i++) {
             GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.lineTo(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
             startAzimuth += dA;
@@ -1604,7 +1590,7 @@ class GeodesicBufferer {
 
 
     private void addCircle_(MultiPathImpl dst, Point point) {
-        addArc_(dst, point.getXY(), null, point.getXY(), true, true);
+        addArc_(dst, point.getXY(), null, null, true, true);
     }
 
     // Planar and Geodesic are equivalent
