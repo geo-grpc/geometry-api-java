@@ -1180,23 +1180,23 @@ public class TestPolygon extends TestCase {
 		}
 		
 		{
-		Polygon mp = new Polygon();
-		Point pt = new Point();
-		pt.setXY(1, 2);
-		pt.setM(Double.NaN);
-		mp.startPath(pt);
-		pt = new Point();
-		pt.setXY(11, 12);
-		pt.setM(3);
-		mp.lineTo(pt);
-		
-		mp.replaceNaNs(VertexDescription.Semantics.M, 5);
-		Point p = new Point(1, 2); p.setM(5);
-		boolean b = mp.getPoint(0).equals(p);
-		assertTrue(b);
-		p = new Point(11, 12); p.setM(3);
-		b = mp.getPoint(1).equals(p);
-		assertTrue(b);
+			Polygon mp = new Polygon();
+			Point pt1 = new Point();
+			pt1.setXY(1, 2);
+			pt1.setM(Double.NaN);
+			mp.startPath(pt1);
+			Point pt2 = new Point();
+			pt2.setXY(11, 12);
+			pt2.setM(3);
+			mp.lineTo(pt2);
+
+			mp.replaceNaNs(VertexDescription.Semantics.M, 5);
+			Point p = new Point(1, 2); p.setM(5);
+			boolean b = mp.getPoint(0).equals(p);
+			assertTrue(b);
+			p = new Point(11, 12); p.setM(3);
+			b = mp.getPoint(1).equals(p);
+			assertTrue(b);
 		}
 		
 	}	
