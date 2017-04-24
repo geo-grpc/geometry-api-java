@@ -1,5 +1,6 @@
 package com.esri.core.geometry;
 
+import org.proj4.*;
 import com.jhlabs.map.proj.Projection;
 import com.jhlabs.map.proj.ProjectionFactory;
 import junit.framework.TestCase;
@@ -10,6 +11,7 @@ import com.jhlabs.map.*;
 import java.awt.geom.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,6 +54,20 @@ public class TestProjection extends TestCase {
             }
         }
     }
+
+    @Test
+    public void testProj4() throws Exception {
+        PJ sourcePJ = new PJ("+init=epsg:32632");                   // (x,y) axis order
+        PJ targetPJ = new PJ("+proj=latlong +datum=WGS84");         // (λ,φ) axis order
+        double[] coordinates = {
+                500000,       0,   // First coordinate
+                400000,  100000,   // Second coordinate
+                600000, -100000    // Third coordinate
+        };
+        sourcePJ.transform(targetPJ, 2, coordinates, 0, 3);
+        System.out.println(Arrays.toString(coordinates));
+    }
+
 
     private void checkAndPrintErrorForProjection(final Projection projection, final double expected, final double actual) {
         if (Math.abs(expected - actual) > PRECESISSION) {
