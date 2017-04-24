@@ -1,6 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
+// Inform IntelliJ projects about the generated code.
+apply plugin: 'idea'
+
 group = 'com.esri.geometry'
 version = '1.2.1'
 
