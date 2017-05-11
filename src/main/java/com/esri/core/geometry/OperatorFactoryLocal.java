@@ -127,6 +127,8 @@ public class OperatorFactoryLocal extends OperatorFactory {
 				new OperatorConvexHullLocal());
 		st_supportedOperators.put(Type.Boundary, new OperatorBoundaryLocal());
 
+		st_supportedOperators.put(Type.RandomPoints, new OperatorRandomPointsLocal());
+
 		// LabelPoint, - not ported
 
 	}

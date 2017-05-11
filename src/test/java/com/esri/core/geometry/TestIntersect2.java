@@ -146,6 +146,21 @@ public class TestIntersect2 extends TestCase {
 		Point ip = (Point) intersectGeom;
 		assertEquals(ip.getX(), -116, 0.1E7);
 		assertEquals(ip.getY(), 20, 0.1E7);
+
+		try {
+			MultiPoint mp = new MultiPoint();
+			mp.add(basePl);
+			intersectGeom = GeometryEngine.intersect(mp, compPl, SpatialReference.create(4326));
+		} catch (Exception ex) {
+			noException = 0;
+		}
+		assertEquals(noException, 1);
+		assertNotNull(intersectGeom);
+		assertTrue(intersectGeom.getType() == Type.MultiPoint);
+		MultiPoint mpOut = (MultiPoint)intersectGeom;
+		assertTrue(mpOut.getPointCount() == 1);
+		assertEquals(mpOut.getPoint(0).getX(), -116, 0.1E7);
+		assertEquals(mpOut.getPoint(0).getY(), 20, 0.1E7);
 	}
 
 	@Test
