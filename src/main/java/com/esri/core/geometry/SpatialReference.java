@@ -70,6 +70,7 @@ public abstract class SpatialReference implements Serializable {
 		return SpatialReferenceImpl.createImpl(wktext);
 	}
 
+	public static SpatialReference createFromProj4(String proj4test) { return SpatialReferenceImpl.createFromProj4Impl(proj4test); }
 	/**
 	 * @return boolean Is spatial reference local?
 	 */

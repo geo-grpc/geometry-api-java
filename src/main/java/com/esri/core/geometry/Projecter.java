@@ -50,6 +50,7 @@ public class Projecter {
                 case Line:
                     break;
                 case Envelope:
+                    result = projectEnvelope(geometry, projectionTransformation, progressTracker);
                     break;
                 case MultiPoint:
                     result = projectMultiPoint(geometry, projectionTransformation, progressTracker);
@@ -152,5 +153,16 @@ public class Projecter {
         multiVertexGeometryOut._resizeImpl(pointCount);
 
         return polygonOut;
+    }
+
+    static Geometry projectEnvelope(Geometry geometry,
+                                    ProjectionTransformation projectionTransformation,
+                                    ProgressTracker progressTracker) throws org.proj4.PJException {
+        Envelope envelope = (Envelope)geometry;
+        // TODO how to properly copy envelope into polygon
+        Polygon polygon = new Polygon();
+        polygon.addEnvelope(envelope, false);
+
+        return projectPolygon(polygon, projectionTransformation, progressTracker);
     }
 }

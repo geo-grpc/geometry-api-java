@@ -130,4 +130,28 @@ public class TestProjection extends TestCase {
             assertEquals(polygon.getPoint(i).getY(), originalPolygon.getPoint(i).getY(), 1e-10);
         }
     }
+
+    @Test
+    public void testProjectEnvelope() {
+        Envelope2D envelope2D = new Envelope2D(-10000, -10000, 10000, 10000);
+        String proj4 = String.format(
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                0f, 0f);
+
+        SpatialReference spatialReference = SpatialReference.createFromProj4(proj4);
+        SpatialReference spatialReferenceWgs84 = SpatialReference.create(4326);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, spatialReferenceWgs84);
+        Polygon polygon = (Polygon)OperatorProject.local().execute(new Envelope(envelope2D), projectionTransformation, null);
+        assertNotNull(polygon);
+        Point2D point2D = new Point2D();
+        double a = 6378137.0; // radius of spheroid for WGS_1984
+        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+        Envelope2D gcsEnvelope = new Envelope2D();
+        polygon.queryEnvelope2D(gcsEnvelope);
+        GeoDist.getEnvCenter(a, e2, gcsEnvelope, point2D);
+        assertEquals(point2D.x, 0, 1e-14);
+        assertEquals(point2D.y, 0, 1e-6);
+
+        // TODO
+    }
 }

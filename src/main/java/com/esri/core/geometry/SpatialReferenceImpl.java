@@ -210,6 +210,13 @@ class SpatialReferenceImpl extends SpatialReference {
 		return spatRef;
 	}
 
+	protected static SpatialReferenceImpl createFromProj4Impl(String proj4Text) {
+		SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
+		spatRef.m_proj4 = proj4Text;
+
+		return spatRef;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

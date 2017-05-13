@@ -21,4 +21,17 @@ public class TestSpatialReference extends Assert {
         assertFalse(a1.equals(b));
         assertFalse(b.equals(a1));
     }
+
+    @Test
+    public void prjCreateFromProj4() {
+        double longitude = 0.0;
+        double latitude = 0.0;
+        String proj4 = String.format(
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                longitude, latitude);
+
+        SpatialReference spatialReference = SpatialReference.createFromProj4(proj4);
+        assertNotNull(spatialReference);
+        assertEquals(spatialReference.getProj4(), proj4);
+    }
 }

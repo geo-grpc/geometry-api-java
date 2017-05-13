@@ -38,26 +38,29 @@ public class RandomPointMaker {
                                        Random numberGenerator,
                                        SpatialReference sr,
                                        ProgressTracker progressTracker) {
-        Envelope inputEnvelope = new Envelope();
-        polygon.queryEnvelope(inputEnvelope);
+        Envelope2D inputEnvelope2D = new Envelope2D();
+        polygon.queryEnvelope2D(inputEnvelope2D);
 
         // TODO, get center lat lon from envelope
             // TODO If Spatial Reference is PCS Project Envelope to GCS
 
         // From GCS Grab point
-        double longitude = 0;
-        double latitude = inputEnvelope.getCenterY();
+        // TODO change to work with other GCS
+        double a = 6378137.0; // radius of spheroid for WGS_1984
+        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
 
-        // TODO Generate Azimuthal Equal Area Projection from lat lon
+        Point2D ptCenter = new Point2D();
+        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
+        double longitude = ptCenter.x;
+        double latitude = ptCenter.y;
+
         // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
         String proj4 = String.format(
-                "+proj=laea +lat_0=52 +lon_0=10 +x_0=%f +y_0=%f +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
                 longitude, latitude);
+        SpatialReference spatialReferenceAzi = SpatialReference.createFromProj4(proj4);
 
-        // TODO get ellipsoid model (right now assumes everything is GRS80
-
-
-        // TODO Projection Transformation from azi and input sr
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, spatialReferenceAzi);
 
         // TODO Project bounding coordinates to equal area
 
@@ -65,7 +68,7 @@ public class RandomPointMaker {
         // by 1000
 
         // TODO replace this envelope with above equal area envelop
-        Envelope envelope = inputEnvelope;
+        Envelope envelope = new Envelope(inputEnvelope2D);
         double areaKm = envelope.calculateArea2D() / 1000.0;
 
         double xmin = envelope.getXMin();
