@@ -41,7 +41,7 @@ abstract class OperatorProject extends Operator {
 	 * @return Returns a GeometryCursor.
 	 */
 	public abstract GeometryCursor execute(GeometryCursor inputGeoms,
-			ProjectionTransformation projection, ProgressTracker progressTracker);
+					ProjectionTransformation projection, ProgressTracker progressTracker);
 
 	/**
 	 * Performs the Project operation on a single geometry instance
@@ -55,7 +55,7 @@ abstract class OperatorProject extends Operator {
 	 * Transforms an array of points. Returns the number of points transformed.
 	 */
 	public abstract int transform(ProjectionTransformation transform,
-			Point[] coordsSrc, int length, Point[] coordsDst);
+			Point[] coordsSrc, int length, Point[] coordsDst) throws org.proj4.PJException;
 
 	/**
 	 * Transforms an array of 2D points and returns it. The points are stored in
@@ -71,7 +71,7 @@ abstract class OperatorProject extends Operator {
 	 * @return projected coordinates in the interleaved form.
 	 */
 	public abstract double[] transform(ProjectionTransformation transform,
-					double[] coordsSrc, int pointCount);
+					double[] coordsSrc, int pointCount) throws org.proj4.PJException;
 
 	/**
 	 * Folds a geometry into the 360 degree range of the associated spatial reference. If the spatial reference be a 'pannable' PCS or GCS. For other spatial types, the function throws an invalid

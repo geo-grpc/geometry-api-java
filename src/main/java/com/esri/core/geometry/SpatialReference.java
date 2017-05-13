@@ -180,6 +180,8 @@ public abstract class SpatialReference implements Serializable {
 
 	public abstract String getText();
 
+	public abstract String getProj4();
+
 	/**
 	 * Returns the oldest value of the well known ID for the horizontal
 	 * coordinate system of the spatial reference. This ID is used for JSON

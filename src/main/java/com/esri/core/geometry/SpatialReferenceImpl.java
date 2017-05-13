@@ -51,6 +51,7 @@ class SpatialReferenceImpl extends SpatialReference {
 	int m_userWkid;// this wkid is provided by user to the create method.
 	int m_userLatestWkid;
 	int m_userOldestWkid;
+	String m_proj4;
 	String m_userWkt;// a string, the well-known text.
 
 	// public SgCoordRef m_sgCoordRef;
@@ -64,6 +65,7 @@ class SpatialReferenceImpl extends SpatialReference {
 		m_userLatestWkid = -1;
 		m_userOldestWkid = -1;
 		m_userWkt = null;
+		m_proj4 = null;
 	}
 
 	@Override
@@ -141,6 +143,10 @@ class SpatialReferenceImpl extends SpatialReference {
 		return m_userWkt;
 	}
 
+
+	@Override
+	public String getProj4() { return m_proj4; }
+
 	/**
 	 * Returns the oldest value of the well known ID for the horizontal
 	 * coordinate system of the spatial reference. This ID is used for JSON
@@ -188,6 +194,7 @@ class SpatialReferenceImpl extends SpatialReference {
 
 		SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
 		spatRef.m_userWkid = wkid;
+		spatRef.m_proj4 = "+init=epsg:" + Integer.toString(wkid);
 
 		return spatRef;
 	}
