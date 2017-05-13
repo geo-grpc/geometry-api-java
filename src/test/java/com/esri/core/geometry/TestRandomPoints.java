@@ -21,18 +21,23 @@ public class TestRandomPoints extends TestCase {
     public void testPointCreate() {
         OperatorRandomPoints operatorRandomPoints = OperatorRandomPoints.local();
         Polygon poly = new Polygon();
-        poly.startPath(20, 13);
-        poly.lineTo(150, 120);
-        poly.lineTo(300, 414);
-        poly.lineTo(610, 14);
-        poly.lineTo(6210, 140);
+        poly.startPath(0, 0);
+        poly.lineTo(0, 10);
+        poly.lineTo(10, 10);
         poly.closePathWithLine();
-        MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, 100, 1977, null, null);
+        SpatialReference sr = SpatialReference.create(4326);
+        MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, .0013, 1977, sr, null);
         assertNotNull(geometry);
-        assertEquals(geometry.getPointCount(), 13414);
+        assertEquals(geometry.getPointCount(), 793194);
         assertNotNull(geometry.getXY(0));
         assertNotNull(geometry.getXY(geometry.getPointCount() - 1));
-        boolean t = OperatorContains.local().execute(poly, geometry, null, null);
+        Polygon bufferedpoly = (Polygon)OperatorBuffer.local().execute(poly, sr, sr.getTolerance() * 2, null);
+        boolean t = OperatorContains.local().execute(bufferedpoly, geometry, sr, null);
         assertTrue(t);
+    }
+
+    @Test
+    public void testMultiPartPolygonCreate() {
+
     }
 }

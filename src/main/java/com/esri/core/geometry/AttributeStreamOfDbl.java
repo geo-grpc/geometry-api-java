@@ -536,6 +536,21 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 		}
 	}
 
+	/**
+	 * WARNING, this is like move semantics in C++, that means outside world could mess up a polygon if they still have
+	 * a pointer to array. Only used internally for functions where array pointer never leaves scope of function
+	 * @param src
+	 */
+	protected void writeRangeMove(double[] src) {
+		if (src.length == 0)
+			return;
+
+		if (size() < src.length)
+			resize(src.length);
+
+		m_buffer = src;
+	}
+
 	// reads count doubles, 2 at a time, into dst. count is assumed to be even,
 	// arrayOffset is an index of the zeroth dimension (i.e. you can't start
 	// reading into dst[0,1])
