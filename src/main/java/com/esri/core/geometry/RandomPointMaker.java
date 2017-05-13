@@ -33,10 +33,24 @@ public class RandomPointMaker {
                                        Random numberGenerator,
                                        SpatialReference sr,
                                        ProgressTracker progressTracker) {
+        Envelope inputEnvelope = new Envelope();
+        polygon.queryEnvelope(inputEnvelope);
+
         // TODO, get center lat lon from envelope
-            // get lat lon, by projection if necessary
+            // TODO If Spatial Reference is PCS Project Envelope to GCS
+
+        // From GCS Grab point
+        double longitude = 0;
+        double latitude = inputEnvelope.getCenterY();
 
         // TODO Generate Azimuthal Equal Area Projection from lat lon
+        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        String proj4 = String.format(
+                "+proj=laea +lat_0=52 +lon_0=10 +x_0=%f +y_0=%f +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                longitude, latitude);
+
+        // TODO get ellipsoid model (right now assumes everything is GRS80
+
 
         // TODO Projection Transformation from azi and input sr
 
@@ -46,8 +60,7 @@ public class RandomPointMaker {
         // by 1000
 
         // TODO replace this envelope with above equal area envelop
-        Envelope envelope = new Envelope();
-        polygon.queryEnvelope(envelope);
+        Envelope envelope = inputEnvelope;
         double areaKm = envelope.calculateArea2D() / 1000.0;
 
         double xmin = envelope.getXMin();
@@ -84,7 +97,7 @@ public class RandomPointMaker {
         // TODO project multipoint back to input spatial reference (it is necessary to do it here,
         // because if we projected the above array, then we wouldn't benefit from clipping
 
-        // Intersect by input geometry 
+        // Intersect by input geometry
         return GeometryEngine.intersect(multiPoint, polygon, sr);
     }
 }
