@@ -33,9 +33,19 @@ public class RandomPointMaker {
                                        Random numberGenerator,
                                        SpatialReference sr,
                                        ProgressTracker progressTracker) {
+        // TODO, get center lat lon from envelope
+            // get lat lon, by projection if necessary
+
+        // TODO Generate Azimuthal Equal Area Projection from lat lon
+
+        // TODO Projection Transformation from azi and input sr
+
+        // TODO Project bounding coordinates to equal area
 
         // Calculate point count within bounding box by dividing area in meters
         // by 1000
+
+        // TODO replace this envelope with above equal area envelop
         Envelope envelope = new Envelope();
         polygon.queryEnvelope(envelope);
         double areaKm = envelope.calculateArea2D() / 1000.0;
@@ -61,6 +71,7 @@ public class RandomPointMaker {
             xy[i] = val;
         }
 
+        // Create Multipoint from vertices
         MultiPoint multiPoint = new MultiPoint();
         multiPoint.add(4, 4);
         MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)multiPoint._getImpl();
@@ -70,6 +81,10 @@ public class RandomPointMaker {
         //multiVertexGeometry._resizeImpl(pointCount);
         multiPoint.resize(pointCount);
 
+        // TODO project multipoint back to input spatial reference (it is necessary to do it here,
+        // because if we projected the above array, then we wouldn't benefit from clipping
+
+        // Intersect by input geometry 
         return GeometryEngine.intersect(multiPoint, polygon, sr);
     }
 }
