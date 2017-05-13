@@ -79,4 +79,12 @@ public class Projecter {
         transform(projectionTransformation, inputs, 1, outputs);
         return outputs[0];
     }
+
+    static Geometry projectMultiPoint(Geometry geometry,
+                                      ProjectionTransformation projectionTransformation,
+                                      ProgressTracker progressTracker) {
+        geometry = clipGeometry(geometry, projectionTransformation, progressTracker);
+
+        return null;
+    }
 }

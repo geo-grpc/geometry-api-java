@@ -102,7 +102,25 @@ public class TestProjection extends TestCase {
         Point pointOut = (Point)OperatorProject.local().execute(point, projectionTransformation, null);
         assertNotNull(pointOut);
         assertTrue(Math.abs(point.getX() - pointOut.getY()) > 1);
+        projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
+        Point originalPoint = (Point)OperatorProject.local().execute(pointOut, projectionTransformation, null);
+        assertEquals(originalPoint.getX(), point.getX());
+        assertEquals(originalPoint.getY(), point.getY());
+    }
 
+    @Test
+    public void testProjectMultiPoint() {
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(32632), SpatialReference.create(4326));
+        MultiPoint point = new MultiPoint();
+        point.add( 500000,       0);
+        point.add(400000,  100000);
+        point.add(600000, -100000);
+        MultiPoint pointOut = (MultiPoint)OperatorProject.local().execute(point, projectionTransformation, null);
+        assertNotNull(pointOut);
+        assertFalse(pointOut.equals(point));
+        projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
+        MultiPoint originalPoint = (MultiPoint)OperatorProject.local().execute(pointOut, projectionTransformation, null);
+        assertTrue(originalPoint.equals(point));
     }
 
 
