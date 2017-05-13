@@ -401,6 +401,7 @@ class GeodesicBufferer {
             ((MultiVertexGeometry) m_geometry).getPointByVal(0, point);
             Envelope2D env2D = new Envelope2D();
             m_geometry.queryEnvelope2D(env2D);
+            // TODO get center Geodesic
             point.setXY(env2D.getCenter());
             return bufferPoint_(point);
         }
