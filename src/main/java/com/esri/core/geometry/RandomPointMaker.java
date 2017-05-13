@@ -25,9 +25,14 @@ public class RandomPointMaker {
             return null;
 
         Polygon polygon = (Polygon)geometry;
+        // TODO should iterate over paths
+        // TODO iterator should check for containment. If a path is contained within another, random points shouldn't
+        // be generated for that contained path
+        // Ask Aaron if paths are written to attribute stream such that paths contained come after container paths
         return __makeRandomPoints(polygon, pointsPerSquareKm, numberGenerator, sr, progressTracker);
     }
 
+    // TODO input should be multiplath
     static Geometry __makeRandomPoints(Polygon polygon,
                                        double pointsPerSquareKm,
                                        Random numberGenerator,
