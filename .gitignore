@@ -26,6 +26,7 @@ libs/
 ######################
 .DS_Store
 .DS_Store?
+*.orig
 ._*
 .Spotlight-V100
 .Trashes

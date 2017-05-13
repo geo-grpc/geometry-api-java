@@ -24,6 +24,24 @@
 
 package com.esri.core.geometry;
 
+import org.proj4.PJ;
+
 //This is a stub
 class ProjectionTransformation {
+    SpatialReference m_fromSpatialReference;
+    SpatialReference m_toSpatialReference;
+    // TODO maybe cache the PJ objects?
+
+    ProjectionTransformation(SpatialReference fromSpatialReference, SpatialReference toSpatialReference) {
+        m_fromSpatialReference = fromSpatialReference;
+        m_toSpatialReference = toSpatialReference;
+    }
+
+    public PJ getFromProj() {
+        return new PJ(m_fromSpatialReference.getProj4());
+    }
+
+    public PJ getToProj() {
+        return new PJ(m_toSpatialReference.getProj4());
+    }
 }

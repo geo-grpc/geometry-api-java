@@ -24,29 +24,33 @@
 
 package com.esri.core.geometry;
 
+import org.proj4.PJ;
+
+import java.util.Arrays;
+
 //This is a stub
 class OperatorProjectLocal extends OperatorProject {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor inputGeoms,
 			ProjectionTransformation transform, ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+		return new OperatorProjectCursor(inputGeoms, transform, progressTracker);
 	}
 
 	public Geometry execute(Geometry inputGeom,
 			ProjectionTransformation transform, ProgressTracker progressTracker) {
-		throw new GeometryException("not implemented");
+		return execute(new SimpleGeometryCursor(inputGeom), transform, progressTracker).next();
 	}
 
 	@Override
 	public int transform(ProjectionTransformation transform, Point[] pointsIn,
-			int count, Point[] pointsOut) {
-		throw new GeometryException("not implemented");
+			int count, Point[] pointsOut) throws org.proj4.PJException {
+		return Projecter.transform(transform, pointsIn, count, pointsOut);
 	}
 
 	public double[] transform(ProjectionTransformation transform,
-			double[] coordsSrc, int pointCount) {
-		throw new GeometryException("not implemented");
+			double[] coordsSrc, int pointCount) throws org.proj4.PJException {
+		return Projecter.transform(transform, coordsSrc, pointCount);
 	}
 
 	@Override
