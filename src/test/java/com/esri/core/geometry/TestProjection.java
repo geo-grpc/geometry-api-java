@@ -14,41 +14,9 @@ public class TestProjection extends TestCase {
     static {
         System.loadLibrary("proj");
     }
-    private static final double PRECESISSION = 1e-3;
-
-//    private final List<Projection> inversableProjections = new ArrayList<Projection>();
 
     @Before
     public void setUp() {
-//        for (final String projectionName : ProjectionFactory.getOrderedProjectionNames()) {
-//            final Projection projection = ProjectionFactory.getNamedProjection(projectionName);
-//            if (!projection.hasInverse()) {
-//                System.out.println("INFO: Ignore not inverable projection: " + projection);
-//                continue;
-//            }
-//            inversableProjections.add(projection);
-//        }
-//        System.out.println();
-//        System.out.flush();
-    }
-
-    @Test
-    public void testProjectionAndInverseAreTheSame() throws Exception {
-//        for (final Projection projection : inversableProjections) {
-//            try {
-//                final java.awt.geom.Point2D.Double sourceLL = new java.awt.geom.Point2D.Double(0, 1);
-//                final java.awt.geom.Point2D.Double projectedXY = projection.project(sourceLL.getX(), sourceLL.getY(), new Point2D.Double());
-//                final java.awt.geom.Point2D.Double sourceLL2 = projection.projectInverse(projectedXY.getX(), projectedXY.getX(), new java.awt.geom.Point2D.Double());
-//
-//
-//                System.out.println("INFO: Test inverable projection: " + projection);
-//                checkAndPrintErrorForProjection(projection, sourceLL.getX(), sourceLL2.getX());
-//                checkAndPrintErrorForProjection(projection, sourceLL.getY(), sourceLL2.getY());
-//            } catch (final Exception e) {
-//                System.err.println("ERROR: Exception for  " + projection);
-//                e.printStackTrace(System.err);
-//            }
-//        }
     }
 
     @Test
@@ -78,12 +46,6 @@ public class TestProjection extends TestCase {
             assertTrue((Math.abs(coordinates_4326[i] - coordinates_32632[i])) > 1);
             assertEquals(coordinates_4326[i], coordinates_WGS84[i]);
         }
-
-//        targetPJ.transform(sourcePJ, 2, coordinates_32632, 0, 3);
-//
-//        for (int i = 0; i < coordinates_WGS84.length; i++) {
-//            assertEquals(coordinates_WGS84[i], coordinates_32632[i], .001);
-//        }
     }
 
     @Test
@@ -168,11 +130,4 @@ public class TestProjection extends TestCase {
             assertEquals(polygon.getPoint(i).getY(), originalPolygon.getPoint(i).getY(), 1e-10);
         }
     }
-
-
-//    private void checkAndPrintErrorForProjection(final Projection projection, final double expected, final double actual) {
-//        if (Math.abs(expected - actual) > PRECESISSION) {
-//            System.err.println("ERROR: Expected " + expected + ", but was " + actual + " for " + projection);
-//        }
-//    }
 }

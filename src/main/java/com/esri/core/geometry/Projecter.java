@@ -8,6 +8,10 @@ import java.util.Arrays;
  * Created by davidraleigh on 5/12/17.
  */
 public class Projecter {
+    static {
+        System.loadLibrary("proj");
+    }
+
     public static int transform(ProjectionTransformation projectionTransformation, Point[] pointsIn,
                          int count, Point[] pointsOut) throws org.proj4.PJException {
         double[] coordsIn = new double[pointsIn.length * 2];
