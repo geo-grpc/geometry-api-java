@@ -200,6 +200,76 @@ final class GeoDist {
 		return answer.val;
 	}
 
+	public static void getEnvCenter(double a,
+									double e2,
+									Envelope2D env2D,
+									Point2D geodeticCenter) {
+		// Get minx miny, minx maxy midpoint
+		Point2D lowerRightUpperLeft = new Point2D();
+		GeoDist.geodesicMidpoint(a, e2, env2D.getLowerRight(), env2D.getUpperLeft(), lowerRightUpperLeft);
+
+
+		// Get maxx miny, maxx maxy midpoint
+		Point2D upperRightLowerLeft = new Point2D();
+		GeoDist.geodesicMidpoint(a, e2, env2D.getLowerLeft(), env2D.getUpperRight(), upperRightLowerLeft);
+
+		// Get midpoint of midpoints
+		GeoDist.geodesicMidpoint(a, e2, lowerRightUpperLeft, upperRightLowerLeft, geodeticCenter);
+	}
+
+	static public void geodesicMidpoint(double a, double e2, Point2D fromPoint, Point2D toPoint, Point2D outMidPoint) {
+		// TODO calculate distance
+		PeDouble azFromTo = new PeDouble();
+		double distance = geodesicDistance(a, e2, fromPoint, toPoint, azFromTo, null);
+
+		// TODO calculate midpoint
+		geodesicForward(a, e2, fromPoint, distance / 2f, azFromTo.val, outMidPoint);
+	}
+
+	static public void geodesicForward(double a,
+									   double e2,
+									   Point2D fromPoint,
+									   double distance,
+									   double azimuth,
+									   Point2D outToPoint) {
+		PeDouble lam2 = new PeDouble();
+		PeDouble phi2 = new PeDouble();
+		GeoDist.geodesic_forward(
+				a,
+				e2,
+				fromPoint.x * DEG_TO_RAD,
+				fromPoint.y * DEG_TO_RAD,
+				distance,
+				azimuth,
+				lam2,
+				phi2);
+
+		outToPoint.x = lam2.val * RAD_TO_DEG;
+		outToPoint.y = phi2.val * RAD_TO_DEG;
+	}
+
+	static public double geodesicDistance(double a,
+										  double e2,
+										  Point2D fromPoint,
+										  Point2D toPoint,
+										  PeDouble azFromTo,
+										  PeDouble azToFrom) {
+//		double a = 6378137.0; // radius of spheroid for WGS_1984
+//        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+		PeDouble answer = new PeDouble();
+		GeoDist.geodesic_distance_ngs(
+				a,
+				e2,
+				fromPoint.x * DEG_TO_RAD,
+				fromPoint.y * DEG_TO_RAD,
+				toPoint.x * DEG_TO_RAD,
+				toPoint.y * DEG_TO_RAD,
+				answer,
+				azFromTo,
+				azToFrom);
+		return answer.val;
+	}
+
 	static public void geodesic_forward(double a,
 										double e2,
 										double lam1,
@@ -276,9 +346,15 @@ final class GeoDist {
 		phi2.val = Math.atan2(phiNumerator, phiDenominator);
 	}
 
-	static public void geodesic_distance_ngs(double a, double e2, double lam1,
-			double phi1, double lam2, double phi2, PeDouble p_dist,
-			PeDouble p_az12, PeDouble p_az21) {
+	static public void geodesic_distance_ngs(double a,
+											 double e2,
+											 double lam1,
+											 double phi1,
+											 double lam2,
+											 double phi2,
+											 PeDouble p_dist,
+											 PeDouble p_az12,
+											 PeDouble p_az21) {
 		/* Highly edited version (plus lots of additions) of NGS FORTRAN code */
 
 		/*

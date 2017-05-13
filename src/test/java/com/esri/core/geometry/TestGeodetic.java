@@ -715,6 +715,26 @@ public class TestGeodetic extends TestCase {
 //		 */
 //	}
 
-	
+	@Test
+	public void testEnvelopeMidpoint() {
+		Envelope2D envelope2D = new Envelope2D(45, -10, 55, 10);
+		Point2D centerPoint = new Point2D();
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+		GeoDist.getEnvCenter(a, e2, envelope2D, centerPoint);
+		assertEquals(50, centerPoint.x, 1e-12);
+		assertEquals(0, centerPoint.y, 1e-4);
+	}
+
+	@Test
+	public void testEnvelopeMidpointDateline() {
+		Envelope2D envelope2D = new Envelope2D(175, -10, -175, 10);
+		Point2D centerPoint = new Point2D();
+		double a = 6378137.0; // radius of spheroid for WGS_1984
+		double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+		GeoDist.getEnvCenter(a, e2, envelope2D, centerPoint);
+		assertEquals(180, Math.abs(centerPoint.x), 1e-12);
+		assertEquals(0, centerPoint.y, 1e-4);
+	}
 
 }
