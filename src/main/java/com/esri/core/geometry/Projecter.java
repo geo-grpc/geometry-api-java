@@ -48,10 +48,13 @@ public class Projecter {
                 case Envelope:
                     break;
                 case MultiPoint:
+                    result = projectMultiPoint(geometry, projectionTransformation, progressTracker);
                     break;
                 case Polyline:
+                    result = projectPolyline(geometry, projectionTransformation, progressTracker);
                     break;
                 case Polygon:
+                    result = projectPolygon(geometry, projectionTransformation, progressTracker);
                     break;
             }
         } catch (PJException e) {
@@ -82,9 +85,68 @@ public class Projecter {
 
     static Geometry projectMultiPoint(Geometry geometry,
                                       ProjectionTransformation projectionTransformation,
-                                      ProgressTracker progressTracker) {
-        geometry = clipGeometry(geometry, projectionTransformation, progressTracker);
+                                      ProgressTracker progressTracker) throws org.proj4.PJException {
+        MultiPoint multiPoint = (MultiPoint)clipGeometry(geometry, projectionTransformation, progressTracker);
 
-        return null;
+        int pointCount = multiPoint.getPointCount();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)multiPoint._getImpl();
+
+        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        double[] output = transform(projectionTransformation, xyPositions.m_buffer, pointCount);
+        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
+        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
+
+        MultiPoint multiPointOut = new MultiPoint(multiPoint.getDescription());
+        MultiVertexGeometryImpl multiVertexGeometryOut = (MultiVertexGeometryImpl)multiPointOut._getImpl();
+
+        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
+        multiVertexGeometryOut._resizeImpl(pointCount);
+        multiPointOut.resize(pointCount);
+
+        return multiPointOut;
+    }
+
+    static Geometry projectPolyline(Geometry geometry,
+                                      ProjectionTransformation projectionTransformation,
+                                      ProgressTracker progressTracker) throws org.proj4.PJException {
+        Polyline polyline = (Polyline)clipGeometry(geometry, projectionTransformation, progressTracker);
+
+        int pointCount = polyline.getPointCount();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polyline._getImpl();
+
+        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        double[] output = transform(projectionTransformation, xyPositions.m_buffer, pointCount);
+        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
+        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
+
+        Polyline polylineOut = new Polyline(polyline.getDescription());
+        MultiVertexGeometryImpl multiVertexGeometryOut = (MultiVertexGeometryImpl)polylineOut._getImpl();
+
+        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
+        multiVertexGeometryOut._resizeImpl(pointCount);
+
+        return polylineOut;
+    }
+
+    static Geometry projectPolygon(Geometry geometry,
+                                    ProjectionTransformation projectionTransformation,
+                                    ProgressTracker progressTracker) throws org.proj4.PJException {
+        Polygon polygon = (Polygon)clipGeometry(geometry, projectionTransformation, progressTracker);
+
+        int pointCount = polygon.getPointCount();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polygon._getImpl();
+
+        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        double[] output = transform(projectionTransformation, xyPositions.m_buffer, pointCount);
+        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
+        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
+
+        Polygon polygonOut = new Polygon(polygon.getDescription());
+        MultiVertexGeometryImpl multiVertexGeometryOut = (MultiVertexGeometryImpl)polygonOut._getImpl();
+
+        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
+        multiVertexGeometryOut._resizeImpl(pointCount);
+
+        return polygonOut;
     }
 }

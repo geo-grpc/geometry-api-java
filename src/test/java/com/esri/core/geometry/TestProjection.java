@@ -111,16 +111,62 @@ public class TestProjection extends TestCase {
     @Test
     public void testProjectMultiPoint() {
         ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(32632), SpatialReference.create(4326));
-        MultiPoint point = new MultiPoint();
-        point.add( 500000,       0);
-        point.add(400000,  100000);
-        point.add(600000, -100000);
-        MultiPoint pointOut = (MultiPoint)OperatorProject.local().execute(point, projectionTransformation, null);
-        assertNotNull(pointOut);
-        assertFalse(pointOut.equals(point));
+        MultiPoint multiPoint = new MultiPoint();
+        multiPoint.add( 500000,       0);
+        multiPoint.add(400000,  100000);
+        multiPoint.add(600000, -100000);
+        MultiPoint multiPointOut = (MultiPoint)OperatorProject.local().execute(multiPoint, projectionTransformation, null);
+        assertNotNull(multiPointOut);
+        assertFalse(multiPointOut.equals(multiPoint));
+        assertEquals(multiPoint.getPointCount(), multiPointOut.getPointCount());
         projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
-        MultiPoint originalPoint = (MultiPoint)OperatorProject.local().execute(pointOut, projectionTransformation, null);
-        assertTrue(originalPoint.equals(point));
+        MultiPoint originalMultiPoint = (MultiPoint)OperatorProject.local().execute(multiPointOut, projectionTransformation, null);
+
+        for (int i = 0; i < multiPoint.getPointCount(); i++) {
+            assertEquals(multiPoint.getPoint(i).getX(), originalMultiPoint.getPoint(i).getX(), 1e-10);
+            assertEquals(multiPoint.getPoint(i).getY(), originalMultiPoint.getPoint(i).getY(), 1e-10);
+        }
+    }
+
+    @Test
+    public void testProjectPolyline() {
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(32632), SpatialReference.create(4326));
+        Polyline polyline = new Polyline();
+        polyline.startPath( 500000,       0);
+        polyline.lineTo(400000,  100000);
+        polyline.lineTo(600000, -100000);
+        Polyline polylineOut = (Polyline)OperatorProject.local().execute(polyline, projectionTransformation, null);
+        assertNotNull(polylineOut);
+        assertFalse(polylineOut.equals(polyline));
+        assertEquals(polyline.getPointCount(), polylineOut.getPointCount());
+        projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
+        Polyline originalPolyline = (Polyline)OperatorProject.local().execute(polylineOut, projectionTransformation, null);
+
+        for (int i = 0; i < polyline.getPointCount(); i++) {
+            assertEquals(polyline.getPoint(i).getX(), originalPolyline.getPoint(i).getX(), 1e-10);
+            assertEquals(polyline.getPoint(i).getY(), originalPolyline.getPoint(i).getY(), 1e-10);
+        }
+    }
+
+    @Test
+    public void testProjectPolygon() {
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(32632), SpatialReference.create(4326));
+        Polygon polygon = new Polygon();
+        polygon.startPath( 500000,       0);
+        polygon.lineTo(400000,  100000);
+        polygon.lineTo(600000, -100000);
+        polygon.closeAllPaths();
+        Polygon polygonOut = (Polygon)OperatorProject.local().execute(polygon, projectionTransformation, null);
+        assertNotNull(polygonOut);
+        assertFalse(polygonOut.equals(polygon));
+        assertEquals(polygon.getPointCount(), polygonOut.getPointCount());
+        projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
+        Polygon originalPolygon = (Polygon)OperatorProject.local().execute(polygonOut, projectionTransformation, null);
+
+        for (int i = 0; i < polygon.getPointCount(); i++) {
+            assertEquals(polygon.getPoint(i).getX(), originalPolygon.getPoint(i).getX(), 1e-10);
+            assertEquals(polygon.getPoint(i).getY(), originalPolygon.getPoint(i).getY(), 1e-10);
+        }
     }
 
 
