@@ -25,3 +25,7 @@ dependencies {
     compile files('DepFiles/public/jproj.jar')
     testCompile group: 'junit', name: 'junit', version:'4.11'
 }
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", "/usr/local/lib/"
+}
