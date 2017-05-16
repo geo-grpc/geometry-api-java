@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Created by davidraleigh on 5/10/17.
  */
-class OperatorRandomPointsCursor extends GeometryCursor {
+public class OperatorRandomPointsCursor extends GeometryCursor {
 
     private GeometryCursor m_inputGeoms;
     private double[] m_pointsPerSquareKm;

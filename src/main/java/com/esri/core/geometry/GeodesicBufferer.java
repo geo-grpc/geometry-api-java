@@ -1,7 +1,5 @@
 package com.esri.core.geometry;
 
-import com.sun.org.apache.bcel.internal.generic.GOTO;
-
 import java.util.ArrayList;
 
 /**

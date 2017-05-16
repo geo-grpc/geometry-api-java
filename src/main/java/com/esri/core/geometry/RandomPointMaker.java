@@ -6,7 +6,7 @@ package com.esri.core.geometry;
 
 import java.util.Random;
 
-public class RandomPointMaker {
+class RandomPointMaker {
 
     /**
      * This assumes an equal area projection

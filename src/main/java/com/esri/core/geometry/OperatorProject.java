@@ -23,12 +23,10 @@
  */
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.Operator.Type;
-
 /**
  * Projection of geometries to different coordinate systems.
  */
-abstract class OperatorProject extends Operator {
+public abstract class OperatorProject extends Operator {
 
 	@Override
 	public Type getType() {

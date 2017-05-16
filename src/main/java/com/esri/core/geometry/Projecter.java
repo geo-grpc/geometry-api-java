@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * Created by davidraleigh on 5/12/17.
  */
-public class Projecter {
+class Projecter {
     static {
         System.loadLibrary("proj");
     }
