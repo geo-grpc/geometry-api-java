@@ -100,6 +100,13 @@ public class TestProjection extends TestCase {
         Polyline polylineOut = (Polyline)OperatorProject.local().execute(polyline, projectionTransformation, null);
         assertNotNull(polylineOut);
         assertFalse(polylineOut.equals(polyline));
+
+        MultiPathImpl polyline_impl = (MultiPathImpl) polylineOut._getImpl();
+        int point_count = polyline_impl.getPointCount();
+        int path_count = polyline_impl.getPathCount();
+        assertEquals(point_count, 3);
+        assertEquals(path_count, 1);
+
         assertEquals(polyline.getPointCount(), polylineOut.getPointCount());
         projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
         Polyline originalPolyline = (Polyline)OperatorProject.local().execute(polylineOut, projectionTransformation, null);

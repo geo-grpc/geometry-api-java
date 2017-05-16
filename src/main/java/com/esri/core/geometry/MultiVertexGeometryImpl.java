@@ -629,11 +629,8 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 			cloneAttributes = new AttributeStreamBase[nattrib];
 			for (int i = 0; i < nattrib; i++) {
 				if (m_vertexAttributes[i] != null) {
-					int ncomps = VertexDescription
-							.getComponentCount(m_description
-									._getSemanticsImpl(i));
-					cloneAttributes[i] = m_vertexAttributes[i]
-							.restrictedClone(getPointCount() * ncomps);
+					int ncomps = VertexDescription.getComponentCount(m_description._getSemanticsImpl(i));
+					cloneAttributes[i] = m_vertexAttributes[i].restrictedClone(getPointCount() * ncomps);
 				}
 			}
 		}
