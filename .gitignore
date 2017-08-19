@@ -12,7 +12,6 @@ description.jardesc
 *.iml
 *.ipr
 *.iws
-.idea/
 
 # Eclipse project files
 .settings/
