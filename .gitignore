@@ -12,9 +12,9 @@ description.jardesc
 *.iml
 *.ipr
 *.iws
-.idea/
-
-!.idea/workspace.xml
+.idea/misc.xml
+.idea/modules
+.idea/libraries
 
 # Eclipse project files
 .settings/
