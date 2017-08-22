@@ -244,16 +244,11 @@ public final class Envelope2D implements Serializable {
 	 * @return True if this envelope intersects the other.
 	 */
 	public boolean isIntersecting(Envelope2D other) {
-		return !isEmpty()
-				&& !other.isEmpty()
-				&& ((xmin <= other.xmin) ? xmax >= other.xmin
-						: other.xmax >= xmin)
-				&& // check that x projections overlap
-				((ymin <= other.ymin) ? ymax >= other.ymin : other.ymax >= ymin); // check
-																					// that
-																					// y
-																					// projections
-																					// overlap
+		return !isEmpty() && !other.isEmpty()
+				// check that x projections overlap
+				&& ((xmin <= other.xmin) ? xmax >= other.xmin : other.xmax >= xmin)
+				// check that y projections overlap
+				&& ((ymin <= other.ymin) ? ymax >= other.ymin : other.ymax >= ymin);
 	}
 
 	/**
@@ -279,27 +274,27 @@ public final class Envelope2D implements Serializable {
 	 *         envelope to empty state and returns False.
 	 */
 	public boolean intersect(Envelope2D other) {
-		if (isEmpty() || other.isEmpty())
-			return false;
+			if (isEmpty() || other.isEmpty())
+				return false;
 
-		if (other.xmin > xmin)
-			xmin = other.xmin;
+			if (other.xmin > xmin)
+				xmin = other.xmin;
 
-		if (other.xmax < xmax)
-			xmax = other.xmax;
+			if (other.xmax < xmax)
+				xmax = other.xmax;
 
-		if (other.ymin > ymin)
-			ymin = other.ymin;
+			if (other.ymin > ymin)
+				ymin = other.ymin;
 
-		if (other.ymax < ymax)
-			ymax = other.ymax;
+			if (other.ymax < ymax)
+				ymax = other.ymax;
 
-		boolean bIntersecting = xmin <= xmax && ymin <= ymax;
+			boolean bIntersecting = xmin <= xmax && ymin <= ymax;
 
-		if (!bIntersecting)
-			setEmpty();
+			if (!bIntersecting)
+				setEmpty();
 
-		return bIntersecting;
+			return bIntersecting;
 	}
 
 	/**
