@@ -33,7 +33,7 @@ WORKDIR /opt/src
 RUN git clone https://github.com/OSGeo/proj.4.git \
     && cd proj.4 \
     && ./autogen.sh \
-    && CFLAGS=-I$JAVA_HOME/include/linux ./configure --with-jni=$JAVA_HOME/include --prefix=/usr \
+    && CFLAGS=-I$JAVA_HOME/include/linux ./configure --with-jni=$JAVA_HOME/include --prefix=/usr/local \
     && make -j 8 \
     && make install
 
