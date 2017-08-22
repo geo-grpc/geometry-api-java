@@ -29,11 +29,12 @@ RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 #    && rm -rf /vdatum
 
 #TODO there should be a release checkout
+WORKDIR /opt/src
 RUN git clone https://github.com/OSGeo/proj.4.git \
     && cd proj.4 \
     && ./autogen.sh \
     && CFLAGS=-I$JAVA_HOME/include/linux ./configure --with-jni=$JAVA_HOME/include --prefix=/usr \
-    && make -j 8\
+    && make -j 8 \
     && make install
 
 COPY ./ /opt/src/geometry-api-java
