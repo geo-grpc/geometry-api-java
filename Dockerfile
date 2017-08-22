@@ -1,5 +1,4 @@
-#FROM java:openjdk-8u111-alpine
-FROM gradle:8-jdk-alpine
+FROM java:openjdk-8u111-alpine
 
 # Install Proj4
 # https://github.com/OSGeo/proj.4/blob/57a07c119ae08945caa92b29c4b427b57f1f728d/Dockerfile
@@ -41,9 +40,9 @@ COPY ./ /opt/src/geometry-api-java
 
 WORKDIR /opt/src/geometry-api-java
 
-RUN gradle build
+RUN ./gradlew build
 
-RUN gradle build install
+RUN ./gradlew build install
 
 #RUN chmod +x /opt/src/geometry-service-java/geometry-service/bin/geometry-operators-server
 #
