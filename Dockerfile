@@ -1,4 +1,5 @@
-FROM java:openjdk-8u111-alpine
+#FROM java:openjdk-8u111-alpine
+FROM gradle:8-jdk-alpine
 
 # Install Proj4
 # https://github.com/OSGeo/proj.4/blob/57a07c119ae08945caa92b29c4b427b57f1f728d/Dockerfile
@@ -28,6 +29,7 @@ RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 #    && wget http://download.osgeo.org/proj/vdatum/egm08_25/egm08_25.gtx && mv egm08_25.gtx /usr/share/proj \
 #    && rm -rf /vdatum
 
+#TODO there should be a release checkout
 RUN git clone https://github.com/OSGeo/proj.4.git \
     && cd proj.4 \
     && ./autogen.sh \
@@ -35,9 +37,9 @@ RUN git clone https://github.com/OSGeo/proj.4.git \
     && make -j 8\
     && make install
 
-COPY ./build/install /opt/src/geometry-api-java
+COPY ./ /opt/src/geometry-api-java
 
-WORKDIR /opt/src/geometry-service-java
+WORKDIR /opt/src/geometry-api-java
 
 RUN gradle build
 
