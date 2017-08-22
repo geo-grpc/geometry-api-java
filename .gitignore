@@ -14,6 +14,8 @@ description.jardesc
 *.iws
 .idea/
 
+!.idea/workspace.xml
+
 # Eclipse project files
 .settings/
 libs/
