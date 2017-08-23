@@ -3,13 +3,6 @@ machine:
     - docker
 
 dependencies:
-  pre:
-    - sudo apt-get update; sudo git clone https://github.com/OSGeo/proj.4.git \
-                                    && cd proj.4 \
-                                    && ./autogen.sh \
-                                    && ./configure --prefix=/usr/local \
-                                    && make \
-                                    && make install \
-                                    && cd /proj.4/docs \
-                                    && make html \
-                                    && rm -rf /proj.4
+  override:
+    - docker info
+    - docker build --rm=false -t us.gcr.io/echoparklabs/geometry-api-java .
