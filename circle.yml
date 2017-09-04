@@ -5,7 +5,7 @@ machine:
 jobs:
   build:
     docker:
-      - image:
+      - image: us.gcr.io/echoparklabs/proj.4:latest
         auth:
           username: circleci-registry-reader@echoparklabs.iam.gserviceaccount.com
           password: $GCR_PASSWORD
