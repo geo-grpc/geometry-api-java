@@ -9,6 +9,10 @@ jobs:
         auth:
           username: circleci-registry-reader@echoparklabs.iam.gserviceaccount.com
           password: $GCR_PASSWORD
+    steps:
+      - run: ./gradlew build
+      - run: ./gradlew build install
+
 
 #dependencies:
 #  override:
