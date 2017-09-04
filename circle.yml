@@ -10,7 +10,7 @@ jobs:
           username: circleci-registry-reader@echoparklabs.iam.gserviceaccount.com
           password: $GCR_PASSWORD
 
-dependencies:
-  override:
-    - docker info
-    - docker build --rm=false -t us.gcr.io/echoparklabs/geometry-api-java .
+#dependencies:
+#  override:
+#    - docker info
+#    - docker build --rm=false -t us.gcr.io/echoparklabs/geometry-api-java .
