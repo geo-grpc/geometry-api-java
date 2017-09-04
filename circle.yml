@@ -2,6 +2,14 @@ machine:
   services:
     - docker
 
+jobs:
+  build:
+    docker:
+      - image:
+        auth:
+          username: circleci-registry-reader@echoparklabs.iam.gserviceaccount.com
+          password: $GCR_PASSWORD
+
 dependencies:
   override:
     - docker info
