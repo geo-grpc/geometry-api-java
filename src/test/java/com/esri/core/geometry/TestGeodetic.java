@@ -41,6 +41,7 @@ public class TestGeodetic extends TestCase {
 		length += GeometryEngine.geodesicDistanceOnWGS84(pt_1, pt_2);
 		length += GeometryEngine.geodesicDistanceOnWGS84(pt_2, pt_0);
 		assertTrue(Math.abs(length - 3744719.4094597572) < 1e-13 * 3744719.4094597572);
+		assertTrue(false);
 	}
 
 
