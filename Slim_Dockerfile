@@ -1,6 +1,0 @@
-FROM us.gcr.io/echoparklabs/proj.4:latest
-
-COPY ./build/libs /opt/src/geometry-api-java/build/libs
-#COPY ./build/resources/main /opt/src/geometry-api-java/build/resources/main
-
-WORKDIR /opt/src/geometry-api-java
