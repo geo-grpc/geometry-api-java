@@ -31,10 +31,10 @@ public class TestProjectionGigsData extends TestCase {
     private String testName;
     private String testData;
     private String description;
-    private double[] tolConversionsIndex1 = new double[1];
-    private double[] tolConversionsIndex2;
-    private double[] tolRoundTripsIndex1 = new double[1];
-    private double[] tolRoundTripsIndex2;
+    private double[] tolConversions_i0 = new double[3];
+    private double[] tolConversions_i1 = new double[3];
+    private double[] tolRoundTrips_i0 = new double[3];
+    private double[] tolRoundTrips_i1 = new double[3];
     private int roundTripTimes;
     ProjectionTransformation leftToRightTransformation;
     ProjectionTransformation rightToLeftTransformation;
@@ -62,47 +62,7 @@ public class TestProjectionGigsData extends TestCase {
         this.leftToRightTransformation = new ProjectionTransformation(leftSR, rightSR);
         this.rightToLeftTransformation = new ProjectionTransformation(rightSR, leftSR);
 
-        /*
-        * "tests": [
-        * {"tolerances": [2.7777777777777776e-07, 0.03], "type": "conversion"},
-        * {"times": 1000, "tolerances": [5.555555555555556e-08, 0.006], "type": "roundtrip"}]
-        * */
-        JSONArray testsItems = obj.getJSONArray("tests");
-        JSONObject testObj1 = testsItems.getJSONObject(0);
-        JSONObject testObj2 = testsItems.getJSONObject(1);
-
-        double tolObj1Index1 = testObj1.getJSONArray("tolerances").getDouble(0);
-        double tolObj2Index1 = testObj2.getJSONArray("tolerances").getDouble(0);
-        double [] tolObj1Index2;
-        double [] tolObj2Index2;
-        if (testObj1.getJSONArray("tolerances").optJSONArray(1) != null) {
-            tolObj1Index2= new double[3];
-            tolObj2Index2= new double[3];
-            for (int i = 0; i < 3; i++) {
-                tolObj1Index2[i] = testObj1.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
-                tolObj2Index2[i] = testObj2.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
-            }
-        } else {
-            tolObj1Index2 = new double[] {testObj1.getJSONArray("tolerances").getDouble(1)};
-            tolObj2Index2 = new double[] {testObj2.getJSONArray("tolerances").getDouble(1)};
-        }
-
-        if (testObj1.getString("type").equals("conversion")) {
-            this.tolConversionsIndex1[0] = tolObj1Index1;
-            this.tolConversionsIndex2 = tolObj1Index2;
-            this.tolRoundTripsIndex1[0] = tolObj2Index1;
-            this.tolRoundTripsIndex2 = tolObj2Index2;
-            this.roundTripTimes = testObj2.getInt("times");
-        } else {
-            this.tolRoundTripsIndex1[0] = tolObj1Index1;
-            this.tolRoundTripsIndex2 = tolObj1Index2;
-            this.tolConversionsIndex1[0] = tolObj2Index1;
-            this.tolConversionsIndex2 = tolObj2Index2;
-            this.roundTripTimes = testObj1.getInt("times");
-        }
-
         JSONArray coordinatePairs = obj.getJSONArray("coordinates");
-
         for (int i = 0; i < coordinatePairs.length(); i++) {
             JSONArray coordinatePair = coordinatePairs.getJSONArray(i);
             JSONArray pt1Array = coordinatePair.getJSONArray(0);
@@ -127,7 +87,45 @@ public class TestProjectionGigsData extends TestCase {
             rightMultiPoint.add(pt2);
         }
 
+        /*
+        * "tests": [
+        * {"tolerances": [2.7777777777777776e-07, 0.03], "type": "conversion"},
+        * {"times": 1000, "tolerances": [5.555555555555556e-08, 0.006], "type": "roundtrip"}]
+        * */
+        JSONArray testsItems = obj.getJSONArray("tests");
+        JSONObject testObj1 = testsItems.getJSONObject(0);
+        JSONObject testObj2 = testsItems.getJSONObject(1);
 
+        double tolObj1Index1 = testObj1.getJSONArray("tolerances").getDouble(0);
+        double tolObj2Index1 = testObj2.getJSONArray("tolerances").getDouble(0);
+        double [] tolObj1Index2 = new double[3];
+        double [] tolObj2Index2 = new double[3];
+
+        if (testObj1.getJSONArray("tolerances").optJSONArray(1) != null) {
+            for (int i = 0; i < 3; i++) {
+                tolObj1Index2[i] = testObj1.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
+                tolObj2Index2[i] = testObj2.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
+            }
+        } else {
+            Arrays.fill(tolObj1Index2, testObj1.getJSONArray("tolerances").getDouble(1));
+            Arrays.fill(tolObj2Index2, testObj2.getJSONArray("tolerances").getDouble(1));
+        }
+
+        if (testObj1.getString("type").equals("conversion")) {
+            Arrays.fill(this.tolConversions_i0, tolObj1Index1);
+            this.tolConversions_i1 = tolObj1Index2;
+
+            Arrays.fill(this.tolRoundTrips_i0, tolObj2Index1);
+            this.tolRoundTrips_i1 = tolObj2Index2;
+            this.roundTripTimes = testObj2.getInt("times");
+        } else {
+            Arrays.fill(this.tolConversions_i0, tolObj2Index1);
+            this.tolConversions_i1 = tolObj2Index2;
+
+            Arrays.fill(this.tolRoundTrips_i0, tolObj1Index1);
+            this.tolRoundTrips_i1 = tolObj1Index2;
+            this.roundTripTimes = testObj1.getInt("times");
+        }
 //        leftPolyline = (Polyline)leftPolygon.getBoundary();
 //        rightPolyline = (Polyline)rightPolyline.getBoundary();
     }
@@ -153,14 +151,19 @@ public class TestProjectionGigsData extends TestCase {
 
         OperatorProject.local().transform(this.leftToRightTransformation, leftExpected, leftExpected.length, rightActual);
         //        test_right = self.transform(self.proj_left, self.proj_right, self.coords_left)
-        ArrayList<String> errorMessages = new ArrayList<>();
-//        int nonMatches = listCountMatches(rightActual, rightExpected, this.tolConversionsIndex2, errorMessages);
+        StringBuilder errorMessages = new StringBuilder();
+        errorMessages.append("\n").append(this.testName);
+        errorMessages.append("\n").append(this.description);
+        int nonMatches = listCountMatches(rightActual, rightExpected, this.tolConversions_i1, errorMessages);
+        assertEquals(errorMessages.toString(), 0, nonMatches);
+
         //        results1 = list_count_matches(test_right, self.coords_right, tolerances[1])
 
         OperatorProject.local().transform(this.rightToLeftTransformation, rightExpected, rightExpected.length, leftActual);
         //        test_left = self.transform(self.proj_right, self.proj_left, self.coords_right)
-//        nonMatches += listCountMatches(leftActual, leftExpected, this.tolConversionsIndex1, errorMessages);
+        nonMatches += listCountMatches(leftActual, leftExpected, this.tolConversions_i0, errorMessages);
         //        results2 = list_count_matches(test_left, self.coords_left, tolerances[0])
+        assertEquals(errorMessages.toString(), 0, nonMatches);
 
 
 
@@ -192,18 +195,20 @@ public class TestProjectionGigsData extends TestCase {
 
      return (matches, non_matches)
      */
-    public static int listCountMatches(Point[] actualPoints, Point[] expectedPoints, double[] tolerances, ArrayList<String> errorMessages) {
+    public static int listCountMatches(Point[] actualPoints, Point[] expectedPoints, double[] tolerances, StringBuilder errorMessages) {
         // matches, non_matches = 0, 0
         int nonMatches = 0;
         for (int i = 0; i < actualPoints.length; i++) {
             Point actualPoint = actualPoints[i];
             Point expectedPoint = expectedPoints[i];
-            String message = new String();
-            if (!matchCheck(actualPoint, expectedPoint, tolerances, message)) {
+            String message = matchCheck(actualPoint, expectedPoint, tolerances);
+            if (message != null) {
                 nonMatches += 1;
-                errorMessages.add(message);
+                errorMessages.append("\nError at index: ").append(i).append("\n");
+                errorMessages.append(message);
             }
         }
+
         return nonMatches;
     }
 
@@ -212,20 +217,48 @@ public class TestProjectionGigsData extends TestCase {
      * float coordinate elements will be checked based on this value
      * list/tuple coordinate elements will be checked based on the
      * corresponding values
-     * @return boolean
+     * @return string
      * @param pt
      * @param expectedPoint
      * @param tolerance error rate
      */
-    public static boolean matchCheck(Point pt, Point expectedPoint, double [] tolerance, String message) {
+    public static String matchCheck(Point pt, Point expectedPoint, double [] tolerance) {
         double[] coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY())};
         if (pt.hasZ())
             coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY()), Math.abs(pt.getZ() - expectedPoint.getZ())};
 
-//        double [] tolerances
+        boolean matching = true;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < coord_diff.length; i++) {
+            if (coord_diff[i] > tolerance[i]) {
+                matching = false;
 
+                stringBuilder.append("Non-match at ");
+                if (i == 0)
+                    stringBuilder.append(" x position\n");
+                else if (i == 1)
+                    stringBuilder.append(" y position\n");
+                else
+                    stringBuilder.append(" z position\n");
+                stringBuilder.append("Actual coordinate:\n");
+                stringBuilder.append(pt.toString());
+                stringBuilder.append("\nExpected coordinate:\n");
+                stringBuilder.append(expectedPoint.toString());
+                stringBuilder.append("\nActual difference:\n");
+                stringBuilder.append("x: ").append(coord_diff[0]).append(" y:").append(coord_diff[1]);
+                if (pt.hasZ())
+                    stringBuilder.append(" z:").append(coord_diff[2]);
+                stringBuilder.append("\nFor tolerances:\n");
+                stringBuilder.append("x:").append(tolerance[0]).append(" y:").append(tolerance[1]);
+                if (pt.hasZ())
+                    stringBuilder.append(" z:").append(tolerance[2]);
+                stringBuilder.append("\n\n");
+            }
+        }
+        if (!matching)
+            return stringBuilder.toString();
 
-        return false;
+        return null;
     }
 
 //            if len(exc) == 3:
