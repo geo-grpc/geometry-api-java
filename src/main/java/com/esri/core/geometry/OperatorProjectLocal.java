@@ -49,8 +49,10 @@ class OperatorProjectLocal extends OperatorProject {
 	}
 
 	public double[] transform(ProjectionTransformation transform,
-			double[] coordsSrc, int pointCount) throws org.proj4.PJException {
-		return Projecter.transform(transform, coordsSrc);
+							  double[] coordsSrc,
+							  int pointCount,
+							  boolean bHasZ) throws org.proj4.PJException {
+		return Projecter.transform(transform, coordsSrc, bHasZ);
 	}
 
 	@Override

@@ -14,13 +14,22 @@ class Projecter {
 
     public static int transform(ProjectionTransformation projectionTransformation, Point[] pointsIn,
                          int count, Point[] pointsOut) throws org.proj4.PJException {
+        if (pointsIn[0].hasZ())
+            return __transform3D(projectionTransformation, pointsIn, count, pointsOut);
+        return __transform2D(projectionTransformation, pointsIn, count, pointsOut);
+    }
+
+    private static int __transform2D(ProjectionTransformation projectionTransformation,
+                                     Point[] pointsIn,
+                                     int count,
+                                     Point[] pointsOut) throws org.proj4.PJException {
         double[] coordsIn = new double[pointsIn.length * 2];
         for (int i = 0; i < pointsIn.length; i++) {
             coordsIn[i * 2] = pointsIn[i].getX();
             coordsIn[i * 2 + 1] = pointsIn[i].getY();
         }
 
-        Projecter.transform(projectionTransformation, coordsIn);
+        Projecter.transform(projectionTransformation, coordsIn, false);
         for (int i = 0; i < pointsOut.length; i++) {
             pointsOut[i].setX(coordsIn[i * 2]);
             pointsOut[i].setY(coordsIn[i * 2 + 1]);
@@ -29,9 +38,35 @@ class Projecter {
         return 0;
     }
 
+    private static int __transform3D(ProjectionTransformation projectionTransformation,
+                                     Point[] pointsIn,
+                                     int count,
+                                     Point[] pointsOut) throws org.proj4.PJException {
+        double[] coordsIn = new double[pointsIn.length * 3];
+        for (int i = 0; i < pointsIn.length; i++) {
+            coordsIn[i * 2] = pointsIn[i].getX();
+            coordsIn[i * 2 + 1] = pointsIn[i].getY();
+            coordsIn[i * 2 + 2] = pointsIn[i].getZ();
+        }
+
+        Projecter.transform(projectionTransformation, coordsIn, true);
+        for (int i = 0; i < pointsOut.length; i++) {
+            pointsOut[i].setX(coordsIn[i * 2]);
+            pointsOut[i].setY(coordsIn[i * 2 + 1]);
+            pointsOut[i].setZ(coordsIn[i * 2 + 2]);
+        }
+
+        return 0;
+    }
+
     public static double[] transform(ProjectionTransformation projectionTransformation,
-                              double[] coordsSrc) throws org.proj4.PJException {
-        projectionTransformation.getFromProj().transform(projectionTransformation.getToProj(), 2, coordsSrc, 0, coordsSrc.length / 2);
+                                     double[] coordsSrc,
+                                     boolean hasZ) throws org.proj4.PJException {
+        int n = 2;
+        if (hasZ)
+            n = 3;
+
+        projectionTransformation.getFromProj().transform(projectionTransformation.getToProj(), n, coordsSrc, 0, coordsSrc.length / n);
         return coordsSrc;
     }
 
@@ -99,7 +134,8 @@ class Projecter {
         MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)multiPoint._getImpl();
 
         AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
-        transform(projectionTransformation, xyPositions.m_buffer);
+        // TODO check that there isn't a way for grabbing xyzPositions
+        transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
@@ -122,7 +158,8 @@ class Projecter {
         MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polyline._getImpl();
 
         AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
-        transform(projectionTransformation, xyPositions.m_buffer);
+        // TODO check that there isn't a way for grabbing xyzPositions
+        transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 
@@ -143,7 +180,8 @@ class Projecter {
         MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polygon._getImpl();
 
         AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
-        transform(projectionTransformation, xyPositions.m_buffer);
+        // TODO check that there isn't a way for grabbing xyzPositions
+        transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
