@@ -1,21 +1,18 @@
 package com.esri.core.geometry;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.proj4.*;
 import junit.framework.TestCase;
-import org.junit.Before;
 import org.junit.Test;
 import org.json.*;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -34,6 +31,21 @@ public class TestProjectionGigsData extends TestCase {
     private String testName;
     private String testData;
     private String description;
+    private double[] tolConversionsIndex1 = new double[1];
+    private double[] tolConversionsIndex2;
+    private double[] tolRoundTripsIndex1 = new double[1];
+    private double[] tolRoundTripsIndex2;
+    private int roundTripTimes;
+    ProjectionTransformation leftToRightTransformation;
+    ProjectionTransformation rightToLeftTransformation;
+    private Polyline leftPolyline = new Polyline();
+    private Polyline rightPolyline = new Polyline();
+    private Polygon leftPolygon = new Polygon();
+    private Polygon rightPolygon = new Polygon();
+    private MultiPoint leftMultiPoint = new MultiPoint();
+    private MultiPoint rightMultiPoint = new MultiPoint();
+
+
 
     public TestProjectionGigsData(Path path, String testName) throws java.io.IOException, org.json.JSONException {
         this.path = path;
@@ -42,15 +54,240 @@ public class TestProjectionGigsData extends TestCase {
         String content = new String(Files.readAllBytes(path), Charset.defaultCharset());
         JSONObject obj = new JSONObject(content);
         this.description = obj.getString("description");
+        JSONArray projectionsItems = obj.getJSONArray("projections");
+        String leftProjection = projectionsItems.getString(0);
+        String rightProjection = projectionsItems.getString(1);
+        SpatialReference leftSR = SpatialReference.createFromProj4(leftProjection);
+        SpatialReference rightSR = SpatialReference.createFromProj4(rightProjection);
+        this.leftToRightTransformation = new ProjectionTransformation(leftSR, rightSR);
+        this.rightToLeftTransformation = new ProjectionTransformation(rightSR, leftSR);
+
+        /*
+        * "tests": [
+        * {"tolerances": [2.7777777777777776e-07, 0.03], "type": "conversion"},
+        * {"times": 1000, "tolerances": [5.555555555555556e-08, 0.006], "type": "roundtrip"}]
+        * */
+        JSONArray testsItems = obj.getJSONArray("tests");
+        JSONObject testObj1 = testsItems.getJSONObject(0);
+        JSONObject testObj2 = testsItems.getJSONObject(1);
+
+        double tolObj1Index1 = testObj1.getJSONArray("tolerances").getDouble(0);
+        double tolObj2Index1 = testObj2.getJSONArray("tolerances").getDouble(0);
+        double [] tolObj1Index2;
+        double [] tolObj2Index2;
+        if (testObj1.getJSONArray("tolerances").optJSONArray(1) != null) {
+            tolObj1Index2= new double[3];
+            tolObj2Index2= new double[3];
+            for (int i = 0; i < 3; i++) {
+                tolObj1Index2[i] = testObj1.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
+                tolObj2Index2[i] = testObj2.getJSONArray("tolerances").getJSONArray(1).getDouble(i);
+            }
+        } else {
+            tolObj1Index2 = new double[] {testObj1.getJSONArray("tolerances").getDouble(1)};
+            tolObj2Index2 = new double[] {testObj2.getJSONArray("tolerances").getDouble(1)};
+        }
+
+        if (testObj1.getString("type").equals("conversion")) {
+            this.tolConversionsIndex1[0] = tolObj1Index1;
+            this.tolConversionsIndex2 = tolObj1Index2;
+            this.tolRoundTripsIndex1[0] = tolObj2Index1;
+            this.tolRoundTripsIndex2 = tolObj2Index2;
+            this.roundTripTimes = testObj2.getInt("times");
+        } else {
+            this.tolRoundTripsIndex1[0] = tolObj1Index1;
+            this.tolRoundTripsIndex2 = tolObj1Index2;
+            this.tolConversionsIndex1[0] = tolObj2Index1;
+            this.tolConversionsIndex2 = tolObj2Index2;
+            this.roundTripTimes = testObj1.getInt("times");
+        }
+
+        JSONArray coordinatePairs = obj.getJSONArray("coordinates");
+
+        for (int i = 0; i < coordinatePairs.length(); i++) {
+            JSONArray coordinatePair = coordinatePairs.getJSONArray(i);
+            JSONArray pt1Array = coordinatePair.getJSONArray(0);
+            JSONArray pt2Array = coordinatePair.getJSONArray(1);
+
+            Point pt1 = new Point(pt1Array.getDouble(0), pt1Array.getDouble(1));
+            Point pt2 = new Point(pt2Array.getDouble(0), pt2Array.getDouble(1));
+            if (coordinatePair.getJSONArray(0).length() == 3) {
+                // if point3d
+                pt1.setZ(pt1Array.getDouble(2));
+                pt2.setZ(pt2Array.getDouble(2));
+            }
+
+            if (i == 0) {
+                leftPolyline.startPath(pt1);
+                rightPolyline.startPath(pt2);
+            } else {
+                leftPolyline.lineTo(pt1);
+                rightPolyline.lineTo(pt2);
+            }
+            leftMultiPoint.add(pt1);
+            rightMultiPoint.add(pt2);
+        }
+
+
+//        leftPolyline = (Polyline)leftPolygon.getBoundary();
+//        rightPolyline = (Polyline)rightPolyline.getBoundary();
     }
 
     @Test
-    public void testConversion() throws Exception {
+    public void testConversionPoints() throws Exception {
+        assertTrue(this.description, true);
+
+        Point[] leftExpected = new Point[leftMultiPoint.getPointCount()];
+        leftMultiPoint.queryCoordinates(leftExpected);
+
+        Point[] rightExpected = new Point[rightMultiPoint.getPointCount()];
+        rightMultiPoint.queryCoordinates(rightExpected);
+
+        Point[] rightActual = IntStream.range(0, rightMultiPoint.getPointCount())
+                .mapToObj(i -> new Point())
+                .toArray(Point[]::new);
+
+        Point[] leftActual = IntStream.range(0, leftMultiPoint.getPointCount())
+                .mapToObj(i -> new Point())
+                .toArray(Point[]::new);
+
+
+        OperatorProject.local().transform(this.leftToRightTransformation, leftExpected, leftExpected.length, rightActual);
+        //        test_right = self.transform(self.proj_left, self.proj_right, self.coords_left)
+        ArrayList<String> errorMessages = new ArrayList<>();
+//        int nonMatches = listCountMatches(rightActual, rightExpected, this.tolConversionsIndex2, errorMessages);
+        //        results1 = list_count_matches(test_right, self.coords_right, tolerances[1])
+
+        OperatorProject.local().transform(this.rightToLeftTransformation, rightExpected, rightExpected.length, leftActual);
+        //        test_left = self.transform(self.proj_right, self.proj_left, self.coords_right)
+//        nonMatches += listCountMatches(leftActual, leftExpected, this.tolConversionsIndex1, errorMessages);
+        //        results2 = list_count_matches(test_left, self.coords_left, tolerances[0])
+
+
+
+//        tolerances = kwargs.get('tolerances', [0.0000000000001, 0.0000000000001])
+//
+
+
+//
+
+//        results2 = list_count_matches(test_left, self.coords_left, tolerances[0])
+//
+//        return (results1[0] + results2[0], results1[1] + results2[1])
+    }
+
+    /**
+     * counts coordinates in lists that match and don't match.
+     * assumes that lists are the same length (they should be)
+
+     returns tuple (matches, non_matches)
+     """
+     matches, non_matches = 0, 0
+     iter_ex_coords = iter(ex_coords)
+     for c in coords:
+     ex_coord = next(iter_ex_coords)
+     if match_func(c, ex_coord, tolerance):
+     matches = matches + 1
+     else:
+     non_matches = non_matches + 1
+
+     return (matches, non_matches)
+     */
+    public static int listCountMatches(Point[] actualPoints, Point[] expectedPoints, double[] tolerances, ArrayList<String> errorMessages) {
+        // matches, non_matches = 0, 0
+        int nonMatches = 0;
+        for (int i = 0; i < actualPoints.length; i++) {
+            Point actualPoint = actualPoints[i];
+            Point expectedPoint = expectedPoints[i];
+            String message = new String();
+            if (!matchCheck(actualPoint, expectedPoint, tolerances, message)) {
+                nonMatches += 1;
+                errorMessages.add(message);
+            }
+        }
+        return nonMatches;
+    }
+
+    /**
+     * Check if coordinate matches expected coordinate within a given tolerance.
+     * float coordinate elements will be checked based on this value
+     * list/tuple coordinate elements will be checked based on the
+     * corresponding values
+     * @return boolean
+     * @param pt
+     * @param expectedPoint
+     * @param tolerance error rate
+     */
+    public static boolean matchCheck(Point pt, Point expectedPoint, double [] tolerance, String message) {
+        double[] coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY())};
+        if (pt.hasZ())
+            coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY()), Math.abs(pt.getZ() - expectedPoint.getZ())};
+
+//        double [] tolerances
+
+
+        return false;
+    }
+
+//            if len(exc) == 3:
+//            # coordinate triples
+//    coord_diff = abs(pt.[0] - expectedPoint.[0]), abs(pt.getY() - expectedPoint.getY()), abs(pt.getZ() - expectedPoint.getZ())
+//        if isinstance(tolerance, float):
+//    matching = coord_diff < (tolerance, tolerance, tolerance)
+//    elif isinstance(tolerance, (list, tuple)):  # FIXME is list's length atleast 3?
+//    matching = coord_diff < tuple(tolerance)
+//            else:
+//            # assume coordinate pairs
+//    coord_diff = abs(pt.[0] - expectedPoint.[0]), abs(pt.getY() - expectedPoint.getY())
+//            if isinstance(tolerance, float):
+//    matching = coord_diff < (tolerance, tolerance)
+//    elif isinstance(tolerance, (list, tuple)):  # FIXME is list's length atleast 2?
+//    matching = coord_diff < tuple(tolerance)
+//
+//            if matching is False:
+//            logging.info('non-match,  calculated coordinate: {c1}\n'
+//            'expected coordinate: {c2}\n difference:{res}\n'
+//            'tolerance: {tol}\n'
+//            ''.format(c1=cor, c2=exc, res=coord_diff, tol=tolerance))
+//
+
+    @Test
+    public void testRoundtripPoints() throws Exception {
         assertTrue(this.description, true);
     }
 
+    @Ignore
     @Test
-    public void testRoundtrip() throws Exception {
+    public void testConversionMultiPoints() throws Exception {
+        assertTrue(this.description, true);
+    }
+
+    @Ignore
+    @Test
+    public void testRoundtripMultiPoints() throws Exception {
+        assertTrue(this.description, true);
+    }
+
+    @Ignore
+    @Test
+    public void testConversionPolyline() throws Exception {
+        assertTrue(this.description, true);
+    }
+
+    @Ignore
+    @Test
+    public void testRoundtripPolyline() throws Exception {
+        assertTrue(this.description, true);
+    }
+
+    @Ignore
+    @Test
+    public void testConversionPolygon() throws Exception {
+        assertTrue(this.description, true);
+    }
+
+    @Ignore
+    @Test
+    public void testRoundtripPolygon() throws Exception {
         assertTrue(this.description, true);
     }
 
@@ -73,4 +310,6 @@ public class TestProjectionGigsData extends TestCase {
 
         return data;
     }
+
+
 }
