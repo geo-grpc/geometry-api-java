@@ -27,6 +27,12 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version:'4.11'
 }
 
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 task copyToLib(type: Copy) {
     into "$buildDir/libs"
     from configurations.runtime
