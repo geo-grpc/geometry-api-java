@@ -11,6 +11,8 @@ description = """Esri Geometry API for Java"""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+// https://stackoverflow.com/questions/18689365/how-to-add-xlintunchecked-to-my-android-gradle-based-project
+// https://stackoverflow.com/a/34452265/445372
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
