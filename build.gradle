@@ -25,7 +25,8 @@ repositories {
 dependencies {
     compile group: 'org.json', name: 'json', version:'20170516'
     compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version:'1.9.12'
-    compile files('/usr/local/lib/jproj.jar')
+    compile files('DepFiles/public/jproj.jar')
+//compile files('/usr/local/lib/jproj.jar')
     testCompile group: 'junit', name: 'junit', version:'4.11'
 }
 
