@@ -1,5 +1,6 @@
 package com.esri.core.geometry;
 
+import java.util.*;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -34,6 +35,20 @@ public class TestRelation extends TestCase {
 			env2.setCoords(855277, 3892059, 855277 + 300, 3892059 + 200);
 			poly2.addEnvelope(env2, false);
 
+			Polygon poly3 = new Polygon();
+			Envelope2D env3 = new Envelope2D();
+			env3.setCoords(855277 + 100, 3892059 + 100, 855277 - 300, 3892059 - 200);
+			poly3.addEnvelope(env3, false);
+
+
+			List<Geometry> list2 = new ArrayList<>();
+			list2.add(poly1);
+			list2.add(poly2);
+
+			List<Geometry> list3 = new ArrayList<>(list2);
+			list3.add(poly3);
+
+
 			{
 				OperatorEquals operatorEquals = (OperatorEquals) (projEnv
 						.getOperator(Operator.Type.Equals));
@@ -51,6 +66,25 @@ public class TestRelation extends TestCase {
 				boolean result = operatorCrosses.execute(poly1, poly2, inputSR,
 						null);
 				assertTrue(!result);
+
+				SimpleGeometryCursor simpleGeometryCursor1 = new SimpleGeometryCursor(poly1);
+				SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+				HashMap<Integer, Boolean> relate_map =
+						operatorCrosses.execute(poly1, simpleGeometryCursor2, inputSR, null);
+				assertNotNull(relate_map);
+				assertTrue(!relate_map.get(0));
+				assertTrue(!relate_map.get(1));
+
+				/*simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+				SimpleGeometryCursor simpleGeometryCursor3 = new SimpleGeometryCursor(list3);
+				relate_map = operatorCrosses.execute(simpleGeometryCursor3, simpleGeometryCursor2, inputSR, null);
+				assertNotNull(relate_map);
+				assertTrue(!relate_map.get(0).get(0));
+				assertTrue(!relate_map.get(0).get(1));
+				assertTrue(!relate_map.get(1).get(0));
+				assertTrue(!relate_map.get(1).get(1));
+				assertTrue(!relate_map.get(2).get(0));
+				assertTrue(!relate_map.get(2).get(1));*/
 			}
 			{
 				OperatorWithin operatorWithin = (OperatorWithin) (projEnv

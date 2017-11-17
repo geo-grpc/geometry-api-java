@@ -26,6 +26,8 @@ package com.esri.core.geometry;
 
 import com.esri.core.geometry.Geometry.GeometryAccelerationDegree;
 
+import java.util.HashMap;
+
 /**
  * A base class for simple relation operators.
  */
@@ -36,8 +38,26 @@ public abstract class OperatorSimpleRelation extends Operator {
 	 * 
 	 * @return Returns True if the relation holds, False otherwise.
 	 */
-	public abstract boolean execute(Geometry inputGeom1, Geometry inputGeom2,
-			SpatialReference sr, ProgressTracker progressTracker);
+	public abstract boolean execute(Geometry inputGeom1,
+									Geometry inputGeom2,
+									SpatialReference sr,
+									ProgressTracker progressTracker);
+
+	public HashMap<Integer, Boolean> execute(Geometry inputGeom1,
+											 GeometryCursor geometryCursor2,
+											 SpatialReference sr,
+											 ProgressTracker progressTracker) {
+		HashMap<Integer, Boolean> hashMap = new HashMap<>();
+		Geometry inputGeom2;
+		while ((inputGeom2 = geometryCursor2.next()) != null)
+		{
+			int index = geometryCursor2.getGeometryID();
+		    if ((progressTracker != null) && !(progressTracker.progress(-1, -1)))
+				throw new RuntimeException("user_canceled");
+			hashMap.put(index, execute(inputGeom1, inputGeom2, sr, progressTracker));
+		}
+		return hashMap;
+    }
 
 	@Override
 	public boolean canAccelerateGeometry(Geometry geometry) {
