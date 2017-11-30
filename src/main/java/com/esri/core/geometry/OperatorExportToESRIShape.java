@@ -42,8 +42,7 @@ public abstract class OperatorExportToESRIShape extends Operator {
 	 * 
 	 * @return Returns a ByteBufferCursor.
 	 */
-	abstract ByteBufferCursor execute(int exportFlags,
-			GeometryCursor geometryCursor);
+	public abstract ByteBufferCursor execute(int exportFlags, GeometryCursor geometryCursor);
 
 	/**
 	 * Performs the ExportToESRIShape operation.
@@ -60,11 +59,9 @@ public abstract class OperatorExportToESRIShape extends Operator {
 	 * @param shapeBuffer The ByteBuffer to contain the exported Geometry in ESRIShape format.
 	 * @return If the input buffer is null, then the size needed for the buffer is returned. Otherwise the number of bytes written to the buffer is returned.
 	 */
-	public abstract int execute(int exportFlags, Geometry geometry,
-			ByteBuffer shapeBuffer);
-	
+	public abstract int execute(int exportFlags, Geometry geometry, ByteBuffer shapeBuffer);
+
 	public static OperatorExportToESRIShape local() {
-		return (OperatorExportToESRIShape) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.ExportToESRIShape);
+		return (OperatorExportToESRIShape) OperatorFactoryLocal.getInstance().getOperator(Type.ExportToESRIShape);
 	}	
 }

@@ -36,8 +36,7 @@ class OperatorImportFromESRIShapeCursor extends GeometryCursor {
 	int m_type;
 	int m_index;
 
-	public OperatorImportFromESRIShapeCursor(int importFlags, int type,
-			ByteBufferCursor shapeBuffers) {
+	public OperatorImportFromESRIShapeCursor(int importFlags, int type, ByteBufferCursor shapeBuffers) {
 		m_index = -1;
 		if (shapeBuffers == null)
 			throw new GeometryException("invalid argument");

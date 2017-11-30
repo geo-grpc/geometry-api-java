@@ -33,7 +33,7 @@ import java.nio.ByteOrder;
 class OperatorExportToESRIShapeLocal extends OperatorExportToESRIShape {
 
 	@Override
-	ByteBufferCursor execute(int exportFlags, GeometryCursor geometryCursor) {
+	public ByteBufferCursor execute(int exportFlags, GeometryCursor geometryCursor) {
 		return new OperatorExportToESRIShapeCursor(exportFlags, geometryCursor);
 	}
 
