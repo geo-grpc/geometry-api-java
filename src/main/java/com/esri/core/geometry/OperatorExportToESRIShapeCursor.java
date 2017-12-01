@@ -28,7 +28,7 @@ import com.esri.core.geometry.VertexDescription.Semantics;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
+public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
 	GeometryCursor m_inputGeometryCursor;
 	int m_exportFlags;
 	int m_index;

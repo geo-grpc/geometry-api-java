@@ -31,6 +31,16 @@ import java.util.ArrayList;
 
 class OperatorImportFromGeoJsonLocal extends OperatorImportFromGeoJson {
 	@Override
+	MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker) throws JSONException {
+		return new OperatorImportFromGeoJsonCursor(import_flags, geoJsonString, progressTracker);
+	}
+
+	@Override
+	MapGeometryCursor execute(int import_flags, StringCursor stringCursor, ProgressTracker progressTracker) throws JSONException {
+		return new OperatorImportFromGeoJsonCursor(import_flags, stringCursor, progressTracker);
+	}
+
+	@Override
 	public MapGeometry execute(int importFlags, Geometry.Type type,
 			String geoJsonString, ProgressTracker progress_tracker)
 			throws JSONException {

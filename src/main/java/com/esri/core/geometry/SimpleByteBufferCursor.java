@@ -25,10 +25,13 @@
 package com.esri.core.geometry;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
 
-class SimpleByteBufferCursor extends ByteBufferCursor {
+public class SimpleByteBufferCursor extends ByteBufferCursor {
 
 	ByteBuffer m_byteBuffer;
+	List<ByteBuffer> m_byteBufferArray;
 	int m_index;
 	int m_count;
 
@@ -36,6 +39,18 @@ class SimpleByteBufferCursor extends ByteBufferCursor {
 		m_byteBuffer = byteBuffer;
 		m_index = -1;
 		m_count = 1;
+	}
+
+	public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
+		m_byteBufferArray = Arrays.asList(byteBufferArray);
+		m_index = -1;
+		m_count = byteBufferArray.length;
+	}
+
+	public SimpleByteBufferCursor(List<ByteBuffer> byteBufferArray) {
+		m_byteBufferArray = byteBufferArray;
+		m_index = -1;
+		m_count = byteBufferArray.size();
 	}
 
 	@Override
@@ -47,7 +62,7 @@ class SimpleByteBufferCursor extends ByteBufferCursor {
 	public ByteBuffer next() {
 		if (m_index < m_count - 1) {
 			m_index++;
-			return m_byteBuffer;
+			return m_byteBuffer != null ? m_byteBuffer : m_byteBufferArray.get(m_index);
 		}
 
 		return null;

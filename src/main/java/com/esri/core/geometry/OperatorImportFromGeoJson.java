@@ -31,6 +31,9 @@ public abstract class OperatorImportFromGeoJson extends Operator {
 		return Type.ImportFromGeoJson;
 	}
 
+	abstract MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker) throws JSONException;
+	abstract MapGeometryCursor execute(int import_flags, StringCursor stringCursor, ProgressTracker progressTracker) throws JSONException;
+
 	/**
 	 * Performs the ImportFromGeoJson operation.
 	 * @param import_flags Use the {@link GeoJsonImportFlags} interface.
@@ -39,9 +42,10 @@ public abstract class OperatorImportFromGeoJson extends Operator {
 	 * @return Returns the imported Geometry.
 	 * @throws JSONException 
 	 */
-	public abstract MapGeometry execute(int import_flags, Geometry.Type type,
-			String geoJsonString, ProgressTracker progress_tracker)
-			throws JSONException;
+	public abstract MapGeometry execute(int import_flags,
+										Geometry.Type type,
+										String geoJsonString,
+										ProgressTracker progress_tracker) throws JSONException;
 
 	/**
 	 * Performs the ImportFromGeoJson operation.

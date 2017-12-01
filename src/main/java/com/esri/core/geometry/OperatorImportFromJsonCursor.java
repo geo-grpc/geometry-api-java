@@ -30,7 +30,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 
-class OperatorImportFromJsonCursor extends MapGeometryCursor {
+public class OperatorImportFromJsonCursor extends MapGeometryCursor {
 	JsonParserCursor m_inputJsonParsers;
 
 	int m_type;

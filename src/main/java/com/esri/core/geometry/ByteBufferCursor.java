@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 /**
  * An abstract ByteBuffer Cursor class.
  */
-abstract class ByteBufferCursor {
+public abstract class ByteBufferCursor {
 
 	/**
 	 * Moves the cursor to the next ByteBuffer. Returns null when reached the

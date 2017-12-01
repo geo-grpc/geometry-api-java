@@ -26,7 +26,7 @@ package com.esri.core.geometry;
 /**
  * An abstract Geometry Cursor class.
  */
-abstract class MapGeometryCursor {
+public abstract class MapGeometryCursor {
 
 	/**
 	 * Moves the cursor to the next ProjectedGeometry. Returns null when reached

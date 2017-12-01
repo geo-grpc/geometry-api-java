@@ -25,7 +25,7 @@ package com.esri.core.geometry;
 
 import org.codehaus.jackson.JsonParser;
 
-class SimpleJsonParserCursor extends JsonParserCursor {
+public class SimpleJsonParserCursor extends JsonParserCursor {
 
 	JsonParser m_jsonParser;
 	JsonParser[] m_jsonParserArray;
