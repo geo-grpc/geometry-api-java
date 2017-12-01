@@ -28,7 +28,7 @@ import java.util.Map;
 class OperatorExportToJsonLocal extends OperatorExportToJson {
 
     @Override
-    public JsonCursor execute(SpatialReference spatialReference,
+    public StringCursor execute(SpatialReference spatialReference,
             GeometryCursor geometryCursor) {
         return new OperatorExportToJsonCursor(spatialReference, geometryCursor);
     }
@@ -36,7 +36,7 @@ class OperatorExportToJsonLocal extends OperatorExportToJson {
     @Override
     public String execute(SpatialReference spatialReference, Geometry geometry) {
         SimpleGeometryCursor gc = new SimpleGeometryCursor(geometry);
-        JsonCursor cursor = new OperatorExportToJsonCursor(spatialReference, gc);
+        StringCursor cursor = new OperatorExportToJsonCursor(spatialReference, gc);
         return cursor.next();
     }
 

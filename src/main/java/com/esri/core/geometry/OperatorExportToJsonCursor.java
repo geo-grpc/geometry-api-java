@@ -27,7 +27,7 @@ import com.esri.core.geometry.VertexDescription.Semantics;
 import java.io.IOException;
 import java.util.Map;
 
-class OperatorExportToJsonCursor extends JsonCursor {
+public class OperatorExportToJsonCursor extends StringCursor {
 
     GeometryCursor m_inputGeometryCursor;
     SpatialReference m_spatialReference;
