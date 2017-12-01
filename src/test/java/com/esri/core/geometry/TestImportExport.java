@@ -1769,6 +1769,18 @@ public class TestImportExport extends TestCase {
         assertNotNull(relate_map);
         assertTrue(!relate_map.get(0));
         assertTrue(!relate_map.get(1));
+
+        simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        operatorExportToWkbCursor = new OperatorExportToWkbCursor(0, simpleGeometryCursor2);
+        operatorImportFromWkbCursor = new OperatorImportFromWkbCursor(0, operatorExportToWkbCursor );
+        double[] distances = {400,400};
+        OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(operatorImportFromWkbCursor, null, distances, false, null);
+        relate_map = ((OperatorWithin)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Within)).execute(poly2, operatorBufferCursor, inputSR, null);
+        assertNotNull(relate_map);
+        assertTrue(relate_map.get(0));
+        assertTrue(relate_map.get(1));
+
+
     }
 
 	public static Polygon makePolygon() {

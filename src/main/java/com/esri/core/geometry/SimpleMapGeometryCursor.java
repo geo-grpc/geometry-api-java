@@ -27,7 +27,7 @@ package com.esri.core.geometry;
  * A simple MapGeometryCursor implementation that wraps a single MapGeometry or
  * an array of MapGeometry classes
  */
-class SimpleMapGeometryCursor extends MapGeometryCursor {
+class  SimpleMapGeometryCursor extends MapGeometryCursor {
 
 	MapGeometry m_geom;
 	MapGeometry[] m_geomArray;
