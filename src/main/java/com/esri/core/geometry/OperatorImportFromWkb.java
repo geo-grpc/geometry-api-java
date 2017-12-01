@@ -38,6 +38,17 @@ public abstract class OperatorImportFromWkb extends Operator {
 		return Type.ImportFromWkb;
 	}
 
+
+    /**
+     *
+     * @param importFlags Use the {@link ShapeImportFlags} interface. The default is 0, which means geometry comes
+     *                       from a trusted source and is topologically simple.
+     * @param wkbBuffers The cursor over wkb buffers that hold the Geometries in wkb format.
+     * @param progressTracker
+     * @return Returns a GeometryCursor.
+     */
+	public abstract GeometryCursor execute(int importFlags, ByteBufferCursor wkbBuffers, ProgressTracker progressTracker);
+
 	/**
 	 * Performs the ImportFromWKB operation.
 	 * @param importFlags Use the {@link WkbImportFlags} interface.
@@ -45,8 +56,11 @@ public abstract class OperatorImportFromWkb extends Operator {
 	 * @param wkbBuffer The buffer holding the Geometry in wkb format.
 	 * @return Returns the imported Geometry.
 	 */
-	public abstract Geometry execute(int importFlags, Geometry.Type type,
-			ByteBuffer wkbBuffer, ProgressTracker progress_tracker);
+	public abstract Geometry execute(int importFlags,
+									 Geometry.Type type,
+									 ByteBuffer wkbBuffer,
+									 ProgressTracker progress_tracker);
+
 
 	/**
 	 * Performs the ImportFromWkb operation.
@@ -55,11 +69,11 @@ public abstract class OperatorImportFromWkb extends Operator {
 	 * @return Returns the imported OGCStructure.
 	 */
 	public abstract OGCStructure executeOGC(int importFlags,
-			ByteBuffer wkbBuffer, ProgressTracker progress_tracker);
+											ByteBuffer wkbBuffer,
+											ProgressTracker progress_tracker);
 
 	public static OperatorImportFromWkb local() {
-		return (OperatorImportFromWkb) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.ImportFromWkb);
+		return (OperatorImportFromWkb) OperatorFactoryLocal.getInstance().getOperator(Type.ImportFromWkb);
 	}
 
 }

@@ -30,11 +30,14 @@ import java.nio.ByteOrder;
 class OperatorExportToWkbLocal extends OperatorExportToWkb {
 
 	@Override
-	public ByteBuffer execute(int exportFlags, Geometry geometry,
-			ProgressTracker progressTracker) {
+	public ByteBufferCursor execute(int exportFlags, GeometryCursor geometryCursor) {
+		return new OperatorExportToWkbCursor(exportFlags, geometryCursor);
+	}
+
+	@Override
+	public ByteBuffer execute(int exportFlags, Geometry geometry, ProgressTracker progressTracker) {
 		int size = exportToWKB(exportFlags, geometry, null);
-		ByteBuffer wkbBuffer = ByteBuffer.allocate(size).order(
-				ByteOrder.nativeOrder());
+		ByteBuffer wkbBuffer = ByteBuffer.allocate(size).order(ByteOrder.nativeOrder());
 		exportToWKB(exportFlags, geometry, wkbBuffer);
 		return wkbBuffer;
 	}
@@ -45,7 +48,7 @@ class OperatorExportToWkbLocal extends OperatorExportToWkb {
 		return exportToWKB(exportFlags, geometry, wkbBuffer);
 	}
 
-	private static int exportToWKB(int exportFlags, Geometry geometry,
+	protected static int exportToWKB(int exportFlags, Geometry geometry,
 			ByteBuffer wkbBuffer) {
 		if (geometry == null)
 			return 0;

@@ -37,14 +37,21 @@ public abstract class OperatorExportToWkb extends Operator {
 		return Type.ExportToWkb;
 	}
 
+    /**
+     * Performs the ExportToWKB operation on cursor of geometries
+     * @param exportFlags This should probably be removed
+     * @param geometryCursor
+     * @return
+     */
+	public abstract ByteBufferCursor execute(int exportFlags, GeometryCursor geometryCursor);
+
 	/**
 	 * Performs the ExportToWKB operation.
 	 * @param exportFlags Use the {@link WkbExportFlags} interface.
 	 * @param geometry The Geometry being exported.
 	 * @return Returns a ByteBuffer object containing the Geometry in WKB format
 	 */
-	public abstract ByteBuffer execute(int exportFlags, Geometry geometry,
-			ProgressTracker progressTracker);
+	public abstract ByteBuffer execute(int exportFlags, Geometry geometry, ProgressTracker progressTracker);
 
 	/**
 	 * Performs the ExportToWKB operation.
@@ -53,12 +60,10 @@ public abstract class OperatorExportToWkb extends Operator {
 	 * @param wkbBuffer The ByteBuffer to contain the exported Geometry in WKB format.
 	 * @return If the input buffer is null, then the size needed for the buffer is returned. Otherwise the number of bytes written to the buffer is returned.
 	 */
-	public abstract int execute(int exportFlags, Geometry geometry,
-			ByteBuffer wkbBuffer, ProgressTracker progressTracker);
+	public abstract int execute(int exportFlags, Geometry geometry, ByteBuffer wkbBuffer, ProgressTracker progressTracker);
 
 	public static OperatorExportToWkb local() {
-		return (OperatorExportToWkb) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.ExportToWkb);
+		return (OperatorExportToWkb) OperatorFactoryLocal.getInstance().getOperator(Type.ExportToWkb);
 	}
 
 }

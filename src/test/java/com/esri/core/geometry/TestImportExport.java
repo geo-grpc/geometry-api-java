@@ -2,6 +2,10 @@ package com.esri.core.geometry;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import junit.framework.TestCase;
 import org.json.JSONException;
 import org.junit.Test;
@@ -1706,6 +1710,66 @@ public class TestImportExport extends TestCase {
 		assertTrue(mapGeometry4326.getGeometry().equals(
 				mapGeometry3857.getGeometry()));
 	}
+
+	@Test
+	public static void testImportExportESRICursors() {
+		Polygon poly1 = new Polygon();
+		Envelope2D env1 = new Envelope2D();
+		env1.setCoords(855277, 3892059, 855277 + 100, 3892059 + 100);
+		poly1.addEnvelope(env1, false);
+
+		Polygon poly2 = new Polygon();
+		Envelope2D env2 = new Envelope2D();
+		env2.setCoords(855277, 3892059, 855277 + 300, 3892059 + 200);
+		poly2.addEnvelope(env2, false);
+		List<Geometry> list2 = new ArrayList<>();
+		list2.add(poly1);
+		list2.add(poly2);
+		SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+
+		OperatorExportToESRIShapeCursor operatorExportToESRIShapeCursor = new OperatorExportToESRIShapeCursor(0, simpleGeometryCursor2);
+		OperatorImportFromESRIShapeCursor operatorImportFromESRIShapeCursor = new OperatorImportFromESRIShapeCursor(0, 0, operatorExportToESRIShapeCursor);
+
+		SpatialReference inputSR = SpatialReference.create(3857);
+		OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
+		OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
+		HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+				operatorImportFromESRIShapeCursor, inputSR, null);
+
+		assertNotNull(relate_map);
+		assertTrue(!relate_map.get(0));
+		assertTrue(!relate_map.get(1));
+	}
+
+    @Test
+    public static void testImportExportWKBCursors() {
+        Polygon poly1 = new Polygon();
+        Envelope2D env1 = new Envelope2D();
+        env1.setCoords(855277, 3892059, 855277 + 100, 3892059 + 100);
+        poly1.addEnvelope(env1, false);
+
+        Polygon poly2 = new Polygon();
+        Envelope2D env2 = new Envelope2D();
+        env2.setCoords(855277, 3892059, 855277 + 300, 3892059 + 200);
+        poly2.addEnvelope(env2, false);
+        List<Geometry> list2 = new ArrayList<>();
+        list2.add(poly1);
+        list2.add(poly2);
+        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+
+        OperatorExportToWkbCursor operatorExportToWkbCursor = new OperatorExportToWkbCursor(0, simpleGeometryCursor2);
+        OperatorImportFromWkbCursor operatorImportFromWkbCursor = new OperatorImportFromWkbCursor(0, operatorExportToWkbCursor );
+
+        SpatialReference inputSR = SpatialReference.create(3857);
+        OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
+        OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
+        HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+                operatorImportFromWkbCursor, inputSR, null);
+
+        assertNotNull(relate_map);
+        assertTrue(!relate_map.get(0));
+        assertTrue(!relate_map.get(1));
+    }
 
 	public static Polygon makePolygon() {
 		Polygon poly = new Polygon();

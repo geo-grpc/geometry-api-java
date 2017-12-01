@@ -34,8 +34,7 @@ class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
 	int m_index;
 	ByteBuffer m_shapeBuffer;
 
-	public OperatorExportToESRIShapeCursor(int exportFlags,
-			GeometryCursor geometryCursor) {
+	public OperatorExportToESRIShapeCursor(int exportFlags, GeometryCursor geometryCursor) {
 		m_index = -1;
 		if (geometryCursor == null)
 			throw new GeometryException("invalid argument");

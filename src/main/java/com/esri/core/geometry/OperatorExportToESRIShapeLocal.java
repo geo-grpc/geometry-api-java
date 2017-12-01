@@ -40,19 +40,15 @@ class OperatorExportToESRIShapeLocal extends OperatorExportToESRIShape {
 	@Override
 	public ByteBuffer execute(int exportFlags, Geometry geometry) {
 		ByteBuffer shapeBuffer = null;
-		int size = OperatorExportToESRIShapeCursor.exportToESRIShape(
-				exportFlags, geometry, shapeBuffer);
+		int size = OperatorExportToESRIShapeCursor.exportToESRIShape(exportFlags, geometry, shapeBuffer);
 		shapeBuffer = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
-		OperatorExportToESRIShapeCursor.exportToESRIShape(exportFlags,
-				geometry, shapeBuffer);
+		OperatorExportToESRIShapeCursor.exportToESRIShape(exportFlags, geometry, shapeBuffer);
 		return shapeBuffer;
 	}
 
 	@Override
-	public int execute(int exportFlags, Geometry geometry,
-			ByteBuffer shapeBuffer) {
+	public int execute(int exportFlags, Geometry geometry, ByteBuffer shapeBuffer) {
 		shapeBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		return OperatorExportToESRIShapeCursor.exportToESRIShape(exportFlags,
-				geometry, shapeBuffer);
+		return OperatorExportToESRIShapeCursor.exportToESRIShape(exportFlags, geometry, shapeBuffer);
 	}
 }

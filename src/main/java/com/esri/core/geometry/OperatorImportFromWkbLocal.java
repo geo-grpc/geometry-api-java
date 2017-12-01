@@ -51,9 +51,14 @@ class OperatorImportFromWkbLocal extends OperatorImportFromWkb {
 		int adjustment;
 	}
 
+
 	@Override
-	public Geometry execute(int importFlags, Geometry.Type type,
-			ByteBuffer wkbBuffer, ProgressTracker progress_tracker) {
+	public GeometryCursor execute(int importFlags, ByteBufferCursor wkbBuffers, ProgressTracker progressTracker) {
+		return new OperatorImportFromWkbCursor(importFlags, wkbBuffers);
+	}
+
+	@Override
+	public Geometry execute(int importFlags, Geometry.Type type, ByteBuffer wkbBuffer, ProgressTracker progress_tracker) {
 
 		ByteOrder initialOrder = wkbBuffer.order();
 
@@ -75,8 +80,7 @@ class OperatorImportFromWkbLocal extends OperatorImportFromWkb {
 	}
 
 	@Override
-	public OGCStructure executeOGC(int importFlags, ByteBuffer wkbBuffer,
-			ProgressTracker progress_tracker) {
+	public OGCStructure executeOGC(int importFlags, ByteBuffer wkbBuffer, ProgressTracker progress_tracker) {
 
 		ByteOrder initialOrder = wkbBuffer.order();
 
