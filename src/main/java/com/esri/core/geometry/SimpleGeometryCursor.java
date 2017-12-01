@@ -24,6 +24,7 @@
 package com.esri.core.geometry;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,40 +33,44 @@ import java.util.List;
  */
 public class SimpleGeometryCursor extends GeometryCursor {
 
-	Geometry m_geom;
-	List<Geometry> m_geomArray;
-
+    Iterator<Geometry> m_geometryIterator = null;
 	int m_index;
-	int m_count;
+	MapGeometryCursor m_mapGeometryCursor = null;
+	MapGeometry mapGeometry = null;
 
 	public SimpleGeometryCursor(Geometry geom) {
-		m_geom = geom;
-		m_index = -1;
-		m_count = 1;
+		this(Arrays.asList(geom));
 	}
 
 	public SimpleGeometryCursor(Geometry[] geoms) {
-		m_geomArray = Arrays.asList(geoms);
-		m_index = -1;
-		m_count = geoms.length;
+		this(Arrays.asList(geoms));
 	}
 
 	public SimpleGeometryCursor(List<Geometry> geoms) {
-		m_geomArray = geoms;
 		m_index = -1;
-		m_count = geoms.size();
+		m_geometryIterator = geoms.iterator();
+	}
+
+	public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor){
+		m_mapGeometryCursor = mapGeometryCursor;
 	}
 
 	@Override
 	public int getGeometryID() {
+		if (m_mapGeometryCursor != null)
+			return m_mapGeometryCursor.getGeometryID();
+
 		return m_index;
 	}
 
 	@Override
 	public Geometry next() {
-		if (m_index < m_count - 1) {
+		if (m_geometryIterator.hasNext()) {
 			m_index++;
-			return m_geom != null ? m_geom : m_geomArray.get(m_index);
+			return m_geometryIterator.next();
+		}
+		if (m_mapGeometryCursor != null && (mapGeometry = m_mapGeometryCursor.next()) != null) {
+			return mapGeometry.m_geometry;
 		}
 
 		return null;
