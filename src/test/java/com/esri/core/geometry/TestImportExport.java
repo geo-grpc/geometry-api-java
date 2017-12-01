@@ -1779,9 +1779,77 @@ public class TestImportExport extends TestCase {
         assertNotNull(relate_map);
         assertTrue(relate_map.get(0));
         assertTrue(relate_map.get(1));
-
-
     }
+
+    static double randomWithRange(double min, double max)
+    {
+        double range = Math.abs(max - min);
+        return (Math.random() * range) + (min <= max ? min : max);
+    }
+
+    @Test
+    public static void testImportExportWKTCursors() {
+        Polygon poly1 = new Polygon();
+        Envelope2D env1 = new Envelope2D();
+        env1.setCoords(855277, 3892059, 855277 + 100, 3892059 + 100);
+        poly1.addEnvelope(env1, false);
+
+        Polygon poly2 = new Polygon();
+        Envelope2D env2 = new Envelope2D();
+        env2.setCoords(855277, 3892059, 855277 + 300, 3892059 + 200);
+        poly2.addEnvelope(env2, false);
+        List<Geometry> list2 = new ArrayList<>();
+        list2.add(poly1);
+        list2.add(poly2);
+
+        int size = 1000;
+        String[] points = new String[size];
+        List<Point> pointList = new ArrayList<>(size);
+        for (int i = 0; i < size; i++){
+            pointList.add(new Point(randomWithRange(-20, 20), randomWithRange(-20, 20)));
+            points[i] = (String.format("Point(%f %f)", pointList.get(i).getX(), pointList.get(i).getY()));
+        }
+
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(points);
+        OperatorImportFromWktCursor operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        Point geom = (Point)operatorImportFromWktCursor.next();
+        int index = 0;
+        while (geom != null) {
+            Point point_orig = pointList.get(index);
+            assertEquals(point_orig.getX(), geom.getX(), 7);
+            assertEquals(point_orig.getY(), geom.getY(), 7);
+
+            geom = (Point)operatorImportFromWktCursor.next();
+            index++;
+        }
+
+
+
+        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        OperatorExportToWktCursor operatorExportToWktCursor = new OperatorExportToWktCursor(0, simpleGeometryCursor2, null);
+        operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, operatorExportToWktCursor);
+
+        SpatialReference inputSR = SpatialReference.create(3857);
+        OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
+        OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
+        HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+                operatorImportFromWktCursor, inputSR, null);
+
+        assertNotNull(relate_map);
+        assertTrue(!relate_map.get(0));
+        assertTrue(!relate_map.get(1));
+
+        simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        operatorExportToWktCursor = new OperatorExportToWktCursor(0, simpleGeometryCursor2, null);
+        operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, operatorExportToWktCursor );
+        double[] distances = {400,400};
+        OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(operatorImportFromWktCursor, null, distances, false, null);
+        relate_map = ((OperatorWithin)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Within)).execute(poly2, operatorBufferCursor, inputSR, null);
+        assertNotNull(relate_map);
+        assertTrue(relate_map.get(0));
+        assertTrue(relate_map.get(1));
+    }
+
 
 	public static Polygon makePolygon() {
 		Polygon poly = new Polygon();

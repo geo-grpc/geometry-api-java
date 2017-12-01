@@ -25,6 +25,11 @@ package com.esri.core.geometry;
 
 class OperatorExportToWktLocal extends OperatorExportToWkt {
 	@Override
+	public StringCursor execute(int exportFlags, GeometryCursor geometryCursor, ProgressTracker progressTracker) {
+		return new OperatorExportToWktCursor(exportFlags, geometryCursor, progressTracker);
+	}
+
+	@Override
 	public String execute(int export_flags, Geometry geometry,
 			ProgressTracker progress_tracker) {
 		StringBuilder string = new StringBuilder();

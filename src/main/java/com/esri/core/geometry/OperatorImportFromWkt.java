@@ -23,13 +23,15 @@
  */
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.Operator.Type;
-
 public abstract class OperatorImportFromWkt extends Operator {
 	@Override
 	public Type getType() {
 		return Type.ImportFromWkb;
 	}
+
+	public abstract GeometryCursor execute(int import_flags,
+                                           SimpleStringCursor wkt_stringCursor,
+                                           ProgressTracker progress_tracker);
 
 	/**
 	 * Performs the ImportFromWkt operation.
@@ -38,8 +40,10 @@ public abstract class OperatorImportFromWkt extends Operator {
 	 * @param wkt_string The string holding the Geometry in wkt format.
 	 * @return Returns the imported Geometry.
 	 */
-	public abstract Geometry execute(int import_flags, Geometry.Type type,
-			String wkt_string, ProgressTracker progress_tracker);
+	public abstract Geometry execute(int import_flags,
+									 Geometry.Type type,
+									 String wkt_string,
+									 ProgressTracker progress_tracker);
 
 	/**
 	 * Performs the ImportFromWkt operation.

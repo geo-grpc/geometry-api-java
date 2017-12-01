@@ -23,7 +23,6 @@
  */
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.Operator.Type;
 
 public abstract class OperatorExportToWkt extends Operator {
 	@Override
@@ -31,8 +30,13 @@ public abstract class OperatorExportToWkt extends Operator {
 		return Type.ExportToWkt;
 	}
 
-	public abstract String execute(int exportFlags, Geometry geometry,
-			ProgressTracker progress_tracker);
+	public abstract StringCursor execute(int exportFlags,
+                                               GeometryCursor geometryCursor,
+                                               ProgressTracker progressTracker);
+
+	public abstract String execute(int exportFlags,
+								   Geometry geometry,
+								   ProgressTracker progress_tracker);
 
 	public static OperatorExportToWkt local() {
 		return (OperatorExportToWkt) OperatorFactoryLocal.getInstance()
