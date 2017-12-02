@@ -27,6 +27,10 @@ package com.esri.core.geometry;
  *An abstract Geometry Cursor class.
  */
 public abstract class GeometryCursor {
+	//TODO add count
+	// TODO add extent
+	// TODO add spatial reference
+
 	/**
 	 *Moves the cursor to the next Geometry. Returns null when reached the end.
 	 *The behavior of the cursor is undefined after the method returns null.
