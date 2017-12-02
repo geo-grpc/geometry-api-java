@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2017 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,43 +23,50 @@
  */
 package com.esri.core.geometry;
 
-import org.json.JSONException;
-
 public abstract class OperatorImportFromGeoJson extends Operator {
+
 	@Override
 	public Type getType() {
 		return Type.ImportFromGeoJson;
 	}
 
-	abstract MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker) throws JSONException;
-	abstract MapGeometryCursor execute(int import_flags, StringCursor stringCursor, ProgressTracker progressTracker) throws JSONException;
+	abstract MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker);
+	abstract MapGeometryCursor execute(int import_flags, StringCursor stringCursor, ProgressTracker progressTracker);
 
 	/**
 	 * Performs the ImportFromGeoJson operation.
-	 * @param import_flags Use the {@link GeoJsonImportFlags} interface.
-	 * @param type Use the {@link Geometry.Type} enum. 
-	 * @param geoJsonString The string holding the Geometry in geoJson format.
-	 * @return Returns the imported Geometry.
-	 * @throws JSONException 
+	 *
+	 * @param type Use the {@link Geometry.Type} enum.
+	 * @param jsonObject The JSONObject holding the geometry and spatial reference.
+	 * @return Returns the imported MapGeometry.
+	 * @throws JsonGeometryException
 	 */
-	public abstract MapGeometry execute(int import_flags,
-										Geometry.Type type,
-										String geoJsonString,
-										ProgressTracker progress_tracker) throws JSONException;
+	public abstract MapGeometry execute(int importFlags, Geometry.Type type, JsonReader jsonReader, ProgressTracker progressTracker);
 
 	/**
+	 * Deprecated, use version without import_flags.
+	 *
 	 * Performs the ImportFromGeoJson operation.
+	 *
+	 * @param import_flags Use the {@link GeoJsonImportFlags} interface.
+	 * @param type Use the {@link Geometry.Type} enum.
+	 * @param geoJsonString The string holding the Geometry in geoJson format.
+	 * @return Returns the imported MapGeometry.
+	 *
+	 */
+	public abstract MapGeometry execute(int import_flags, Geometry.Type type, String geoJsonString, ProgressTracker progress_tracker);
+
+	/**
+	 *
+	 * Performs the ImportFromGeoJson operation.
+	 *
 	 * @param import_flags Use the {@link GeoJsonImportFlags} interface.
 	 * @param geoJsonString The string holding the Geometry in geoJson format.
 	 * @return Returns the imported MapOGCStructure.
-	 * @throws JSONException 
 	 */
-	public abstract MapOGCStructure executeOGC(int import_flags,
-			String geoJsonString, ProgressTracker progress_tracker)
-			throws JSONException;
+	public abstract MapOGCStructure executeOGC(int import_flags, String geoJsonString, ProgressTracker progress_tracker);
 
 	public static OperatorImportFromGeoJson local() {
-		return (OperatorImportFromGeoJson) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.ImportFromGeoJson);
+		return (OperatorImportFromGeoJson) OperatorFactoryLocal.getInstance().getOperator(Type.ImportFromGeoJson);
 	}
 }

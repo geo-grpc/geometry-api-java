@@ -1,7 +1,34 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry;
 
 import junit.framework.TestCase;
+
 import org.junit.Test;
+
+import com.esri.core.geometry.PolygonUtils.PiPResult;
 
 //import java.util.Random;
 
@@ -1038,4 +1065,47 @@ public class TestIntersection extends TestCase {
             boolean eq = OperatorEquals.local().execute(g, polyline, sr, null);
             assertTrue(eq);
         }
+
+        /*
+        Point2D uniqueIntersectionPointOfNonDisjointGeometries(Geometry g1, Geometry g2, SpatialReference sr) {
+        	Geometry g1Test = g1;
+        	boolean g1Polygon = g1.getType() == Geometry.Type.Polygon;
+        	boolean g2Polygon = g2.getType() == Geometry.Type.Polygon;
+
+        	if (g1Polygon || g2Polygon)
+        	{
+        		if (g1Polygon) {
+        			Point2D p = getFirstPoint(g2);
+        			if (PolygonUtils.isPointInPolygon2D((Polygon)g1, p, 0) != PiPResult.PiPOutside)
+        				return p;
+        		}
+        		if (g2Polygon) {
+        			Point2D p = getFirstPoint(g1);
+        			if (PolygonUtils.isPointInPolygon2D((Polygon)g2, p, 0) != PiPResult.PiPOutside)
+        				return p;
+        		}
+        	}
+
+        	if (g1Polygon)
+        	{
+        		Polyline polyline = new Polyline();
+        		polyline.add((MultiPath)g1, false);
+        		g1Test = polyline;
+        	}
+        	Geometry g2Test = g2;
+        	if (g2Polygon)
+        	{
+        		Polyline polyline = new Polyline();
+        		polyline.add((MultiPath)g2, false);
+        		g2Test = polyline;
+        	}
+        	
+        	GeometryCursor gc = OperatorIntersection.local().execute(new SimpleGeometryCursor(g1Test), new SimpleGeometryCursor(g2Test), sr, null, 3);
+        	for (Geometry res = gc.next(); res != null; res = gc.next()) {
+        		return getFirstPoint(res);
+        	}
+        	
+        	throw new GeometryException("internal error");
+        }*/
+
 }

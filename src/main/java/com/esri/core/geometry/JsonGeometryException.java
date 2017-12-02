@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2017 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,30 +21,34 @@
 
  email: contracts@esri.com
  */
+
 package com.esri.core.geometry;
 
-import org.codehaus.jackson.JsonParser;
-
 /**
- * An abstract JsonParser Cursor class.
+ * A runtime exception raised when a JSON related exception occurs.
  */
-abstract class JsonParserCursor {
+public class JsonGeometryException extends GeometryException {
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Constructs a Json Geometry Exception with the given error string/message.
+	 *
+	 * @param str
+	 *            - The error string.
+	 */
+	public JsonGeometryException(String str) {
+		super(str);
+	}
 
 	/**
-	 * Moves the cursor to the next JsonParser. Returns null when reached the
-	 * end.
+	 * Constructs a Json Geometry Exception with the given another exception.
+	 *
+	 * @param ex
+	 *            - The exception to copy the message from.
 	 */
-	public abstract JsonParser next();
-
-	/**
-	 * Returns the ID of the current geometry. The ID is propagated across the
-	 * operations (when possible).
-	 * 
-	 * Returns an ID associated with the current Geometry. The ID is passed
-	 * along and is returned by some operators to preserve relationship between
-	 * the input and output geometry classes. It is not always possible to
-	 * preserve an ID during an operation.
-	 */
-	public abstract int getID();
-
+	public JsonGeometryException(Exception ex) {
+		super(ex.getMessage());
+	}
+	
 }
+

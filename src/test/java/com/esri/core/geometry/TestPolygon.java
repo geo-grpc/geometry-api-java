@@ -1,4 +1,30 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry;
+
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -1199,5 +1225,104 @@ public class TestPolygon extends TestCase {
 			assertTrue(b);
 		}
 		
-	}	
+	}
+
+	@Test
+	public void testPolygon2PolygonFails() {
+		OperatorFactoryLocal factory = OperatorFactoryLocal.getInstance();
+		OperatorExportToGeoJson exporter = (OperatorExportToGeoJson) factory
+				.getOperator(Operator.Type.ExportToGeoJson);
+		String result = exporter.execute(birmingham());
+
+		OperatorImportFromGeoJson importer = (OperatorImportFromGeoJson) factory
+				.getOperator(Operator.Type.ImportFromGeoJson);
+		MapGeometry mapGeometry = importer.execute(
+				GeoJsonImportFlags.geoJsonImportDefaults,
+				Geometry.Type.Polygon, result, null);
+		Polygon polygon = (Polygon) mapGeometry.getGeometry();
+		assertEquals(birmingham(), polygon);
+	}
+
+	@Test
+	public void testPolygon2PolygonFails2() {
+		String birminghamGeojson = GeometryEngine
+				.geometryToGeoJson(birmingham());
+		MapGeometry returnedGeometry = GeometryEngine.geoJsonToGeometry(
+				birminghamGeojson, GeoJsonImportFlags.geoJsonImportDefaults,
+				Geometry.Type.Polygon);
+		Polygon polygon = (Polygon) returnedGeometry.getGeometry();
+		assertEquals(polygon, birmingham());
+	}
+
+	@Test
+	public void testPolygon2PolygonWorks() {
+		String birminghamGeojson = GeometryEngine
+				.geometryToGeoJson(birmingham());
+		MapGeometry returnedGeometry = GeometryEngine.geoJsonToGeometry(
+				birminghamGeojson, GeoJsonImportFlags.geoJsonImportDefaults,
+				Geometry.Type.Polygon);
+		Polygon polygon = (Polygon) returnedGeometry.getGeometry();
+		assertEquals(polygon.toString(), birmingham().toString());
+	}
+
+	@Test
+	public void testPolygon2Polygon2Works() {
+		String birminghamJson = GeometryEngine.geometryToJson(4326,
+				birmingham());
+		MapGeometry returnedGeometry = GeometryEngine
+				.jsonToGeometry(birminghamJson);
+		Polygon polygon = (Polygon) returnedGeometry.getGeometry();
+		assertEquals(polygon, birmingham());
+		String s = polygon.toString();
+	}
+
+	@Test
+	public void testSegmentIteratorCrash() {
+		Polygon poly = new Polygon();
+
+		// clockwise => outer ring
+		poly.startPath(0, 0);
+		poly.lineTo(-0.5, 0.5);
+		poly.lineTo(0.5, 1);
+		poly.lineTo(1, 0.5);
+		poly.lineTo(0.5, 0);
+
+		// hole
+		poly.startPath(0.5, 0.2);
+		poly.lineTo(0.6, 0.5);
+		poly.lineTo(0.2, 0.9);
+		poly.lineTo(-0.2, 0.5);
+		poly.lineTo(0.1, 0.2);
+		poly.lineTo(0.2, 0.3);
+
+		// island
+		poly.startPath(0.1, 0.7);
+		poly.lineTo(0.3, 0.7);
+		poly.lineTo(0.3, 0.4);
+		poly.lineTo(0.1, 0.4);
+
+		assertEquals(poly.getSegmentCount(), 15);
+		assertEquals(poly.getPathCount(), 3);
+		SegmentIterator segmentIterator = poly.querySegmentIterator();
+		int paths = 0;
+		int segments = 0;
+		while (segmentIterator.nextPath()) {
+			paths++;
+			Segment segment;
+			while (segmentIterator.hasNextSegment()) {
+				segment = segmentIterator.nextSegment();
+				segments++;
+			}
+		}
+		assertEquals(paths, 3);
+		assertEquals(segments, 15);
+	}
+
+	private static Polygon birmingham() {
+		Polygon poly = new Polygon();
+		poly.addEnvelope(new Envelope(-1.954245, 52.513531, -1.837357,
+				52.450123), false);
+		poly.addEnvelope(new Envelope(0, 0, 1, 1), false);
+		return poly;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2017 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,9 +29,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.json.JSONException;
+import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Provides services that operate on geometry instances. The methods of GeometryEngine class call corresponding OperatorXXX classes.
@@ -43,7 +41,6 @@ public class GeometryEngine {
 
 	private static OperatorFactoryLocal factory = OperatorFactoryLocal
 			.getInstance();
-
 
 
 	/**
@@ -59,6 +56,23 @@ public class GeometryEngine {
 	 *         spatial reference.
 	 */
 	public static MapGeometry jsonToGeometry(JsonParser json) {
+		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, new JsonParserReader(json));
+		return geom;
+	}
+
+	/**
+	 * Imports the MapGeometry from its JSON representation. M and Z values are
+	 * not imported from JSON representation.
+	 *
+	 * See OperatorImportFromJson.
+	 *
+	 * @param json
+	 *            The JSON representation of the geometry (with spatial
+	 *            reference).
+	 * @return The MapGeometry instance containing the imported geometry and its
+	 *         spatial reference.
+	 */
+	public static MapGeometry jsonToGeometry(JsonReader json) {
 		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
 		return geom;
 	}
@@ -77,7 +91,7 @@ public class GeometryEngine {
 	 * @throws IOException 
 	 * @throws JsonParseException 
 	 */
-	public static MapGeometry jsonToGeometry(String json) throws JsonParseException, IOException {
+	public static MapGeometry jsonToGeometry(String json) {
 		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
 		return geom;
 	}
@@ -128,43 +142,60 @@ public class GeometryEngine {
         return exporter.execute(geometry);
     }
 
-    /**
-     * Exports the specified geometry instance to its GeoJSON representation.
-     *
-     *See OperatorExportToGeoJson.
-     *
-     * @see GeometryEngine#geometryToGeoJson(SpatialReference spatialReference,
-     *      Geometry geometry)
-     *
-     * @param wkid
-     *            The spatial reference Well Known ID to be used for the GeoJSON representation.
-     * @param geometry
-     *            The geometry to be exported to GeoJSON.
-     * @return The GeoJSON representation of the specified geometry.
-     */
-    public static String geometryToGeoJson(int wkid, Geometry geometry) {
-        return GeometryEngine.geometryToGeoJson(
-                wkid > 0 ? SpatialReference.create(wkid) : null, geometry);
-    }
+	/**
+	 * Imports the MapGeometry from its JSON representation. M and Z values are
+	 * not imported from JSON representation.
+	 *
+	 * See OperatorImportFromJson.
+	 *
+	 * @param json
+	 *            The JSON representation of the geometry (with spatial
+	 *            reference).
+	 * @return The MapGeometry instance containing the imported geometry and its
+	 *         spatial reference.
+	 * @throws IOException
+	 * @throws JsonParseException
+	 */
+	public static MapGeometry geoJsonToGeometry(String json, int importFlags, Geometry.Type type) {
+		MapGeometry geom = OperatorImportFromGeoJson.local().execute(importFlags, type, json, null);
+		return geom;
+	}
 
-    /**
-     * Exports the specified geometry instance to it's JSON representation.
-     *
-     *See OperatorImportFromGeoJson.
-     *
-     * @param spatialReference
-     *            The spatial reference of associated object.
-     * @param geometry
-     *            The geometry.
-     * @return The GeoJSON representation of the specified geometry.
-     */
-    public static String geometryToGeoJson(SpatialReference spatialReference,
-            Geometry geometry) {
-        OperatorExportToGeoJson exporter = (OperatorExportToGeoJson) factory
-                .getOperator(Operator.Type.ExportToGeoJson);
+	/**
+	 * Exports the specified geometry instance to its GeoJSON representation.
+	 *
+	 * See OperatorExportToGeoJson.
+	 *
+	 * @see GeometryEngine#geometryToGeoJson(SpatialReference spatialReference,
+	 *      Geometry geometry)
+	 *
+	 * @param wkid
+	 *            The spatial reference Well Known ID to be used for the GeoJSON
+	 *            representation.
+	 * @param geometry
+	 *            The geometry to be exported to GeoJSON.
+	 * @return The GeoJSON representation of the specified geometry.
+	 */
+	public static String geometryToGeoJson(int wkid, Geometry geometry) {
+		return GeometryEngine.geometryToGeoJson(wkid > 0 ? SpatialReference.create(wkid) : null, geometry);
+	}
 
-        return exporter.execute(spatialReference, geometry);
-    }
+	/**
+	 * Exports the specified geometry instance to it's JSON representation.
+	 *
+	 * See OperatorImportFromGeoJson.
+	 *
+	 * @param spatialReference
+	 *            The spatial reference of associated object.
+	 * @param geometry
+	 *            The geometry.
+	 * @return The GeoJSON representation of the specified geometry.
+	 */
+	public static String geometryToGeoJson(SpatialReference spatialReference, Geometry geometry) {
+		OperatorExportToGeoJson exporter = (OperatorExportToGeoJson) factory.getOperator(Operator.Type.ExportToGeoJson);
+
+		return exporter.execute(spatialReference, geometry);
+	}
 
 	/**
 	 * Imports geometry from the ESRI shape file format.
@@ -230,25 +261,6 @@ public class GeometryEngine {
 		OperatorImportFromWkt op = (OperatorImportFromWkt) factory
 				.getOperator(Operator.Type.ImportFromWkt);
 		return op.execute(importFlags, geometryType, wkt, null);
-	}
-
-	/**
-	 * Imports a geometry from a geoJson string.
-	 * 
-	 * See OperatorImportFromGeoJson.
-	 * 
-	 * @param geoJson The string containing the geometry in geoJson format.
-	 * @param importFlags Use the {@link GeoJsonImportFlags} interface.
-	 * @param geometryType The required type of the Geometry to be imported. Use Geometry.Type.Unknown if the geometry type needs to be determined from the geoJson context.
-	 * @return The geometry.
-	 * @throws GeometryException when the geometryType is not Geometry.Type.Unknown and the geoJson contains a geometry that cannot be converted to the given geometryType.
-	 * @throws IllegalArgument exception if an error is found while parsing the geoJson string.
-	 */
-	public static MapGeometry geometryFromGeoJson(String geoJson,
-			int importFlags, Geometry.Type geometryType) throws JSONException {
-		OperatorImportFromGeoJson op = (OperatorImportFromGeoJson) factory
-				.getOperator(Operator.Type.ImportFromGeoJson);
-		return op.execute(importFlags, geometryType, geoJson, null);
 	}
 
 	/**
@@ -650,7 +662,6 @@ public class GeometryEngine {
 
 		return cutsList.toArray(new Geometry[0]);
 	}
-
 	/**
 	 * Calculates a buffer polygon for each geometry at each of the 
 	 * corresponding specified distances.  It is assumed that all geometries have
@@ -696,7 +707,6 @@ public class GeometryEngine {
 			return buffers;
 		}
 	}
-
 
 	/**
 	 * Calculates a buffer polygon of the geometry as specified by the 
@@ -887,7 +897,6 @@ public class GeometryEngine {
 		boolean result = op.isSimpleAsFeature(geometry, spatialReference, null);
 		return result;
 	}
-
 
 	/**
 	 * A geodesic distance is the shortest distance between any two points on the earth's surface when the earth's

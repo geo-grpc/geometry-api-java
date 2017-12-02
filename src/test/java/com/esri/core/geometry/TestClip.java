@@ -1,3 +1,27 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry;
 
 import junit.framework.TestCase;
@@ -107,7 +131,7 @@ public class TestClip extends TestCase {
 		}
 	}
 
-	public static Polygon makePolygon() {
+	static Polygon makePolygon() {
 		Polygon poly = new Polygon();
 		poly.startPath(0, 0);
 		poly.lineTo(10, 10);
@@ -116,7 +140,7 @@ public class TestClip extends TestCase {
 		return poly;
 	}
 
-	public static Polyline makePolyline() {
+	static Polyline makePolyline() {
 		Polyline poly = new Polyline();
 		poly.startPath(0, 0);
 		poly.lineTo(10, 10);
@@ -183,7 +207,7 @@ public class TestClip extends TestCase {
 		// ((MultiPathImpl::SPtr)clippedPolygon._GetImpl()).SaveToTextFileDbg("c:\\temp\\test_ArcObjects_failure_CR196492.txt");
 	}
 
-	public static Polyline makePolylineCR() {
+	static Polyline makePolylineCR() {
 		Polyline polyline = new Polyline();
 
 		polyline.startPath(-200, -90);
@@ -197,7 +221,7 @@ public class TestClip extends TestCase {
 		return polyline;
 	}
 
-	public static MultiPoint makeMultiPoint() {
+	static MultiPoint makeMultiPoint() {
 		MultiPoint mpoint = new MultiPoint();
 
 		Point2D pt1 = new Point2D();
@@ -219,7 +243,7 @@ public class TestClip extends TestCase {
 		return mpoint;
 	}
 
-	public static Point makePoint() {
+	static Point makePoint() {
 		Point point = new Point();
 
 		Point2D pt = new Point2D();

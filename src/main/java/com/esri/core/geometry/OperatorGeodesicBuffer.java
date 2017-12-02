@@ -43,6 +43,8 @@ public abstract class OperatorGeodesicBuffer extends Operator {
 	 * default deviation.
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
 	 * @param bUnion If True, the buffered geometries will be unioned, otherwise they wont be unioned.
+	 * @param progressTracker Can be null. Allows to cancel lengthy operation.
+	 * @return Geometry cursor over result buffers.
 	 */
 	public abstract GeometryCursor execute(
 			GeometryCursor inputGeometries,
@@ -65,6 +67,8 @@ public abstract class OperatorGeodesicBuffer extends Operator {
 	 * @param maxDeviationMeters The deviation offset to use for convergence. The geodesic arcs of the resulting buffer will be closer than the max deviation of the true buffer. Pass in NaN to use the
 	 * default deviation.
 	 * @param bReserved Must be false. Reserved for future development. Will throw an exception if not false.
+	 * @param progressTracker Can be null. Allows to cancel lengthy operation.
+	 * @return Returns result buffer.
 	 */
 	public abstract Geometry execute(
 			Geometry inputGeometry,

@@ -1,46 +1,34 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry.ogc;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.json.JSONException;
-
-import com.esri.core.geometry.Envelope;
-import com.esri.core.geometry.Envelope1D;
-import com.esri.core.geometry.Geometry;
-import com.esri.core.geometry.GeometryCursor;
-import com.esri.core.geometry.GeometryCursorAppend;
-import com.esri.core.geometry.GeometryEngine;
-import com.esri.core.geometry.MapGeometry;
-import com.esri.core.geometry.MapOGCStructure;
-import com.esri.core.geometry.MultiPoint;
-import com.esri.core.geometry.OGCStructure;
-import com.esri.core.geometry.Operator;
-import com.esri.core.geometry.OperatorBuffer;
-import com.esri.core.geometry.OperatorConvexHull;
-import com.esri.core.geometry.OperatorExportToWkb;
-import com.esri.core.geometry.OperatorExportToGeoJson;
-import com.esri.core.geometry.OperatorFactoryLocal;
-import com.esri.core.geometry.OperatorImportFromESRIShape;
-import com.esri.core.geometry.OperatorImportFromGeoJson;
-import com.esri.core.geometry.OperatorImportFromJson;
-import com.esri.core.geometry.OperatorImportFromWkb;
-import com.esri.core.geometry.OperatorImportFromWkt;
-import com.esri.core.geometry.OperatorIntersection;
-import com.esri.core.geometry.OperatorSimplify;
-import com.esri.core.geometry.OperatorSimplifyOGC;
-import com.esri.core.geometry.OperatorUnion;
-import com.esri.core.geometry.Point;
-import com.esri.core.geometry.Polygon;
-import com.esri.core.geometry.Polyline;
-import com.esri.core.geometry.SimpleGeometryCursor;
-import com.esri.core.geometry.SpatialReference;
-import com.esri.core.geometry.VertexDescription;
+import com.esri.core.geometry.*;
 
 /**
  * OGC Simple Feature Access specification v.1.2.1
@@ -93,7 +81,12 @@ public abstract class OGCGeometry {
 	public String asGeoJson() {
 		OperatorExportToGeoJson op = (OperatorExportToGeoJson) OperatorFactoryLocal
 				.getInstance().getOperator(Operator.Type.ExportToGeoJson);
-		return op.execute(getEsriGeometry());
+		return op.execute(esriSR, getEsriGeometry());
+	}
+
+	String asGeoJsonImpl(int export_flags) {
+		OperatorExportToGeoJson op = (OperatorExportToGeoJson) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ExportToGeoJson);
+		return op.execute(export_flags, esriSR, getEsriGeometry());
 	}
 	
 	/**
@@ -211,14 +204,25 @@ public abstract class OGCGeometry {
 	abstract public OGCGeometry boundary();
 
 	/**
-	 * OGC equals
-	 * 
+	 * OGC equals. Performs topological comparison with tolerance.
+	 * This is different from equals(Object), that uses exact comparison.
 	 */
-	public boolean equals(OGCGeometry another) {
+	public boolean Equals(OGCGeometry another) {
+		if (this == another)
+			return true;
+		
+		if (another == null)
+			return false;
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.equals(geom1, geom2,
 				getEsriSpatialReference());
+	}
+	
+	@Deprecated
+	public boolean equals(OGCGeometry another) {
+		return Equals(another);
 	}
 	
 	public boolean disjoint(OGCGeometry another) {
@@ -488,17 +492,13 @@ public abstract class OGCGeometry {
 				SpatialReference.create(4326));
 	}
 
-	public static OGCGeometry fromJson(String string)
-			throws JsonParseException, IOException {
-		JsonFactory factory = new JsonFactory();
-		JsonParser jsonParserPt = factory.createJsonParser(string);
-		jsonParserPt.nextToken();
-		MapGeometry mapGeom = GeometryEngine.jsonToGeometry(jsonParserPt);
+	public static OGCGeometry fromJson(String string) {
+		MapGeometry mapGeom = GeometryEngine.jsonToGeometry(JsonParserReader.createFromString(string));
 		return OGCGeometry.createFromEsriGeometry(mapGeom.getGeometry(),
 				mapGeom.getSpatialReference());
 	}
 
-	public static OGCGeometry fromGeoJson(String string) throws JSONException {
+	public static OGCGeometry fromGeoJson(String string) {
 		OperatorImportFromGeoJson op = (OperatorImportFromGeoJson) OperatorFactoryLocal
 				.getInstance().getOperator(Operator.Type.ImportFromGeoJson);
 		MapOGCStructure mapOGCStructure = op.executeOGC(0, string, null);
@@ -678,5 +678,52 @@ public abstract class OGCGeometry {
 		}
 		return String
 				.format("%s: %s", this.getClass().getSimpleName(), snippet);
+	}
+	
+	@Override
+	public boolean equals(Object other)	{
+		if (other == null)
+			return false;
+
+		if (other == this)
+			return true;
+
+		if (other.getClass() != getClass())
+			return false;
+		
+		OGCGeometry another = (OGCGeometry)other;
+		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
+		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
+		
+		if (geom1 == null) {
+			if (geom2 != null)
+				return false;
+		}
+		else if (!geom1.equals(geom2)) {
+			return false;
+		}
+		
+		if (esriSR == another.esriSR) {
+			return true;
+		}
+			
+		if (esriSR != null && another.esriSR != null) {
+			return esriSR.equals(another.esriSR);
+		}
+			
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
+		if (geom1 != null)
+			hash = geom1.hashCode();
+		
+		if (esriSR != null)
+			hash = NumberUtils.hashCombine(hash, esriSR.hashCode());
+		
+		return hash;
 	}
 }

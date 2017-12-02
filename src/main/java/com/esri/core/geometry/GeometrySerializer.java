@@ -27,6 +27,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+//Left here for backward compatibility. Use GenericGeometrySerializer instead
+@Deprecated
 final class GeometrySerializer implements Serializable {
 	private static final long serialVersionUID = 1L;
 

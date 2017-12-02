@@ -1,3 +1,27 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry;
 
 import junit.framework.TestCase;
@@ -11,10 +35,9 @@ import com.esri.core.geometry.ogc.OGCMultiPoint;
 import com.esri.core.geometry.ogc.OGCMultiPolygon;
 import com.esri.core.geometry.ogc.OGCPoint;
 import com.esri.core.geometry.ogc.OGCPolygon;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.esri.core.geometry.ogc.OGCConcreteGeometryCollection;
 
-import org.codehaus.jackson.JsonParseException;
-import org.json.JSONException;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -40,6 +63,8 @@ public class TestOGC extends TestCase {
 		assertTrue(p.Y() == 2);
 		assertTrue(g.equals(OGCGeometry.fromText("POINT(1 2)")));
 		assertTrue(!g.equals(OGCGeometry.fromText("POINT(1 3)")));
+		assertTrue(g.equals((Object)OGCGeometry.fromText("POINT(1 2)")));
+		assertTrue(!g.equals((Object)OGCGeometry.fromText("POINT(1 3)")));
 		OGCGeometry buf = g.buffer(10);
 		assertTrue(buf.geometryType().equals("Polygon"));
 		OGCPolygon poly = (OGCPolygon) buf.envelope();
@@ -48,7 +73,7 @@ public class TestOGC extends TestCase {
 	}
 
 	@Test
-	public void testPolygon() {
+	public void testPolygon() throws Exception {
 		OGCGeometry g = OGCGeometry
 				.fromText("POLYGON((-10 -10, 10 -10, 10 10, -10 10, -10 -10), (-5 -5, -5 5, 5 5, 5 -5, -5 -5))");
 		assertTrue(g.geometryType().equals("Polygon"));
@@ -57,21 +82,41 @@ public class TestOGC extends TestCase {
 		OGCLineString ls = p.exteriorRing();
 		// assertTrue(ls.pointN(1).equals(OGCGeometry.fromText("POINT(10 -10)")));
 		boolean b = ls
-				.equals(OGCGeometry
+				.Equals(OGCGeometry
 						.fromText("LINESTRING(-10 -10, 10 -10, 10 10, -10 10, -10 -10)"));
 		assertTrue(b);
 		OGCLineString lsi = p.interiorRingN(0);
-		b = lsi.equals(OGCGeometry
+		b = lsi.Equals(OGCGeometry
 				.fromText("LINESTRING(-5 -5, -5 5, 5 5, 5 -5, -5 -5)"));
 		assertTrue(b);
-		assertTrue(!lsi.equals(ls));
+		b = lsi.equals((Object)OGCGeometry
+				.fromText("LINESTRING(-5 -5, -5 5, 5 5, 5 -5, -5 -5)"));
+		assertTrue(!lsi.Equals(ls));
 		OGCMultiCurve boundary = p.boundary();
 		String s = boundary.asText();
 		assertTrue(s.equals("MULTILINESTRING ((-10 -10, 10 -10, 10 10, -10 10, -10 -10), (-5 -5, -5 5, 5 5, 5 -5, -5 -5))"));
+
+		{
+			OGCGeometry g2 = OGCGeometry.fromGeoJson(
+					"{\"type\": \"Polygon\", \"coordinates\": [[[1.00000001,1.00000001], [4.00000001,1.00000001], [4.00000001,4.00000001], [1.00000001,4.00000001]]]}");
+			OGCGeometry
+					.fromGeoJson(
+							"{\"type\": \"LineString\", \"coordinates\": [[1.00000001,1.00000001], [7.00000001,8.00000001]]}")
+					.intersects(g2);
+			OGCGeometry
+					.fromGeoJson(
+							"{\"type\": \"LineString\", \"coordinates\": [[2.449,4.865], [7.00000001,8.00000001]]}")
+					.intersects(g2);
+
+			OGCGeometry g3 = OGCGeometry.fromGeoJson(
+					"{\"type\": \"Polygon\", \"coordinates\": [[[1.00000001,1.00000001], [4.00000001,1.00000001], [4.00000001,4.00000001], [1.00000001,4.00000001]]]}");
+			boolean bb = g2.equals((Object) g3);
+			assertTrue(bb);
+		}
 	}
 
 	@Test
-	public void testGeometryCollection() throws JSONException {
+	public void testGeometryCollection() throws Exception {
 		OGCGeometry g = OGCGeometry
 				.fromText("GEOMETRYCOLLECTION(POLYGON EMPTY, POINT(1 1), LINESTRING EMPTY, MULTIPOLYGON EMPTY, MULTILINESTRING EMPTY)");
 		assertTrue(g.geometryType().equals("GeometryCollection"));
@@ -139,6 +184,10 @@ public class TestOGC extends TestCase {
 		wktString = g.asText();
 		assertTrue(wktString
 				.equals("GEOMETRYCOLLECTION (POLYGON EMPTY, POINT (1 1), GEOMETRYCOLLECTION EMPTY, LINESTRING EMPTY, GEOMETRYCOLLECTION (POLYGON EMPTY, POINT (1 1), LINESTRING EMPTY, MULTIPOLYGON EMPTY, MULTILINESTRING EMPTY, MULTIPOINT EMPTY), MULTIPOLYGON EMPTY, MULTILINESTRING EMPTY)"));
+		
+		assertTrue(g.equals((Object)OGCGeometry.fromText(wktString)));
+		
+		assertTrue(g.hashCode() == OGCGeometry.fromText(wktString).hashCode());
 
 	}
 
@@ -768,7 +817,7 @@ public class TestOGC extends TestCase {
 	}
 
 	@Test
-	public void testIsectTriaJson1() throws JsonParseException, IOException {
+	public void testIsectTriaJson1() throws Exception {
 		String json1 = "{\"rings\":[[[1, 0], [3, 0], [1, 2], [1, 0]]], \"spatialReference\":{\"wkid\":4326}}";
 		String json2 = "{\"rings\":[[[0, 1], [2, 1], [0, 3], [0, 1]]], \"spatialReference\":{\"wkid\":4326}}";
 		OGCGeometry g0 = OGCGeometry.fromJson(json1);
@@ -833,15 +882,7 @@ public class TestOGC extends TestCase {
 	public void testWktMultiPolygon() {
 		String restJson = "{\"rings\": [[[-100, -100], [-100, 100], [100, 100], [100, -100], [-100, -100]], [[-90, -90], [90, 90], [-90, 90], [90, -90], [-90, -90]],	[[-10, -10], [-10, 10], [10, 10], [10, -10], [-10, -10]]]}";
 		MapGeometry g = null;
-		try {
-			g = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, restJson);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		g = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, restJson);
 		String wkt = OperatorExportToWkt.local().execute(0, g.getGeometry(), null);
 		assertTrue(wkt.equals("MULTIPOLYGON (((-100 -100, 100 -100, 100 100, -100 100, -100 -100), (-90 -90, 90 -90, -90 90, 90 90, -90 -90)), ((-10 -10, 10 -10, 10 10, -10 10, -10 -10)))"));
 	}
@@ -868,7 +909,7 @@ public class TestOGC extends TestCase {
 	}
 	
 	@Test
-	public void testPolylineSimplifyIssueGithub52() throws JsonParseException, IOException {
+	public void testPolylineSimplifyIssueGithub52() throws Exception {
 		String json = "{\"paths\":[[[2,0],[4,3],[5,1],[3.25,1.875],[1,3]]],\"spatialReference\":{\"wkid\":4326}}";
 		{
 			OGCGeometry g = OGCGeometry.fromJson(json);

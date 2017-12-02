@@ -28,15 +28,17 @@ class OperatorBufferLocal extends OperatorBuffer {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor inputGeometries,
-								  SpatialReference sr,
-								  double[] distances,
-								  boolean bUnion,
-								  ProgressTracker progressTracker) {
-		if (bUnion) {
-			OperatorBufferCursor cursor = new OperatorBufferCursor(inputGeometries, sr, distances, false, progressTracker);
-			return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, sr, progressTracker);
-		} else
-			return new OperatorBufferCursor(inputGeometries, sr, distances,false, progressTracker);
+                                  SpatialReference sr,
+                                  double[] distances,
+                                  boolean bUnion,
+                                  ProgressTracker progressTracker) {
+		return execute(inputGeometries,
+                sr,
+                distances,
+                NumberUtils.NaN(),
+                96,
+				bUnion,
+                progressTracker);
 	}
 
 	@Override
@@ -52,4 +54,19 @@ class OperatorBufferLocal extends OperatorBuffer {
 		return outputCursor.next();
 	}
 
+	@Override
+	public GeometryCursor execute(GeometryCursor inputGeometries,
+                                  SpatialReference sr,
+                                  double[] distances,
+                                  double max_deviation,
+                                  int max_vertices_in_full_circle,
+                                  boolean b_union,
+                                  ProgressTracker progressTracker) {
+		if (b_union) {
+			OperatorBufferCursor cursor = new OperatorBufferCursor(inputGeometries, sr, distances, max_deviation, max_vertices_in_full_circle,false, progressTracker);
+			return OperatorUnion.local().execute(cursor, sr, progressTracker);// (int)Operator_union::Options::enum_disable_edge_dissolver
+		} else {
+			return new OperatorBufferCursor(inputGeometries, sr,distances, max_deviation, max_vertices_in_full_circle, false, progressTracker);
+		}
+	}
 }

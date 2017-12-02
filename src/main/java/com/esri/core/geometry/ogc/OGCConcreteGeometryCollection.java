@@ -1,10 +1,37 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry.ogc;
 
 import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.GeometryCursor;
+import com.esri.core.geometry.NumberUtils;
 import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.SpatialReference;
+import com.esri.core.geometry.GeoJsonExportFlags;
+import com.esri.core.geometry.OperatorExportToGeoJson;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -145,6 +172,40 @@ public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
 		}
 
 		return wkbBuffer;
+	}
+
+	@Override
+	public String asGeoJson() {
+		return asGeoJsonImpl(GeoJsonExportFlags.geoJsonExportDefaults);
+	}
+
+	@Override
+	String asGeoJsonImpl(int export_flags) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{\"type\":\"GeometryCollection\",\"geometries\":");
+
+		sb.append("[");
+		for (int i = 0, n = numGeometries(); i < n; i++) {
+			if (i > 0)
+				sb.append(",");
+
+			if (geometryN(i) != null)
+				sb.append(geometryN(i).asGeoJsonImpl(GeoJsonExportFlags.geoJsonExportSkipCRS));
+		}
+
+		sb.append("],\"crs\":");
+
+		if (esriSR != null) {
+			String crs_value = OperatorExportToGeoJson.local().exportSpatialReference(0, esriSR);
+			sb.append(crs_value);
+		} else {
+			sb.append("\"null\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	@Override
@@ -314,13 +375,54 @@ public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
 	}
 
 	@Override
-	public OGCGeometry convertToMulti()
-	{
+	public OGCGeometry convertToMulti() {
 		return this;
 	}
 
 	@Override
 	public String asJson() {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean equals(Object other)	{
+		if (other == null)
+			return false;
+
+		if (other == this)
+			return true;
+
+		if (other.getClass() != getClass())
+			return false;
+		
+		OGCConcreteGeometryCollection another = (OGCConcreteGeometryCollection)other;
+		if (geometries != null) {		
+			if (!geometries.equals(another.geometries))
+				return false;
+		}
+		else if (another.geometries != null)
+			return false;
+		
+		if (esriSR == another.esriSR) {
+			return true;
+		}
+			
+		if (esriSR != null && another.esriSR != null) {
+			return esriSR.equals(another.esriSR);
+		}
+			
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		if (geometries != null)
+			hash = geometries.hashCode();
+		
+		if (esriSR != null)
+			hash = NumberUtils.hashCombine(hash, esriSR.hashCode());
+		
+		return hash;
 	}
 }

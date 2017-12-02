@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2017 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,14 +31,14 @@ import java.util.Arrays;
 
 final class AttributeStreamOfDbl extends AttributeStreamBase {
 
-	double[] m_buffer = null;
-	int m_size;
+	protected double[] m_buffer = null;
+	private int m_size;
 
 	public int size() {
 		return m_size;
 	}
 
-	public void reserve(int reserve)// only in Java
+	public void reserve(int reserve)
 	{
 		if (reserve <= 0)
 			return;
@@ -54,6 +54,10 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	}
 
+	public int capacity() {
+		return m_buffer != null ? m_buffer.length : 0;
+	}
+	
 	public AttributeStreamOfDbl(int size) {
 		int sz = size;
 		if (sz < 2)
@@ -89,7 +93,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	/**
 	 * Reads a value from the buffer at given offset.
-	 * 
+	 *
 	 * @param offset
 	 *            is the element number in the stream.
 	 */
@@ -103,7 +107,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	/**
 	 * Overwrites given element with new value.
-	 * 
+	 *
 	 * @param offset
 	 *            is the element number in the stream.
 	 * @param value
@@ -125,7 +129,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	/**
 	 * Reads a value from the buffer at given offset.
-	 * 
+	 *
 	 * @param offset
 	 *            is the element number in the stream.
 	 */
@@ -136,7 +140,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	/**
 	 * Overwrites given element with new value.
-	 * 
+	 *
 	 * @param offset
 	 *            is the element number in the stream.
 	 * @param value
@@ -213,7 +217,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 		if (newSize <= m_size) {
 			if ((newSize * 5) / 4 < m_buffer.length) {// decrease when the 25%
-														// margin is exceeded
+				// margin is exceeded
 				double[] newBuffer = new double[newSize];
 				System.arraycopy(m_buffer, 0, newBuffer, 0, newSize);
 				m_buffer = newBuffer;
@@ -251,7 +255,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 					"invalid call. Attribute Stream is locked and cannot be resized.");
 		if (newSize <= m_size) {
 			if ((newSize * 5) / 4 < m_buffer.length) {// decrease when the 25%
-														// margin is exceeded
+				// margin is exceeded
 				double[] newBuffer = new double[newSize];
 				System.arraycopy(m_buffer, 0, newBuffer, 0, newSize);
 				m_buffer = newBuffer;
@@ -594,8 +598,8 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 			throw new GeometryException("invalid_call");
 
 		if (validSize - (index + count) > 0) {
-			System.arraycopy(m_buffer, index + count, m_buffer, index, validSize
-							- (index + count));
+			System.arraycopy(m_buffer, index + count, m_buffer, index,
+					validSize - (index + count));
 		}
 		m_size -= count;
 	}
@@ -671,8 +675,8 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 			throw new IllegalArgumentException();
 
 		AttributeStreamOfDbl src = (AttributeStreamOfDbl) _src; // the input
-																// type must
-																// match
+		// type must
+		// match
 
 		if (src.size() < (int) (srcStart + count))
 			throw new IllegalArgumentException();

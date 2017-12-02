@@ -737,4 +737,24 @@ public class TestGeodetic extends TestCase {
 		assertEquals(0, centerPoint.y, 1e-4);
 	}
 
+	public void testLengthAccurateCR191313() {
+		/*
+		 * // random_test(); OperatorFactoryLocal engine =
+		 * OperatorFactoryLocal.getInstance(); //TODO: Make this:
+		 * OperatorShapePreservingLength geoLengthOp =
+		 * (OperatorShapePreservingLength)
+		 * factory.getOperator(Operator.Type.ShapePreservingLength);
+		 * SpatialReference spatialRef = SpatialReference.create(102631);
+		 * //[6097817.59407673
+		 * ,17463475.2931517],[-1168053.34617516,11199801.3734424
+		 * ]]],"spatialReference":{"wkid":102631}
+		 *
+		 * Polyline polyline = new Polyline();
+		 * polyline.startPath(6097817.59407673, 17463475.2931517);
+		 * polyline.lineTo(-1168053.34617516, 11199801.3734424); double length =
+		 * geoLengthOp.execute(polyline, spatialRef, null);
+		 * assertTrue(Math.abs(length - 2738362.3249366437) < 2e-9 * length);
+		 */
+	}
+
 }

@@ -1,10 +1,30 @@
+/*
+ Copyright 1995-2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
 package com.esri.core.geometry;
 
-import java.io.IOException;
 import junit.framework.TestCase;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
 import org.junit.Test;
 
 public class TestDistance extends TestCase {
@@ -146,17 +166,13 @@ public class TestDistance extends TestCase {
 	}
 
 	@Test
-	public static void testDistanceWithNullSpatialReference()
-			throws JsonParseException, IOException {
+	public static void testDistanceWithNullSpatialReference() {
 		// There was a bug that distance op did not work with null Spatial
 		// Reference.
 		String str1 = "{\"paths\":[[[-117.138791850991,34.017492675023],[-117.138762336971,34.0174925550462]]]}";
 		String str2 = "{\"paths\":[[[-117.138867827972,34.0174854109623],[-117.138850197027,34.0174929160126],[-117.138791850991,34.017492675023]]]}";
-		JsonFactory jsonFactory = new JsonFactory();
-		JsonParser jsonParser1 = jsonFactory.createJsonParser(str1);
-		JsonParser jsonParser2 = jsonFactory.createJsonParser(str2);
-		MapGeometry geom1 = GeometryEngine.jsonToGeometry(jsonParser1);
-		MapGeometry geom2 = GeometryEngine.jsonToGeometry(jsonParser2);
+		MapGeometry geom1 = GeometryEngine.jsonToGeometry(JsonParserReader.createFromString(str1));
+		MapGeometry geom2 = GeometryEngine.jsonToGeometry(JsonParserReader.createFromString(str2));
 		double distance = GeometryEngine.distance(geom1.getGeometry(),
 				geom2.getGeometry(), null);
 		assertTrue(distance == 0);
