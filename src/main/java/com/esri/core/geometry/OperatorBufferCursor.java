@@ -52,7 +52,10 @@ class OperatorBufferCursor extends GeometryCursor {
 
 	@Override
 	public Geometry next() {
-		{
+		if (m_bUnion) {
+			OperatorBufferCursor bufferCursor = new OperatorBufferCursor(m_inputGeoms, m_Spatial_reference, m_distances, false, m_progress_tracker);
+			return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferCursor, m_Spatial_reference, m_progress_tracker).next();
+		} else {
 			Geometry geom;
 			while ((geom = m_inputGeoms.next()) != null) {
 				m_index = m_inputGeoms.getGeometryID();
@@ -72,7 +75,6 @@ class OperatorBufferCursor extends GeometryCursor {
 
 	// virtual bool IsRecycling() OVERRIDE { return false; }
 	Geometry buffer(Geometry geom, double distance) {
-		return Bufferer.buffer(geom, distance, m_Spatial_reference,
-				NumberUtils.TheNaN, 96, m_progress_tracker);
+		return Bufferer.buffer(geom, distance, m_Spatial_reference, NumberUtils.TheNaN, 96, m_progress_tracker);
 	}
 }

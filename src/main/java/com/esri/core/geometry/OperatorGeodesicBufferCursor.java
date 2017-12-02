@@ -42,6 +42,11 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
 
     @Override
     public Geometry next() {
+        if (m_bUnion) {
+            OperatorGeodesicBufferCursor cursor = new OperatorGeodesicBufferCursor(m_inputGeoms, m_spatialReference, m_distances, m_maxDeviation, false, false, m_progressTracker);
+            return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, m_spatialReference, m_progressTracker).next();
+        }
+
         Geometry geom;
         while ((geom = m_inputGeoms.next()) != null) {
             m_index = m_inputGeoms.getGeometryID();

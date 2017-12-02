@@ -28,28 +28,26 @@ class OperatorBufferLocal extends OperatorBuffer {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor inputGeometries,
-			SpatialReference sr, double[] distances, boolean bUnion,
-			ProgressTracker progressTracker) {
+								  SpatialReference sr,
+								  double[] distances,
+								  boolean bUnion,
+								  ProgressTracker progressTracker) {
 		if (bUnion) {
-			OperatorBufferCursor cursor = new OperatorBufferCursor(
-					inputGeometries, sr, distances, false, progressTracker);
-			return ((OperatorUnion) OperatorFactoryLocal.getInstance()
-					.getOperator(Operator.Type.Union)).execute(cursor, sr,
-					progressTracker);
+			OperatorBufferCursor cursor = new OperatorBufferCursor(inputGeometries, sr, distances, false, progressTracker);
+			return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, sr, progressTracker);
 		} else
-			return new OperatorBufferCursor(inputGeometries, sr, distances,
-					false, progressTracker);
+			return new OperatorBufferCursor(inputGeometries, sr, distances,false, progressTracker);
 	}
 
 	@Override
-	public Geometry execute(Geometry inputGeometry, SpatialReference sr,
-			double distance, ProgressTracker progressTracker) {
-		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(
-				inputGeometry);
+	public Geometry execute(Geometry inputGeometry,
+							SpatialReference sr,
+							double distance,
+							ProgressTracker progressTracker) {
+		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(inputGeometry);
 		double[] distances = new double[1];
 		distances[0] = distance;
-		GeometryCursor outputCursor = execute(inputCursor, sr, distances,
-				false, progressTracker);
+		GeometryCursor outputCursor = execute(inputCursor, sr, distances,false, progressTracker);
 
 		return outputCursor.next();
 	}

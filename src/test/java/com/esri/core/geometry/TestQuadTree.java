@@ -1,6 +1,8 @@
 package com.esri.core.geometry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -81,6 +83,47 @@ public class TestQuadTree extends TestCase {
 		assertTrue(count == 10000);
 	}
 
+	static double randomWithRange(double min, double max)
+	{
+		double range = Math.abs(max - min);
+		return (Math.random() * range) + (min <= max ? min : max);
+	}
+
+//	@Test
+//	public static void test_quadTree() {
+//		int size = 1000;
+//		List<Geometry> pointList = new ArrayList<>(size);
+//		for (int i = 0; i < size; i++) {
+//            double y = randomWithRange(-20, 20);
+//            double x = randomWithRange(-20, 20);
+//			pointList.add(new Point(x, y));
+//		}
+//		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
+//        HashMap<Integer, Geometry> quadTreeMap = new HashMap<>();
+//        Envelope2D quad_envelope2D = new Envelope2D();
+//        Geometry geometry = null;
+//        Envelope2D geometry_env = new Envelope2D();
+//        int element_ids = 0;
+//        while ((geometry = simpleGeometryCursor.next()) != null) {
+//            geometry.queryEnvelope2D(geometry_env);
+//            quad_envelope2D.merge(geometry_env);
+//            quadTreeMap.put(element_ids++, geometry);
+//        }
+//        QuadTree quadTree = new QuadTree(quad_envelope2D, 3);
+//        for (Integer element_id : quadTreeMap.keySet()) {
+//            quadTreeMap.get(element_id).queryEnvelope2D(geometry_env);
+//            quadTree.insert(element_ids, geometry_env);
+//        }
+//        QuadTree.QuadTreeIterator quadTreeIterator = quadTree.getIterator();
+//        quadTreeIterator.resetIterator(quad_envelope2D, 0.0);
+//        int count = 0;
+//        while (quadTreeIterator.next() != -1) {
+//            count++;
+//        }
+//
+//        assertTrue(count == size);
+//	}
+
 	
 	public static Polyline makePolyline() {
 		Polyline poly = new Polyline();
@@ -119,6 +162,8 @@ public class TestQuadTree extends TestCase {
 
 		return poly;
 	}
+
+
 
 	static QuadTree buildQuadTree_(MultiPathImpl multipathImpl) {
 		Envelope2D extent = new Envelope2D();

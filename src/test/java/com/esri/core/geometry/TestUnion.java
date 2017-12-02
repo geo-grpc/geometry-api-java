@@ -46,6 +46,70 @@ public class TestUnion extends TestCase {
 		Geometry result = outputCursor.next();
 	}
 
+	static double randomWithRange(double min, double max)
+	{
+		double range = Math.abs(max - min);
+		return (Math.random() * range) + (min <= max ? min : max);
+	}
+
+	@Test
+	public static void testBufferUnionEnvelope() {
+		int size = 1000;
+		List<Geometry> envList = new ArrayList<>(size);
+		Envelope2D envelope2D = new Envelope2D();
+		for (int i = 0; i < size; i++){
+			double x = randomWithRange(-20, 20);
+			double y = randomWithRange(-20, 20);
+			Point point = new Point(x, y);
+			point.queryEnvelope2D(envelope2D);
+			Envelope2D envelope2D1 = envelope2D.getInflated(5, 5);
+			Envelope envelope = new Envelope(envelope2D1);
+			envList.add(envelope);
+		}
+		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(envList);
+		double[] d = {2.5};
+		OperatorUnionCursor operatorUnionCursor = new OperatorUnionCursor(simpleGeometryCursor, null, null);
+		Geometry result = operatorUnionCursor.next();
+		assertTrue(result.calculateArea2D() > 40 * 40);
+	}
+
+	@Test
+	public static void testBufferUnionPoint() {
+		int size = 1000;
+		List<String> points = new ArrayList<>(size);
+		List<Geometry> pointList = new ArrayList<>(size);
+		for (int i = 0; i < size; i++){
+			double x = randomWithRange(-20, 20);
+			double y = randomWithRange(-20, 20);
+			points.add(String.format("Point(%f %f)", x, y));
+			pointList.add(new Point(x, y));
+		}
+		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
+		double[] d = {2.5};
+		OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(simpleGeometryCursor, null, d, true, null);
+		// Tests union on buffer at next call
+		Geometry result = operatorBufferCursor.next();
+		assertTrue(result.calculateArea2D() > 40 * 40);
+	}
+
+    @Test
+    public static void testGeodesicBufferUnionPoint() {
+        int size = 2;
+        List<String> points = new ArrayList<>(size);
+        List<Geometry> pointList = new ArrayList<>(size);
+        for (int i = 0; i < size; i++){
+            double x = randomWithRange(-20, 20);
+            double y = randomWithRange(-20, 20);
+            points.add(String.format("Point(%f %f)", x, y));
+            pointList.add(new Point(x, y));
+        }
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
+        double[] d = {2500};
+        OperatorGeodesicBufferCursor operatorGeodesicBufferCursor = new OperatorGeodesicBufferCursor(simpleGeometryCursor, SpatialReference.create(4326), d, 1.0, false, true, null);
+        // Tests union on buffer at next call
+        Geometry result = operatorGeodesicBufferCursor.next();
+        assertTrue(result.calculateArea2D() > 0);
+    }
 //    /**
 //     * @since 1.7
 //     */
