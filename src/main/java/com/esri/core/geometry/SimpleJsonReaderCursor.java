@@ -23,7 +23,7 @@
  */
 package com.esri.core.geometry;
 
-class SimpleJsonReaderCursor extends JsonReaderCursor {
+public class SimpleJsonReaderCursor extends JsonReaderCursor {
 
 	JsonReader m_jsonParser;
 	JsonReader[] m_jsonParserArray;

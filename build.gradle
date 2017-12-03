@@ -5,9 +5,9 @@ apply plugin: 'maven'
 apply plugin: 'idea'
 
 group = 'com.esri.geometry'
-version = '1.2.1'
+version = '2.0.0'
 
-description = """Esri Geometry API for Java"""
+description = """Echo Park Labs' version of the ESRI Geometry API for Java"""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
