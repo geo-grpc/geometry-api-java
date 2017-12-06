@@ -47,6 +47,14 @@ public class TestSpatialReference  extends TestCase {
     }
 
     @Test
+    public void testTolerance() {
+        String wktWGS84 = "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]";
+        SpatialReference a1 = SpatialReference.create(wktWGS84);
+        SpatialReference a2 = SpatialReference.create(4326);
+        assertEquals(a1.getTolerance(), a2.getTolerance());
+    }
+
+    @Test
     public void prjCreateFromProj4() {
         double longitude = 0.0;
         double latitude = 0.0;

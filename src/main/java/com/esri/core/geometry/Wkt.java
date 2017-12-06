@@ -83,7 +83,7 @@ final class Wkt {
 									n1 = buffer.indexOf(',', n1 + 4);
 									if (n1 > 0) {
 										n1++;
-										n2 = buffer.indexOf(']', n1 + 1);
+										n2 = buffer.indexOf(',', n1 + 1);
 										if (n2 > 0) {
 											try {
 												factor = Double

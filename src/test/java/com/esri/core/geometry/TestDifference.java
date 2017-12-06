@@ -178,7 +178,7 @@ public class TestDifference extends TestCase {
 			Point point_1 = new Point();
 			Point point_2 = new Point();
 			point_1.setXY(0, 0);
-			point_2.setXY(0.000000009, 0.000000009);
+			point_2.setXY(0.0000000009, 0.0000000009);
 			Point differenced = (Point) (difference.execute(point_1, point_2,
 					SpatialReference.create(4326), null));
 			assertTrue(differenced.isEmpty());
@@ -229,7 +229,7 @@ public class TestDifference extends TestCase {
 			Point point_2 = new Point();
 			multi_point_1.add(0, 0);
 			multi_point_1.add(1, 1);
-			point_2.setXY(0.000000009, 0.000000009);
+			point_2.setXY(0.0000000009, 0.0000000009);
 			MultiPoint differenced_1 = (MultiPoint) (difference
 					.execute(multi_point_1, point_2,
 							SpatialReference.create(4326), null));

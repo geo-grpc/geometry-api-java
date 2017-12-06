@@ -94,8 +94,7 @@ public final class Wkid {
 			m_wkid_to_new = new HashMap<Integer, Integer>(100);
 			m_wkid_to_old = new HashMap<Integer, Integer>(100);
 			{
-				InputStream input = Wkid.class
-						.getResourceAsStream("new_to_old_wkid.txt");
+				InputStream input = Wkid.class.getResourceAsStream("new_to_old_wkid.txt");
 				BufferedReader reader = new BufferedReader(
 						new InputStreamReader(input));
 				while (true) {

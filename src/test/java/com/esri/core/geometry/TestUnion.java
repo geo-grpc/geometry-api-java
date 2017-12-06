@@ -32,15 +32,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
 public class TestUnion extends TestCase {
-	@Override
+    public ArrayDeque<Geometry> pointList= null;
+    public ArrayDeque<Geometry> bufferedPointList = null;
+    @Override
 	protected void setUp() throws Exception {
+        Random random = new Random(1977);
+        int max_size = 10000;
+        pointList = new ArrayDeque<>(max_size);
+        bufferedPointList = new ArrayDeque<>(max_size);
+        for (int i = 0; i < max_size; i++){
+            double x = randomWithRange(-20, 20, random);
+            double y = randomWithRange(-20, 20, random);
+            Geometry point = new Point(x, y);
+            pointList.add(point);
+            bufferedPointList.add(OperatorBufferLocal.local().execute(point, null, 2.5, null));
+        }
+
 		super.setUp();
 	}
 
@@ -50,7 +63,7 @@ public class TestUnion extends TestCase {
 	}
 
 	@Test
-	public static void testUnion() {
+	public void testUnion() {
 		Point pt = new Point(10, 20);
 
 		Point pt2 = new Point();
@@ -70,70 +83,110 @@ public class TestUnion extends TestCase {
 		Geometry result = outputCursor.next();
 	}
 
-	static double randomWithRange(double min, double max)
+	static double randomWithRange(double min, double max, Random random)
 	{
 		double range = Math.abs(max - min);
-		return (Math.random() * range) + (min <= max ? min : max);
+		return (random.nextDouble() * range) + (min <= max ? min : max);
 	}
+
+
+//	@Test
+//    @Ignore
+//	public void testBufferUnionEnvelope() {
+//		int size = 1000;
+//        Random random = new Random(1977);
+//		List<Geometry> envList = new ArrayList<>(size);
+//		Envelope2D envelope2D = new Envelope2D();
+//		for (int i = 0; i < size; i++){
+//		    pointList.pop().queryEnvelope2D(envelope2D);
+//			Envelope2D envelope2D1 = envelope2D.getInflated(5, 5);
+//			Envelope envelope = new Envelope(envelope2D1);
+//			envList.add(envelope);
+//		}
+//		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(envList);
+//		double[] d = {2.5};
+//		OperatorUnionCursor operatorUnionCursor = new OperatorUnionCursor(simpleGeometryCursor, null, null);
+//		Geometry result = operatorUnionCursor.next();
+//		assertTrue(result.calculateArea2D() > 40 * 40);
+//	}
+
+//    @Ignore
+//    @Test
+//    public void testBufferUnionPoint() {
+//        int size = 10000;
+//        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(bufferedPointList);
+//
+//        double[] d = {2.5};
+//        OperatorUnionCursor operatorUnionCursor = new OperatorUnionCursor(simpleGeometryCursor, null, null);
+//
+//        // Tests union on buffer at next call
+//        long startTime = System.nanoTime();
+//        Geometry result = operatorUnionCursor.next();
+//        long endTime = System.nanoTime();
+//        long duration = (endTime - startTime) / 1000000;
+//        System.out.println(result.calculateArea2D());
+//        System.out.println(duration);
+//        assertTrue(result.calculateArea2D() > 40 * 40);
+//    }
 
 	@Test
-	public static void testBufferUnionEnvelope() {
-		int size = 1000;
-		List<Geometry> envList = new ArrayList<>(size);
-		Envelope2D envelope2D = new Envelope2D();
-		for (int i = 0; i < size; i++){
-			double x = randomWithRange(-20, 20);
-			double y = randomWithRange(-20, 20);
-			Point point = new Point(x, y);
-			point.queryEnvelope2D(envelope2D);
-			Envelope2D envelope2D1 = envelope2D.getInflated(5, 5);
-			Envelope envelope = new Envelope(envelope2D1);
-			envList.add(envelope);
-		}
-		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(envList);
-		double[] d = {2.5};
-		OperatorUnionCursor operatorUnionCursor = new OperatorUnionCursor(simpleGeometryCursor, null, null);
-		Geometry result = operatorUnionCursor.next();
-		assertTrue(result.calculateArea2D() > 40 * 40);
-	}
+    public void testQuadTreeIterator() {
+        int size = 1000;
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(bufferedPointList.stream().collect(Collectors.toList()).subList(0, size));
 
-	@Test
-	public static void testBufferUnionPoint() {
-		int size = 1000;
-		List<String> points = new ArrayList<>(size);
-		List<Geometry> pointList = new ArrayList<>(size);
-		for (int i = 0; i < size; i++){
-			double x = randomWithRange(-20, 20);
-			double y = randomWithRange(-20, 20);
-			points.add(String.format("Point(%f %f)", x, y));
-			pointList.add(new Point(x, y));
-		}
-		SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
-		double[] d = {2.5};
-		OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(simpleGeometryCursor, null, d, NumberUtils.NaN(),96, true, null);
-		// Tests union on buffer at next call
-		Geometry result = operatorBufferCursor.next();
-		assertTrue(result.calculateArea2D() > 40 * 40);
-	}
-
-    @Test
-    public static void testGeodesicBufferUnionPoint() {
-        int size = 2;
-        List<String> points = new ArrayList<>(size);
-        List<Geometry> pointList = new ArrayList<>(size);
-        for (int i = 0; i < size; i++){
-            double x = randomWithRange(-20, 20);
-            double y = randomWithRange(-20, 20);
-            points.add(String.format("Point(%f %f)", x, y));
-            pointList.add(new Point(x, y));
+        HashMap<Integer, Geometry> m_quadTreeMap = new HashMap<>();
+        Envelope2D quad_envelope2D = new Envelope2D();
+        Geometry geometry = null;
+        Envelope2D geometry_env = new Envelope2D();
+        int count_index = 0;
+        while ((geometry = simpleGeometryCursor.next()) != null) {
+            geometry.queryEnvelope2D(geometry_env);
+            quad_envelope2D.merge(geometry_env);
+            m_quadTreeMap.put(count_index++, geometry);
         }
-        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
-        double[] d = {2500};
-        OperatorGeodesicBufferCursor operatorGeodesicBufferCursor = new OperatorGeodesicBufferCursor(simpleGeometryCursor, SpatialReference.create(4326), d, 1.0, false, true, null);
-        // Tests union on buffer at next call
-        Geometry result = operatorGeodesicBufferCursor.next();
-        assertTrue(result.calculateArea2D() > 0);
+        QuadTree quadTree = new QuadTree(quad_envelope2D, 16);
+        for (Integer element_id : m_quadTreeMap.keySet()) {
+            m_quadTreeMap.get(element_id).queryEnvelope2D(geometry_env);
+            quadTree.insert(element_id, geometry_env);
+        }
+
+        QuadTree.QuadTreeIterator quadTreeIterator = quadTree.getIterator(true);
+        quadTreeIterator.resetIterator(quad_envelope2D, 0.0);
+        int element_handle = -1;
+        List<Geometry> geometryList = new ArrayList<>();
+        assertFalse(geometryList.containsAll(m_quadTreeMap.values()));
+
+        int max_height = 0;
+        while ((element_handle = quadTreeIterator.next()) != -1) {
+            int element_id = quadTree.getElement(element_handle);
+            int quad_handle = quadTree.getQuad(element_handle);
+
+            int sub_count = quadTree.getContainedSubTreeElementCount(quad_handle);
+            int sub_count_2 = quadTree.getSubTreeElementCount(quad_handle);
+
+            int quad_height = quadTree.getHeight(quad_handle);
+            max_height = quad_height > max_height ? quad_height : max_height;
+            Envelope2D envelope2D = quadTree.getExtent(quad_handle);
+            assertTrue(quadTree.hasData(envelope2D, 0.0));
+            geometryList.add(m_quadTreeMap.get(element_id));
+        }
+        assertTrue(max_height == 3);
+        assertEquals(16, quadTree.getMaxHeight());
+
+        assertTrue(geometryList.containsAll(m_quadTreeMap.values()));
     }
+
+//    @Test
+//    @Ignore
+//    public void testGeodesicBufferUnionPoint() {
+//        int size = 2;
+//        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(pointList);
+//        double[] d = {2500};
+//        OperatorGeodesicBufferCursor operatorGeodesicBufferCursor = new OperatorGeodesicBufferCursor(simpleGeometryCursor, SpatialReference.create(4326), d, 1.0, false, true, null);
+//        // Tests union on buffer at next call
+//        Geometry result = operatorGeodesicBufferCursor.next();
+//        assertTrue(result.calculateArea2D() > 0);
+//    }
 //    /**
 //     * @since 1.7
 //     */
