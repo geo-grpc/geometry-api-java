@@ -154,7 +154,6 @@ public class GeometryEngine {
 	 * @return The MapGeometry instance containing the imported geometry and its
 	 *         spatial reference.
 	 * @throws IOException
-	 * @throws JsonParseException
 	 */
 	public static MapGeometry geoJsonToGeometry(String json, int importFlags, Geometry.Type type) {
 		MapGeometry geom = OperatorImportFromGeoJson.local().execute(importFlags, type, json, null);

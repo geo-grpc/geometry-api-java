@@ -23,9 +23,8 @@
  */
 package com.esri.core.geometry;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A simple GeometryCursor implementation that wraps a single Geometry or
@@ -33,22 +32,28 @@ import java.util.List;
  */
 public class SimpleGeometryCursor extends GeometryCursor {
 
-    Iterator<Geometry> m_geometryIterator = null;
-	int m_index;
+	int m_index = -1;
 	MapGeometryCursor m_mapGeometryCursor = null;
 	MapGeometry mapGeometry = null;
+	ArrayDeque<Geometry> m_geometryDeque = null;
 
 	public SimpleGeometryCursor(Geometry geom) {
-		this(Arrays.asList(geom));
+		m_geometryDeque = new ArrayDeque<>(1);
+		m_geometryDeque.add(geom);
 	}
 
 	public SimpleGeometryCursor(Geometry[] geoms) {
-		this(Arrays.asList(geoms));
+		m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
+	}
+
+	public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
+		m_geometryDeque = geoms;
+		m_index = -1;
 	}
 
 	public SimpleGeometryCursor(List<Geometry> geoms) {
+		m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
 		m_index = -1;
-		m_geometryIterator = geoms.iterator();
 	}
 
 	public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor){
@@ -65,9 +70,9 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
 	@Override
 	public Geometry next() {
-		if (m_geometryIterator.hasNext()) {
+		if (!m_geometryDeque.isEmpty()) {
 			m_index++;
-			return m_geometryIterator.next();
+			return m_geometryDeque.pop();
 		}
 		if (m_mapGeometryCursor != null && (mapGeometry = m_mapGeometryCursor.next()) != null) {
 			return mapGeometry.m_geometry;

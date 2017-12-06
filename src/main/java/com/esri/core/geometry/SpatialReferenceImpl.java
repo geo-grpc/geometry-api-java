@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.ref.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.esri.core.geometry.Envelope2D;
 import com.esri.core.geometry.GeoDist;
@@ -44,7 +46,7 @@ class SpatialReferenceImpl extends SpatialReference {
 	static final boolean no_projection_engine = true;
 	public final static int c_SULIMIT32 = 2147483645;
 	public final static long c_SULIMIT64 = 9007199254740990L;
-
+	public final static Pattern m_pattern = Pattern.compile("^([\\w\\W]+AUTHORITY[\\s]*\\[[\\s]*\"EPSG\"[\\s]*,[\\s]*[\"]*([\\d]+)[\"]*[\\s]*][\\s]*][\\s]*)$");
 	enum Precision {
 		Integer32, Integer64, FloatingPoint
 	};
@@ -205,11 +207,24 @@ class SpatialReferenceImpl extends SpatialReference {
 			throw new IllegalArgumentException(
 					"Cannot create SpatialReference from null or empty text.");
 
-		SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
-		spatRef.m_userWkt = wkt;
+		int wkid = __wkid_from_wkt(wkt);
+		if (wkid == 0){
+			SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
+			spatRef.m_userWkt = wkt;
+			return spatRef;
+		}
 
-		return spatRef;
+		return createImpl(wkid);
 	}
+
+	private static int __wkid_from_wkt(String wkt) {
+		Matcher matcher = m_pattern.matcher(wkt);
+		if (matcher.find()) {
+			return Integer.parseInt(matcher.group(2));
+		}
+		return 0;
+	}
+
 
 	protected static SpatialReferenceImpl createFromProj4Impl(String proj4Text) {
 		SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
