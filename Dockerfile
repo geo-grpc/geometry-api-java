@@ -1,4 +1,4 @@
-FROM us.gcr.io/echoparklabs/proj.4:latest-debian-slim as builder
+FROM us.gcr.io/echoparklabs/proj.4:latest as builder
 
 COPY ./ /opt/src/geometry-api-java
 
@@ -8,7 +8,7 @@ RUN ./gradlew build install
 
 
 
-FROM us.gcr.io/echoparklabs/proj.4:latest-debian-slim
+FROM us.gcr.io/echoparklabs/proj.4:latest
 
 WORKDIR /opt/src/geometry-api-java/build/libs
 

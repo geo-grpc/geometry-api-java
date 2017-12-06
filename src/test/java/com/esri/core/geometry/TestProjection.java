@@ -161,4 +161,18 @@ public class TestProjection extends TestCase {
 
         // TODO
     }
+
+    @Test
+    public void testEPSGCodes() {
+        String wktGeom = "MULTIPOLYGON (((6311583.246999994 1871386.1630000025, 6311570 1871325, 6311749.093999997 1871285.9699999988, 6311768.118000001 1871345.9619999975, 6311583.246999994 1871386.1630000025)))";
+        SpatialReference spatialReference = SpatialReference.create(102646);
+        SpatialReference spatialReferenceWgs84 = SpatialReference.create(4326);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, spatialReferenceWgs84);
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
+        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, projectionTransformation, null);
+        Geometry geometry = projectCursor.next();
+
+        assertNotNull(geometry);
+    }
 }

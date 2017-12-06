@@ -46,6 +46,7 @@ class SpatialReferenceImpl extends SpatialReference {
 	static final boolean no_projection_engine = true;
 	public final static int c_SULIMIT32 = 2147483645;
 	public final static long c_SULIMIT64 = 9007199254740990L;
+    //	https://regex101.com/r/F0FAUw/1
 	public final static Pattern m_pattern = Pattern.compile("^([\\w\\W]+AUTHORITY[\\s]*\\[[\\s]*\"EPSG\"[\\s]*,[\\s]*[\"]*([\\d]+)[\"]*[\\s]*][\\s]*][\\s]*)$");
 	enum Precision {
 		Integer32, Integer64, FloatingPoint
