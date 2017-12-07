@@ -1,5 +1,7 @@
 FROM us.gcr.io/echoparklabs/proj.4:latest as builder
 
+RUN apt-get update
+
 COPY ./ /opt/src/geometry-api-java
 
 WORKDIR /opt/src/geometry-api-java
@@ -9,6 +11,8 @@ RUN ./gradlew build install
 
 
 FROM us.gcr.io/echoparklabs/proj.4:latest
+
+RUN apt-get update
 
 WORKDIR /opt/src/geometry-api-java/build/libs
 

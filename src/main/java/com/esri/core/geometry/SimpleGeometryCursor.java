@@ -42,17 +42,19 @@ public class SimpleGeometryCursor extends GeometryCursor {
 		m_geometryDeque.add(geom);
 	}
 
+	@Deprecated
 	public SimpleGeometryCursor(Geometry[] geoms) {
 		m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
 	}
 
-	public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
-		m_geometryDeque = geoms;
+	@Deprecated
+	public SimpleGeometryCursor(List<Geometry> geoms) {
+		m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
 		m_index = -1;
 	}
 
-	public SimpleGeometryCursor(List<Geometry> geoms) {
-		m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
+	public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
+		m_geometryDeque = geoms;
 		m_index = -1;
 	}
 

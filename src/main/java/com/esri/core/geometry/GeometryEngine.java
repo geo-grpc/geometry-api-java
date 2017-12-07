@@ -214,16 +214,11 @@ public class GeometryEngine {
 	 *             given geometryType. or the buffer is corrupt. Another
 	 *             exception possible is IllegalArgumentsException.
 	 */
-	public static Geometry geometryFromEsriShape(byte[] esriShapeBuffer,
-			Geometry.Type geometryType) {
-		OperatorImportFromESRIShape op = (OperatorImportFromESRIShape) factory
-				.getOperator(Operator.Type.ImportFromESRIShape);
-		return op
-				.execute(
-						ShapeImportFlags.ShapeImportNonTrusted,
-						geometryType,
-						ByteBuffer.wrap(esriShapeBuffer).order(
-								ByteOrder.LITTLE_ENDIAN));
+	public static Geometry geometryFromEsriShape(byte[] esriShapeBuffer, Geometry.Type geometryType) {
+		OperatorImportFromESRIShape op = (OperatorImportFromESRIShape) factory.getOperator(Operator.Type.ImportFromESRIShape);
+		return op.execute(ShapeImportFlags.ShapeImportNonTrusted,
+				geometryType,
+				ByteBuffer.wrap(esriShapeBuffer).order(ByteOrder.LITTLE_ENDIAN));
 	}
 
 	/**
@@ -253,12 +248,9 @@ public class GeometryEngine {
 	 * @param geometryType The required type of the Geometry to be imported. Use Geometry.Type.Unknown if the geometry type needs to be determined from the WKT context.
 	 * @return The geometry.
 	 * @throws GeometryException when the geometryType is not Geometry.Type.Unknown and the WKT contains a geometry that cannot be converted to the given geometryType.
-	 * @throws IllegalArgument exception if an error is found while parsing the WKT string.
 	 */
-	public static Geometry geometryFromWkt(String wkt, int importFlags,
-			Geometry.Type geometryType) {
-		OperatorImportFromWkt op = (OperatorImportFromWkt) factory
-				.getOperator(Operator.Type.ImportFromWkt);
+	public static Geometry geometryFromWkt(String wkt, int importFlags, Geometry.Type geometryType) {
+		OperatorImportFromWkt op = (OperatorImportFromWkt) factory.getOperator(Operator.Type.ImportFromWkt);
 		return op.execute(importFlags, geometryType, wkt, null);
 	}
 
@@ -289,15 +281,11 @@ public class GeometryEngine {
 	 *            The spatial reference of the geometries.
 	 * @return The geometry object representing the resultant union.
 	 */
-	public static Geometry union(Geometry[] geometries,
-			SpatialReference spatialReference) {
-		OperatorUnion op = (OperatorUnion) factory
-				.getOperator(Operator.Type.Union);
+	public static Geometry union(Geometry[] geometries,SpatialReference spatialReference) {
+		OperatorUnion op = (OperatorUnion) factory.getOperator(Operator.Type.Union);
 
-		SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(
-				geometries);
-		GeometryCursor result = op.execute(inputGeometries, spatialReference,
-				null);
+		SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(geometries);
+		GeometryCursor result = op.execute(inputGeometries, spatialReference,null);
 		return result.next();
 	}
 
