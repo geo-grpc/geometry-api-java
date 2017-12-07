@@ -24,41 +24,41 @@
 package com.esri.core.geometry;
 
 interface DirtyFlags {
-	public static final int dirtyIsKnownSimple = 1; // !<0 when is_weak_simple
-													// or is_strong_simple flag
-													// is valid
-	public static final int isWeakSimple = 2; // !<when dirty_is_known_simple is
-												// 0, this flag indicates
-												// whether the geometry is weak
-												// simple or not
-	public static final int isStrongSimple = 4; // !<when dirty_is_known_simple
-												// is 0, this flag indicates
-												// whether the geometry is
-												// strong simple or not
-	public static final int dirtyOGCFlags = 8; // !<OGCFlags are set by simplify
-												// or WKB/WKT import.
+    public static final int dirtyIsKnownSimple = 1; // !<0 when is_weak_simple
+    // or is_strong_simple flag
+    // is valid
+    public static final int isWeakSimple = 2; // !<when dirty_is_known_simple is
+    // 0, this flag indicates
+    // whether the geometry is weak
+    // simple or not
+    public static final int isStrongSimple = 4; // !<when dirty_is_known_simple
+    // is 0, this flag indicates
+    // whether the geometry is
+    // strong simple or not
+    public static final int dirtyOGCFlags = 8; // !<OGCFlags are set by simplify
+    // or WKB/WKT import.
 
-	public static final int dirtyVerifiedStreams = 32; // < at least one stream
-														// is unverified
-	public static final int dirtyExactIntervals = 64; // < exact envelope is
-														// dirty
-	public static final int dirtyLooseIntervals = 128; // < loose envelope is
-														// dirty
-	public static final int dirtyIntervals = dirtyExactIntervals
-			| dirtyLooseIntervals; // < loose and dirty envelopes are loose
-	public static final int dirtyIsEnvelope = 256; // < the geometry is not
-													// known to be an envelope
-	public static final int dirtyLength2D = 512; // < the geometry length needs
-													// update
-	public static final int dirtyRingAreas2D = 1024; // < m_cached_ring_areas_2D
-														// need update
-	public static final int dirtyCoordinates = dirtyIsKnownSimple
-			| dirtyIntervals | dirtyIsEnvelope | dirtyLength2D
-			| dirtyRingAreas2D | dirtyOGCFlags;
-	public static final int dirtyAllInternal = 0xFFFF; // there has been no
-														// change to the streams
-														// from outside.
-	public static final int dirtyAll = 0xFFFFFF; // there has been a change to
-													// one of attribute streams
-													// from the outside.
+    public static final int dirtyVerifiedStreams = 32; // < at least one stream
+    // is unverified
+    public static final int dirtyExactIntervals = 64; // < exact envelope is
+    // dirty
+    public static final int dirtyLooseIntervals = 128; // < loose envelope is
+    // dirty
+    public static final int dirtyIntervals = dirtyExactIntervals
+            | dirtyLooseIntervals; // < loose and dirty envelopes are loose
+    public static final int dirtyIsEnvelope = 256; // < the geometry is not
+    // known to be an envelope
+    public static final int dirtyLength2D = 512; // < the geometry length needs
+    // update
+    public static final int dirtyRingAreas2D = 1024; // < m_cached_ring_areas_2D
+    // need update
+    public static final int dirtyCoordinates = dirtyIsKnownSimple
+            | dirtyIntervals | dirtyIsEnvelope | dirtyLength2D
+            | dirtyRingAreas2D | dirtyOGCFlags;
+    public static final int dirtyAllInternal = 0xFFFF; // there has been no
+    // change to the streams
+    // from outside.
+    public static final int dirtyAll = 0xFFFFFF; // there has been a change to
+    // one of attribute streams
+    // from the outside.
 }

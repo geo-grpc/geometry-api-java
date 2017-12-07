@@ -14,9 +14,9 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
 
         return new OperatorGeneralizeByAreaCursor(geoms,
                 percentReduction,
-                                                bRemoveDegenerateParts,
+                bRemoveDegenerateParts,
                 generalizeType,
-                                                progressTracker);
+                progressTracker);
     }
 
     @Override
@@ -29,8 +29,8 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
         SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
 
         GeometryCursor geometryCursor = execute(inputGeomCurs, percentReduction,
-                                                bRemoveDegenerateParts, generalizeType,
-                                                progressTracker);
+                bRemoveDegenerateParts, generalizeType,
+                progressTracker);
 
         return geometryCursor.next();
     }

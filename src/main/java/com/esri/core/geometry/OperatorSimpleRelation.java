@@ -33,43 +33,42 @@ import java.util.HashMap;
  */
 public abstract class OperatorSimpleRelation extends Operator {
 
-	/**
-	 * Performs the given relation operation between two geometries.
-	 * 
-	 * @return Returns True if the relation holds, False otherwise.
-	 */
-	public abstract boolean execute(Geometry inputGeom1,
-									Geometry inputGeom2,
-									SpatialReference sr,
-									ProgressTracker progressTracker);
+    /**
+     * Performs the given relation operation between two geometries.
+     *
+     * @return Returns True if the relation holds, False otherwise.
+     */
+    public abstract boolean execute(Geometry inputGeom1,
+                                    Geometry inputGeom2,
+                                    SpatialReference sr,
+                                    ProgressTracker progressTracker);
 
-	public HashMap<Integer, Boolean> execute(Geometry inputGeom1,
-											 GeometryCursor geometryCursor2,
-											 SpatialReference sr,
-											 ProgressTracker progressTracker) {
-		HashMap<Integer, Boolean> hashMap = new HashMap<>();
-		Geometry inputGeom2;
-		while ((inputGeom2 = geometryCursor2.next()) != null)
-		{
-			int index = geometryCursor2.getGeometryID();
-		    if ((progressTracker != null) && !(progressTracker.progress(-1, -1)))
-				throw new RuntimeException("user_canceled");
-			hashMap.put(index, execute(inputGeom1, inputGeom2, sr, progressTracker));
-		}
-		return hashMap;
+    public HashMap<Integer, Boolean> execute(Geometry inputGeom1,
+                                             GeometryCursor geometryCursor2,
+                                             SpatialReference sr,
+                                             ProgressTracker progressTracker) {
+        HashMap<Integer, Boolean> hashMap = new HashMap<>();
+        Geometry inputGeom2;
+        while ((inputGeom2 = geometryCursor2.next()) != null) {
+            int index = geometryCursor2.getGeometryID();
+            if ((progressTracker != null) && !(progressTracker.progress(-1, -1)))
+                throw new RuntimeException("user_canceled");
+            hashMap.put(index, execute(inputGeom1, inputGeom2, sr, progressTracker));
+        }
+        return hashMap;
     }
 
-	@Override
-	public boolean canAccelerateGeometry(Geometry geometry) {
-		return RelationalOperations.Accelerate_helper
-				.can_accelerate_geometry(geometry);
-	}
+    @Override
+    public boolean canAccelerateGeometry(Geometry geometry) {
+        return RelationalOperations.Accelerate_helper
+                .can_accelerate_geometry(geometry);
+    }
 
-	@Override
-	public boolean accelerateGeometry(Geometry geometry,
-			SpatialReference spatialReference,
-			GeometryAccelerationDegree accelDegree) {
-		return RelationalOperations.Accelerate_helper.accelerate_geometry(
-				geometry, spatialReference, accelDegree);
-	}
+    @Override
+    public boolean accelerateGeometry(Geometry geometry,
+                                      SpatialReference spatialReference,
+                                      GeometryAccelerationDegree accelDegree) {
+        return RelationalOperations.Accelerate_helper.accelerate_geometry(
+                geometry, spatialReference, accelDegree);
+    }
 }

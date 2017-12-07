@@ -30,42 +30,42 @@ import java.util.List;
 
 public class SimpleByteBufferCursor extends ByteBufferCursor {
 
-	ByteBuffer m_byteBuffer;
-	List<ByteBuffer> m_byteBufferArray;
-	int m_index;
-	int m_count;
+    ByteBuffer m_byteBuffer;
+    List<ByteBuffer> m_byteBufferArray;
+    int m_index;
+    int m_count;
 
-	public SimpleByteBufferCursor(ByteBuffer byteBuffer) {
-		m_byteBuffer = byteBuffer;
-		m_index = -1;
-		m_count = 1;
-	}
+    public SimpleByteBufferCursor(ByteBuffer byteBuffer) {
+        m_byteBuffer = byteBuffer;
+        m_index = -1;
+        m_count = 1;
+    }
 
-	public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
-		m_byteBufferArray = Arrays.asList(byteBufferArray);
-		m_index = -1;
-		m_count = byteBufferArray.length;
-	}
+    public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
+        m_byteBufferArray = Arrays.asList(byteBufferArray);
+        m_index = -1;
+        m_count = byteBufferArray.length;
+    }
 
-	public SimpleByteBufferCursor(List<ByteBuffer> byteBufferArray) {
-		m_byteBufferArray = byteBufferArray;
-		m_index = -1;
-		m_count = byteBufferArray.size();
-	}
+    public SimpleByteBufferCursor(List<ByteBuffer> byteBufferArray) {
+        m_byteBufferArray = byteBufferArray;
+        m_index = -1;
+        m_count = byteBufferArray.size();
+    }
 
-	@Override
-	public int getByteBufferID() {
-		return m_index;
-	}
+    @Override
+    public int getByteBufferID() {
+        return m_index;
+    }
 
-	@Override
-	public ByteBuffer next() {
-		if (m_index < m_count - 1) {
-			m_index++;
-			return m_byteBuffer != null ? m_byteBuffer : m_byteBufferArray.get(m_index);
-		}
+    @Override
+    public ByteBuffer next() {
+        if (m_index < m_count - 1) {
+            m_index++;
+            return m_byteBuffer != null ? m_byteBuffer : m_byteBufferArray.get(m_index);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 }

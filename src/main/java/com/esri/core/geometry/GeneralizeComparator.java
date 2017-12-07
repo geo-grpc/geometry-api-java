@@ -216,8 +216,8 @@ class GeneralizeComparator extends Treap.Comparator {
         return compare(triangleLeft, triangleRight);
     }
 
-        @Override
-        void onDelete(int elm) {
+    @Override
+    void onDelete(int elm) {
 ////            EditShapeTriangle triangle = tryGetCachedTriangle_(elm);
 ////            if (triangle == null) {
 ////                triangle = tryCreateCachedTriangle_(elm);
@@ -226,7 +226,7 @@ class GeneralizeComparator extends Treap.Comparator {
 ////            int prevVertexIndex = triangle.m_prevVertexIndex;
 ////            int nextVertexIndex = triangle.m_nextVertexIndex;
 
-            tryDeleteCachedTriangle_(elm);
+        tryDeleteCachedTriangle_(elm);
 
 ////            EditShapeTriangle trianglePrev = tryGetCachedTriangle_(prevVertexIndex);
 ////            if (trianglePrev == null) {
@@ -236,7 +236,7 @@ class GeneralizeComparator extends Treap.Comparator {
 ////            if (triangleNext == null) {
 ////                triangleNext = tryCreateCachedTriangle_(nextVertexIndex);
 ////            }
-        }
+    }
 //
 //        @Override
 //        void onSet(int oldelm) {
@@ -317,7 +317,7 @@ class GeneralizeComparator extends Treap.Comparator {
             return 1;
         else if (tri1.m_vertexIndex > tri2.m_vertexIndex) {
             return -1;
-        } else if(tri1.m_vertexIndex < tri2.m_vertexIndex) {
+        } else if (tri1.m_vertexIndex < tri2.m_vertexIndex) {
             return 1;
         }
 

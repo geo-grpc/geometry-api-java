@@ -37,210 +37,208 @@ import com.fasterxml.jackson.core.JsonParser;
  * This class provide tolerance value for the topological and relational operations.
  */
 public abstract class SpatialReference implements Serializable {
-	// Note: We use writeReplace with SpatialReferenceSerializer. This field is
-	// irrelevant. Needs to be removed after final.
-	private static final long serialVersionUID = 2L;
+    // Note: We use writeReplace with SpatialReferenceSerializer. This field is
+    // irrelevant. Needs to be removed after final.
+    private static final long serialVersionUID = 2L;
 
-	/**
-	 * Creates an instance of the spatial reference based on the provided well
-	 * known ID for the horizontal coordinate system.
-	 * 
-	 * @param wkid
-	 *            The well-known ID.
-	 * @return SpatialReference The spatial reference.
-	 * @throws IllegalArgumentException
-	 *             if wkid is not supported or does not exist.
-	 */
-	public static SpatialReference create(int wkid) {
-		SpatialReferenceImpl spatRef = SpatialReferenceImpl.createImpl(wkid);
-		return spatRef;
-	}
+    /**
+     * Creates an instance of the spatial reference based on the provided well
+     * known ID for the horizontal coordinate system.
+     *
+     * @param wkid The well-known ID.
+     * @return SpatialReference The spatial reference.
+     * @throws IllegalArgumentException if wkid is not supported or does not exist.
+     */
+    public static SpatialReference create(int wkid) {
+        SpatialReferenceImpl spatRef = SpatialReferenceImpl.createImpl(wkid);
+        return spatRef;
+    }
 
-	/**
-	 * Creates an instance of the spatial reference based on the provided well
-	 * known text representation for the horizontal coordinate system.
-	 * 
-	 * @param wktext
-	 *            The well-known text string representation of spatial
-	 *            reference.
-	 * @return SpatialReference The spatial reference.
-	 */
-	public static SpatialReference create(String wktext) {
-		return SpatialReferenceImpl.createImpl(wktext);
-	}
+    /**
+     * Creates an instance of the spatial reference based on the provided well
+     * known text representation for the horizontal coordinate system.
+     *
+     * @param wktext The well-known text string representation of spatial
+     *               reference.
+     * @return SpatialReference The spatial reference.
+     */
+    public static SpatialReference create(String wktext) {
+        return SpatialReferenceImpl.createImpl(wktext);
+    }
 
-	public static SpatialReference createFromProj4(String proj4test) { return SpatialReferenceImpl.createFromProj4Impl(proj4test); }
-	/**
-	 * @return boolean Is spatial reference local?
-	 */
-	boolean isLocal() {
-		return false;
-	}
+    public static SpatialReference createFromProj4(String proj4test) {
+        return SpatialReferenceImpl.createFromProj4Impl(proj4test);
+    }
 
-	/**
-	 * Returns spatial reference from the JsonParser.
-	 * 
-	 * @param parser
-	 *            The JSON parser.
-	 * @return The spatial reference or null if there is no spatial reference
-	 *         information, or the parser does not point to an object start.
-	 * @throws Exception
-	 *             if parsing has failed
-	 */
-	public static SpatialReference fromJson(JsonParser parser) throws Exception {
-		return fromJson(new JsonParserReader(parser));
-	}
-	
-	public static SpatialReference fromJson(String string) throws Exception {
-		return fromJson(JsonParserReader.createFromString(string));
-	}
-	
-	public static SpatialReference fromJson(JsonReader parser) throws Exception {
-		// Note this class is processed specially: it is expected that the
-		// iterator points to the first element of the SR object.
-		boolean bFoundWkid = false;
-		boolean bFoundLatestWkid = false;
-		boolean bFoundVcsWkid = false;
-		boolean bFoundLatestVcsWkid = false;
-		boolean bFoundWkt = false;
+    /**
+     * @return boolean Is spatial reference local?
+     */
+    boolean isLocal() {
+        return false;
+    }
 
-		int wkid = -1;
-		int latestWkid = -1;
-		int vcs_wkid = -1;
-		int latestVcsWkid = -1;
-		String wkt = null;
-		while (parser.nextToken() != JsonReader.Token.END_OBJECT) {
-			String name = parser.currentString();
-			parser.nextToken();
+    /**
+     * Returns spatial reference from the JsonParser.
+     *
+     * @param parser The JSON parser.
+     * @return The spatial reference or null if there is no spatial reference
+     * information, or the parser does not point to an object start.
+     * @throws Exception if parsing has failed
+     */
+    public static SpatialReference fromJson(JsonParser parser) throws Exception {
+        return fromJson(new JsonParserReader(parser));
+    }
 
-			if (!bFoundWkid && name.equals("wkid")) {
-				bFoundWkid = true;
+    public static SpatialReference fromJson(String string) throws Exception {
+        return fromJson(JsonParserReader.createFromString(string));
+    }
 
-				if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
-					wkid = parser.currentIntValue();
-			} else if (!bFoundLatestWkid && name.equals("latestWkid")) {
-				bFoundLatestWkid = true;
+    public static SpatialReference fromJson(JsonReader parser) throws Exception {
+        // Note this class is processed specially: it is expected that the
+        // iterator points to the first element of the SR object.
+        boolean bFoundWkid = false;
+        boolean bFoundLatestWkid = false;
+        boolean bFoundVcsWkid = false;
+        boolean bFoundLatestVcsWkid = false;
+        boolean bFoundWkt = false;
 
-				if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
-					latestWkid = parser.currentIntValue();
-			} else if (!bFoundWkt && name.equals("wkt")) {
-				bFoundWkt = true;
+        int wkid = -1;
+        int latestWkid = -1;
+        int vcs_wkid = -1;
+        int latestVcsWkid = -1;
+        String wkt = null;
+        while (parser.nextToken() != JsonReader.Token.END_OBJECT) {
+            String name = parser.currentString();
+            parser.nextToken();
 
-				if (parser.currentToken() == JsonReader.Token.VALUE_STRING)
-					wkt = parser.currentString();
-			} else if (!bFoundVcsWkid && name.equals("vcsWkid")) {
-				bFoundVcsWkid = true;
+            if (!bFoundWkid && name.equals("wkid")) {
+                bFoundWkid = true;
 
-				if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
-					vcs_wkid = parser.currentIntValue();
-			} else if (!bFoundLatestVcsWkid && name.equals("latestVcsWkid")) {
-				bFoundLatestVcsWkid = true;
+                if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
+                    wkid = parser.currentIntValue();
+            } else if (!bFoundLatestWkid && name.equals("latestWkid")) {
+                bFoundLatestWkid = true;
 
-				if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
-					latestVcsWkid = parser.currentIntValue();
-			}
-		}
+                if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
+                    latestWkid = parser.currentIntValue();
+            } else if (!bFoundWkt && name.equals("wkt")) {
+                bFoundWkt = true;
 
-		if (latestVcsWkid <= 0 && vcs_wkid > 0) {
-			latestVcsWkid = vcs_wkid;
-		}
+                if (parser.currentToken() == JsonReader.Token.VALUE_STRING)
+                    wkt = parser.currentString();
+            } else if (!bFoundVcsWkid && name.equals("vcsWkid")) {
+                bFoundVcsWkid = true;
 
-		// iter.step_out_after(); do not step out for the spatial reference,
-		// because this method is used standalone
+                if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
+                    vcs_wkid = parser.currentIntValue();
+            } else if (!bFoundLatestVcsWkid && name.equals("latestVcsWkid")) {
+                bFoundLatestVcsWkid = true;
 
-		SpatialReference spatial_reference = null;
+                if (parser.currentToken() == JsonReader.Token.VALUE_NUMBER_INT)
+                    latestVcsWkid = parser.currentIntValue();
+            }
+        }
 
-		if (wkt != null && wkt.length() != 0) {
-			try {
-				spatial_reference = SpatialReference.create(wkt);
-			} catch (Exception e) {
-			}
-		}
+        if (latestVcsWkid <= 0 && vcs_wkid > 0) {
+            latestVcsWkid = vcs_wkid;
+        }
 
-		if (spatial_reference == null && latestWkid > 0) {
-			try {
-				spatial_reference = SpatialReference.create(latestWkid);
-			} catch (Exception e) {
-			}
-		}
+        // iter.step_out_after(); do not step out for the spatial reference,
+        // because this method is used standalone
 
-		if (spatial_reference == null && wkid > 0) {
-			try {
-				spatial_reference = SpatialReference.create(wkid);
-			} catch (Exception e) {
-			}
-		}
+        SpatialReference spatial_reference = null;
 
-		return spatial_reference;
-	}	
+        if (wkt != null && wkt.length() != 0) {
+            try {
+                spatial_reference = SpatialReference.create(wkt);
+            } catch (Exception e) {
+            }
+        }
 
-	/**
-	 * Returns the well known ID for the horizontal coordinate system of the
-	 * spatial reference.
-	 * 
-	 * @return wkid The well known ID.
-	 */
-	public abstract int getID();
+        if (spatial_reference == null && latestWkid > 0) {
+            try {
+                spatial_reference = SpatialReference.create(latestWkid);
+            } catch (Exception e) {
+            }
+        }
 
-	public abstract String getText();
+        if (spatial_reference == null && wkid > 0) {
+            try {
+                spatial_reference = SpatialReference.create(wkid);
+            } catch (Exception e) {
+            }
+        }
 
-	public abstract String getProj4();
+        return spatial_reference;
+    }
 
-	/**
-	 * Returns the oldest value of the well known ID for the horizontal
-	 * coordinate system of the spatial reference. This ID is used for JSON
-	 * serialization. Not public.
-	 */
-	abstract int getOldID();
+    /**
+     * Returns the well known ID for the horizontal coordinate system of the
+     * spatial reference.
+     *
+     * @return wkid The well known ID.
+     */
+    public abstract int getID();
 
-	/**
-	 * Returns the latest value of the well known ID for the horizontal
-	 * coordinate system of the spatial reference. This ID is used for JSON
-	 * serialization. Not public.
-	 */
-	abstract int getLatestID();
+    public abstract String getText();
 
-	/**
-	 * Returns the XY tolerance of the spatial reference.
-	 * 
-	 * The tolerance value defines the precision of topological operations, and
-	 * "thickness" of boundaries of geometries for relational operations.
-	 * 
-	 * When two points have xy coordinates closer than the tolerance value, they
-	 * are considered equal. As well as when a point is within tolerance from
-	 * the line, the point is assumed to be on the line.
-	 * 
-	 * During topological operations the tolerance is increased by a factor of
-	 * about 1.41 and any two points within that distance are snapped
-	 * together.
-	 * 
-	 * @return The XY tolerance of the spatial reference.
-	 */
-	public double getTolerance() {
-		return getTolerance(VertexDescription.Semantics.POSITION);
-	}
+    public abstract String getProj4();
 
-	/**
-	 * Get the XY tolerance of the spatial reference
-	 * 
-	 * @return The XY tolerance of the spatial reference as double.
-	 */
-	abstract double getTolerance(int semantics);
+    /**
+     * Returns the oldest value of the well known ID for the horizontal
+     * coordinate system of the spatial reference. This ID is used for JSON
+     * serialization. Not public.
+     */
+    abstract int getOldID();
 
-	Object writeReplace() throws ObjectStreamException {
-		SpatialReferenceSerializer srSerializer = new SpatialReferenceSerializer();
-		srSerializer.setSpatialReferenceByValue(this);
-		return srSerializer;
-	}
-	
-	/**
-	 * Returns string representation of the class for debugging purposes. The
-	 * format and content of the returned string is not part of the contract of
-	 * the method and is subject to change in any future release or patch
-	 * without further notice.
-	 */
-	public String toString() {
-		return "[ tol: " + getTolerance() + "; wkid: " + getID() + "; wkt: "
-				+ getText() + "]";
-	}
+    /**
+     * Returns the latest value of the well known ID for the horizontal
+     * coordinate system of the spatial reference. This ID is used for JSON
+     * serialization. Not public.
+     */
+    abstract int getLatestID();
+
+    /**
+     * Returns the XY tolerance of the spatial reference.
+     * <p>
+     * The tolerance value defines the precision of topological operations, and
+     * "thickness" of boundaries of geometries for relational operations.
+     * <p>
+     * When two points have xy coordinates closer than the tolerance value, they
+     * are considered equal. As well as when a point is within tolerance from
+     * the line, the point is assumed to be on the line.
+     * <p>
+     * During topological operations the tolerance is increased by a factor of
+     * about 1.41 and any two points within that distance are snapped
+     * together.
+     *
+     * @return The XY tolerance of the spatial reference.
+     */
+    public double getTolerance() {
+        return getTolerance(VertexDescription.Semantics.POSITION);
+    }
+
+    /**
+     * Get the XY tolerance of the spatial reference
+     *
+     * @return The XY tolerance of the spatial reference as double.
+     */
+    abstract double getTolerance(int semantics);
+
+    Object writeReplace() throws ObjectStreamException {
+        SpatialReferenceSerializer srSerializer = new SpatialReferenceSerializer();
+        srSerializer.setSpatialReferenceByValue(this);
+        return srSerializer;
+    }
+
+    /**
+     * Returns string representation of the class for debugging purposes. The
+     * format and content of the returned string is not part of the contract of
+     * the method and is subject to change in any future release or patch
+     * without further notice.
+     */
+    public String toString() {
+        return "[ tol: " + getTolerance() + "; wkid: " + getID() + "; wkt: "
+                + getText() + "]";
+    }
 }

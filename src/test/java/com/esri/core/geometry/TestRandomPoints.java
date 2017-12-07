@@ -31,7 +31,7 @@ public class TestRandomPoints extends TestCase {
         assertEquals(geometry.getPointCount(), 793194);
         assertNotNull(geometry.getXY(0));
         assertNotNull(geometry.getXY(geometry.getPointCount() - 1));
-        Polygon bufferedpoly = (Polygon)OperatorBuffer.local().execute(poly, sr, sr.getTolerance() * 2, null);
+        Polygon bufferedpoly = (Polygon) OperatorBuffer.local().execute(poly, sr, sr.getTolerance() * 2, null);
         boolean t = OperatorContains.local().execute(bufferedpoly, geometry, sr, null);
         assertTrue(t);
     }

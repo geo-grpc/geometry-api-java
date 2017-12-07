@@ -37,75 +37,74 @@ import com.esri.core.geometry.WkbExportFlags;
 import com.esri.core.geometry.WktExportFlags;
 
 public final class OGCPoint extends OGCGeometry {
-	public OGCPoint(Point pt, SpatialReference sr) {
-		point = pt;
-		esriSR = sr;
-	}
+    public OGCPoint(Point pt, SpatialReference sr) {
+        point = pt;
+        esriSR = sr;
+    }
 
-	@Override
-	public String asText() {
-		return GeometryEngine.geometryToWkt(getEsriGeometry(),
-				WktExportFlags.wktExportPoint);
-	}
+    @Override
+    public String asText() {
+        return GeometryEngine.geometryToWkt(getEsriGeometry(),
+                WktExportFlags.wktExportPoint);
+    }
 
-	@Override
-	public ByteBuffer asBinary() {
-		OperatorExportToWkb op = (OperatorExportToWkb) OperatorFactoryLocal
-				.getInstance().getOperator(Operator.Type.ExportToWkb);
-		return op.execute(WkbExportFlags.wkbExportPoint, getEsriGeometry(),
-				null);
-	}
+    @Override
+    public ByteBuffer asBinary() {
+        OperatorExportToWkb op = (OperatorExportToWkb) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.ExportToWkb);
+        return op.execute(WkbExportFlags.wkbExportPoint, getEsriGeometry(),
+                null);
+    }
 
-	public double X() {
-		return point.getX();
-	}
+    public double X() {
+        return point.getX();
+    }
 
-	public double Y() {
-		return point.getY();
-	}
+    public double Y() {
+        return point.getY();
+    }
 
-	public double Z() {
-		return point.getZ();
-	}
+    public double Z() {
+        return point.getZ();
+    }
 
-	public double M() {
-		return point.getM();
-	}
+    public double M() {
+        return point.getM();
+    }
 
-	@Override
-	public String geometryType() {
-		return "Point";
-	}
+    @Override
+    public String geometryType() {
+        return "Point";
+    }
 
-	@Override
-	public OGCGeometry boundary() {
-		return new OGCMultiPoint(new MultiPoint(getEsriGeometry()
-				.getDescription()), esriSR);// return empty point
-	}
+    @Override
+    public OGCGeometry boundary() {
+        return new OGCMultiPoint(new MultiPoint(getEsriGeometry()
+                .getDescription()), esriSR);// return empty point
+    }
 
-	@Override
-	public OGCGeometry locateAlong(double mValue) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public OGCGeometry locateAlong(double mValue) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public OGCGeometry locateBetween(double mStart, double mEnd) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public OGCGeometry locateBetween(double mStart, double mEnd) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public com.esri.core.geometry.Geometry getEsriGeometry() {
-		return point;
-	}
-	
-	@Override
-	public OGCGeometry convertToMulti()
-	{
-		return new OGCMultiPoint(point, esriSR);
-	}
+    @Override
+    public com.esri.core.geometry.Geometry getEsriGeometry() {
+        return point;
+    }
 
-	com.esri.core.geometry.Point point;
+    @Override
+    public OGCGeometry convertToMulti() {
+        return new OGCMultiPoint(point, esriSR);
+    }
+
+    com.esri.core.geometry.Point point;
 
 }

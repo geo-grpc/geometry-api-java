@@ -28,7 +28,7 @@ public class SimpleStringCursor extends StringCursor {
     }
 
     public String next() {
-        if (m_stringIterator.hasNext()){
+        if (m_stringIterator.hasNext()) {
             m_index++;
             return m_stringIterator.next();
         }

@@ -31,39 +31,39 @@ import java.util.Arrays;
 //This is a stub
 class OperatorProjectLocal extends OperatorProject {
 
-	@Override
-	public GeometryCursor execute(GeometryCursor inputGeoms,
-			ProjectionTransformation transform, ProgressTracker progressTracker) {
-		return new OperatorProjectCursor(inputGeoms, transform, progressTracker);
-	}
+    @Override
+    public GeometryCursor execute(GeometryCursor inputGeoms,
+                                  ProjectionTransformation transform, ProgressTracker progressTracker) {
+        return new OperatorProjectCursor(inputGeoms, transform, progressTracker);
+    }
 
-	public Geometry execute(Geometry inputGeom,
-			ProjectionTransformation transform, ProgressTracker progressTracker) {
-		return execute(new SimpleGeometryCursor(inputGeom), transform, progressTracker).next();
-	}
+    public Geometry execute(Geometry inputGeom,
+                            ProjectionTransformation transform, ProgressTracker progressTracker) {
+        return execute(new SimpleGeometryCursor(inputGeom), transform, progressTracker).next();
+    }
 
-	@Override
-	public int transform(ProjectionTransformation transform, Point[] pointsIn,
-			int count, Point[] pointsOut) throws org.proj4.PJException {
-		return Projecter.transform(transform, pointsIn, count, pointsOut);
-	}
+    @Override
+    public int transform(ProjectionTransformation transform, Point[] pointsIn,
+                         int count, Point[] pointsOut) throws org.proj4.PJException {
+        return Projecter.transform(transform, pointsIn, count, pointsOut);
+    }
 
-	public double[] transform(ProjectionTransformation transform,
-							  double[] coordsSrc,
-							  int pointCount,
-							  boolean bHasZ) throws org.proj4.PJException {
-		return Projecter.transform(transform, coordsSrc, bHasZ);
-	}
+    public double[] transform(ProjectionTransformation transform,
+                              double[] coordsSrc,
+                              int pointCount,
+                              boolean bHasZ) throws org.proj4.PJException {
+        return Projecter.transform(transform, coordsSrc, bHasZ);
+    }
 
-	@Override
-	public Geometry foldInto360RangeGeodetic(/* const */Geometry _geom, /* const */
-	SpatialReference pannableSR, /* GeodeticCurveType */int curveType) {
-		throw new GeometryException("not implemented");
-	}
+    @Override
+    public Geometry foldInto360RangeGeodetic(/* const */Geometry _geom, /* const */
+                                             SpatialReference pannableSR, /* GeodeticCurveType */int curveType) {
+        throw new GeometryException("not implemented");
+    }
 
-	@Override
-	public Geometry foldInto360Range(/* const */Geometry geom, /* const */
-	SpatialReference pannableSR) {
-		throw new GeometryException("not implemented");
-	}
+    @Override
+    public Geometry foldInto360Range(/* const */Geometry geom, /* const */
+                                     SpatialReference pannableSR) {
+        throw new GeometryException("not implemented");
+    }
 }

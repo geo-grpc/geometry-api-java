@@ -105,7 +105,7 @@ class GeodesicBufferer {
         protected int m_type;
 
         protected GeodesicBufferCommand(Point2D from, Point2D to, Point2D center,
-                                      int type, int next, int prev) {
+                                        int type, int next, int prev) {
             m_from = new Point2D();
             m_to = new Point2D();
             m_center = new Point2D();
@@ -118,7 +118,7 @@ class GeodesicBufferer {
         }
 
         protected GeodesicBufferCommand(Point2D from, Point2D to, int next, int prev,
-                                      String dummy) {
+                                        String dummy) {
             m_from = new Point2D();
             m_to = new Point2D();
             m_center = new Point2D();
@@ -253,10 +253,10 @@ class GeodesicBufferer {
                     return m_bufferer.bufferPolylinePath_((Polyline) (m_bufferer.m_geometry), ind, m_bfilter);
                 } else {
                     Polyline tmp_polyline = new Polyline(m_bufferer.m_geometry.getDescription());
-                    tmp_polyline.addPath((Polyline)m_bufferer.m_geometry, ind, true);
+                    tmp_polyline.addPath((Polyline) m_bufferer.m_geometry, ind, true);
                     for (int i = ind + 1; i < m_index; i++) {
                         ((MultiPathImpl) tmp_polyline._getImpl()).addSegmentsFromPath(
-                                (MultiPathImpl)m_bufferer.m_geometry._getImpl(),
+                                (MultiPathImpl) m_bufferer.m_geometry._getImpl(),
                                 i,
                                 0,
                                 mp.getSegmentCount(i),
@@ -363,7 +363,7 @@ class GeodesicBufferer {
                     m_geometry.queryEnvelope2D(env);
 
                     if (GeoDist.getEnvWidth(m_a, m_e2, env) <= -m_distance * 2 ||
-                        GeoDist.getEnvHeight(m_a, m_e2, env) <=  m_distance * 2)
+                            GeoDist.getEnvHeight(m_a, m_e2, env) <= m_distance * 2)
                         return new Polygon(m_geometry.getDescription());
                 }
             } else {
@@ -454,7 +454,7 @@ class GeodesicBufferer {
                 point.setXY(env2D.getCenter());
                 return bufferPoint_(point);
             }
-            return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferedBoundaryCursor.next(), m_geometry, m_spatialReference, null);
+            return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferedBoundaryCursor.next(), m_geometry, m_spatialReference, null);
 //            // For the positive distance we need to process polygon in the parts
 //            // such that each exterior ring with holes is processed separatelly.
 //            GeometryCursorForPolygon cursor = new GeometryCursorForPolygon(this);
@@ -676,7 +676,7 @@ class GeodesicBufferer {
     private Geometry bufferMultiPoint_() {
         assert (m_distance > 0);
         GeometryCursorForMultiPoint mpCursor = new GeometryCursorForMultiPoint(
-                (MultiPoint)m_geometry,
+                (MultiPoint) m_geometry,
                 m_distance,
                 m_spatialReference,
                 m_densify_dist,
@@ -803,7 +803,7 @@ class GeodesicBufferer {
             Polyline tmpPoly = new Polyline(input_multi_path.getDescription());
             tmpPoly.addPath(input_multi_path, ipath, false);
             ((MultiPathImpl) tmpPoly._getImpl()).addSegmentsFromPath(
-                    (MultiPathImpl)input_multi_path._getImpl(),
+                    (MultiPathImpl) input_multi_path._getImpl(),
                     ipath,
                     0,
                     input_multi_path.getSegmentCount(ipath),
@@ -829,7 +829,7 @@ class GeodesicBufferer {
 
     private Polygon bufferCleanup_(MultiPath multi_path, boolean simplify_result) {
         double tol = simplify_result ? m_tolerance : m_small_tolerance;
-        String words = GeometryEngine.geometryToWkt((Polyline)multi_path, 0);
+        String words = GeometryEngine.geometryToWkt((Polyline) multi_path, 0);
         Polygon resultPolygon = (Polygon) (TopologicalOperations
                 .planarSimplify(multi_path, tol, true, !simplify_result,
                         m_progress_tracker));
@@ -1033,7 +1033,7 @@ class GeodesicBufferer {
                 edit_shape.getXY(iprev, pt_before);
 
                 // not sure is this is the right direction. might want before to current
-                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, null, az12, null);
+                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, null, az12, null);
                 // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
                 GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
                 pt_left_prev.x = lam2.val * RAD_TO_DEG;
@@ -1052,7 +1052,7 @@ class GeodesicBufferer {
             }
 
             // not sure is this is the right direction. might want before to current
-            GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y *DEG_TO_RAD, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, null, az12, null);
+            GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, null, az12, null);
             // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
             GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
             pt.x = lam2.val * RAD_TO_DEG;
@@ -1107,12 +1107,12 @@ class GeodesicBufferer {
 //            pt1.add(pt_after, v_left);
             m_buffer_commands.add(
                     new GeodesicBufferCommand(
-                        pt,
-                        pt1,
-                        pt_current,
-                        GeodesicBufferCommand.Flags.enum_line,
-                        m_buffer_commands.size() + 1,
-                        m_buffer_commands.size() - 1));
+                            pt,
+                            pt1,
+                            pt_current,
+                            GeodesicBufferCommand.Flags.enum_line,
+                            m_buffer_commands.size() + 1,
+                            m_buffer_commands.size() - 1));
 
             pt_left_prev.setCoords(pt1);
 //            v_left_prev.setCoords(v_left);
@@ -1171,7 +1171,7 @@ class GeodesicBufferer {
             m_helper_array = new Point2D[9];
 
         int istart = 0;
-        for (int iseg = 0, nseg = m_buffer_commands.size(); iseg < nseg;) {
+        for (int iseg = 0, nseg = m_buffer_commands.size(); iseg < nseg; ) {
             GeodesicBufferCommand command = m_buffer_commands.get(iseg);
             if ((command.m_type & GeodesicBufferCommand.Flags.enum_connection) != 0) {
                 //TODO put a breakpoint. needs test case
@@ -1302,7 +1302,7 @@ class GeodesicBufferer {
             // When the path is closed, we can process all vertices.
             int iter_count = closed ? ncount : isize - 2;
             int gap_counter = 0;
-            for (int iter = 0; iter < iter_count;) {
+            for (int iter = 0; iter < iter_count; ) {
                 edit_shape.getXY(inext, pt_after);
 
                 if (reload) {
@@ -1338,7 +1338,7 @@ class GeodesicBufferer {
 
                 if (b_write) {
                     if (gap_counter > 0) {
-                        for (;;) {// re-test back
+                        for (; ; ) {// re-test back
                             int ibefore_before = dir > 0 ? edit_shape
                                     .getPrevVertex(ibefore) : edit_shape
                                     .getNextVertex(ibefore);
@@ -1561,7 +1561,7 @@ class GeodesicBufferer {
             double ratio = angleDifference / (2 * Math.PI);
             real_size = (int) Math.floor(real_size * ratio);
             // change the angle to be distributed about the real_size interval
-            dA = angleDifference / ((double)real_size);
+            dA = angleDifference / ((double) real_size);
         }
 
 
@@ -1600,7 +1600,7 @@ class GeodesicBufferer {
 
     // Planar and Geodesic are equivalent
     private Polygon setStrongSimple_(Polygon poly) {
-        ((MultiPathImpl) poly._getImpl()).setIsSimple(MultiVertexGeometryImpl.GeometryXSimple.Strong, m_tolerance,false);
+        ((MultiPathImpl) poly._getImpl()).setIsSimple(MultiVertexGeometryImpl.GeometryXSimple.Strong, m_tolerance, false);
         ((MultiPathImpl) poly._getImpl())._updateOGCFlags();
         return poly;
     }

@@ -27,27 +27,27 @@ package com.esri.core.geometry;
 //This is a stub
 class OperatorGeodeticDensifyLocal extends OperatorGeodeticDensifyByLength {
 
-	@Override
-	public GeometryCursor execute(GeometryCursor geoms,
-								  SpatialReference sr,
-								  double maxSegmentLengthMeters,
-								  int curveType,
-								  ProgressTracker progressTracker) {
-		if (maxSegmentLengthMeters <= 0)
-			// TODO fix geometry exception to match native implementation
-			throw new GeometryException("max segment length must be positive and greater than 0");// GEOMTHROW(invalid_argument);
+    @Override
+    public GeometryCursor execute(GeometryCursor geoms,
+                                  SpatialReference sr,
+                                  double maxSegmentLengthMeters,
+                                  int curveType,
+                                  ProgressTracker progressTracker) {
+        if (maxSegmentLengthMeters <= 0)
+            // TODO fix geometry exception to match native implementation
+            throw new GeometryException("max segment length must be positive and greater than 0");// GEOMTHROW(invalid_argument);
 
-		return new OperatorGeodeticDensifyCursor(geoms, sr, maxSegmentLengthMeters, progressTracker);
-	}
+        return new OperatorGeodeticDensifyCursor(geoms, sr, maxSegmentLengthMeters, progressTracker);
+    }
 
-	@Override
-	public Geometry execute(Geometry geom,
-							SpatialReference sr,
-							double maxSegmentLengthMeters,
-							int curveType,
-							ProgressTracker progressTracker) {
-		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(geom);
-		GeometryCursor outputCursor = execute(inputCursor, sr, maxSegmentLengthMeters, curveType, progressTracker);
-		return outputCursor.next();
-	}
+    @Override
+    public Geometry execute(Geometry geom,
+                            SpatialReference sr,
+                            double maxSegmentLengthMeters,
+                            int curveType,
+                            ProgressTracker progressTracker) {
+        SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(geom);
+        GeometryCursor outputCursor = execute(inputCursor, sr, maxSegmentLengthMeters, curveType, progressTracker);
+        return outputCursor.next();
+    }
 }

@@ -30,13 +30,13 @@ import com.esri.core.geometry.Operator.Type;
  * Relational operation Contains.
  */
 public abstract class OperatorContains extends OperatorSimpleRelation {
-	@Override
-	public Type getType() {
-		return Type.Contains;
-	}
+    @Override
+    public Type getType() {
+        return Type.Contains;
+    }
 
-	public static OperatorContains local() {
-		return (OperatorContains) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.Contains);
-	}
+    public static OperatorContains local() {
+        return (OperatorContains) OperatorFactoryLocal.getInstance()
+                .getOperator(Type.Contains);
+    }
 }

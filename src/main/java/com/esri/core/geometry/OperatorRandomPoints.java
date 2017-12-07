@@ -6,7 +6,9 @@ package com.esri.core.geometry;
 
 public abstract class OperatorRandomPoints extends Operator {
     @Override
-    public Operator.Type getType() { return Type.RandomPoints; }
+    public Operator.Type getType() {
+        return Type.RandomPoints;
+    }
 
     public abstract GeometryCursor execute(
             GeometryCursor inputPolygons,

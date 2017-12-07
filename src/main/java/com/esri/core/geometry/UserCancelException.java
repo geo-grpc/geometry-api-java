@@ -24,9 +24,9 @@
 package com.esri.core.geometry;
 
 class UserCancelException extends GeometryException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public UserCancelException() {
-		super("user cancel");
-	}
+    public UserCancelException() {
+        super("user cancel");
+    }
 }

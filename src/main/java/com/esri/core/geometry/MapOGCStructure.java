@@ -24,6 +24,6 @@
 package com.esri.core.geometry;
 
 public class MapOGCStructure {
-	public OGCStructure m_ogcStructure;
-	public SpatialReference m_spatialReference;
+    public OGCStructure m_ogcStructure;
+    public SpatialReference m_spatialReference;
 }

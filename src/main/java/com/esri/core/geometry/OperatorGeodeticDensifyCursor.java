@@ -19,7 +19,7 @@ public class OperatorGeodeticDensifyCursor extends GeometryCursor {
         m_index = -1;
         m_inputGeoms = inputGeoms1;
         m_maxLength = maxLength;
-        m_spatialReference = (SpatialReferenceImpl)spatialReference;
+        m_spatialReference = (SpatialReferenceImpl) spatialReference;
         m_startPoint = new Point();
         m_endPoint = new Point();
         m_progressTracker = progressTracker;

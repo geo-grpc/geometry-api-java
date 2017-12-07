@@ -25,9 +25,9 @@
 package com.esri.core.geometry;
 
 public class Utils {
-	static void showProjectedGeometryInfo(MapGeometry mapGeom) {
-		return;
-		/*
+    static void showProjectedGeometryInfo(MapGeometry mapGeom) {
+        return;
+        /*
 		System.out.println("\n");
 		MapGeometry geom = mapGeom;
 		int wkid = geom.getSpatialReference() != null ? geom
@@ -94,6 +94,6 @@ public class Utils {
 			System.out.println("wkid: " + wkid);
 		}*/
 
-	}
+    }
 
 }

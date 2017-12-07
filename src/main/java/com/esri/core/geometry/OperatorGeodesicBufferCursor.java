@@ -30,7 +30,7 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
         }
         m_index = -1;
         m_inputGeoms = inputGeoms;
-        m_spatialReference = (SpatialReferenceImpl)sr;
+        m_spatialReference = (SpatialReferenceImpl) sr;
         m_distances = distances;
         m_maxDeviation = maxDeviation;
         m_bUnion = b_union;
@@ -44,7 +44,7 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
     public Geometry next() {
         if (m_bUnion) {
             OperatorGeodesicBufferCursor cursor = new OperatorGeodesicBufferCursor(m_inputGeoms, m_spatialReference, m_distances, m_maxDeviation, false, false, m_progressTracker);
-            return ((OperatorUnion)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, m_spatialReference, m_progressTracker).next();
+            return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, m_spatialReference, m_progressTracker).next();
         }
 
         Geometry geom;

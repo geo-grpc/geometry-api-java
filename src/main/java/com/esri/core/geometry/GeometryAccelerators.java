@@ -27,53 +27,55 @@ import java.util.ArrayList;
 
 class GeometryAccelerators {
 
-	private RasterizedGeometry2D m_rasterizedGeometry;
-	private QuadTreeImpl m_quad_tree;
+    private RasterizedGeometry2D m_rasterizedGeometry;
+    private QuadTreeImpl m_quad_tree;
     private QuadTreeImpl m_quad_tree_for_paths;
 
-	public RasterizedGeometry2D getRasterizedGeometry() {
-		return m_rasterizedGeometry;
-	}
+    public RasterizedGeometry2D getRasterizedGeometry() {
+        return m_rasterizedGeometry;
+    }
 
-	public QuadTreeImpl getQuadTree() {
-		return m_quad_tree;
-	}
+    public QuadTreeImpl getQuadTree() {
+        return m_quad_tree;
+    }
 
-	public QuadTreeImpl getQuadTreeForPaths() {
-		return m_quad_tree_for_paths;
-	}
+    public QuadTreeImpl getQuadTreeForPaths() {
+        return m_quad_tree_for_paths;
+    }
 
-	void _setRasterizedGeometry(RasterizedGeometry2D rg) {
-		m_rasterizedGeometry = rg;
-	}
+    void _setRasterizedGeometry(RasterizedGeometry2D rg) {
+        m_rasterizedGeometry = rg;
+    }
 
-	void _setQuadTree(QuadTreeImpl quad_tree) {
-		m_quad_tree = quad_tree;
-	}
+    void _setQuadTree(QuadTreeImpl quad_tree) {
+        m_quad_tree = quad_tree;
+    }
 
-	void _setQuadTreeForPaths(QuadTreeImpl quad_tree) { m_quad_tree_for_paths = quad_tree; }
+    void _setQuadTreeForPaths(QuadTreeImpl quad_tree) {
+        m_quad_tree_for_paths = quad_tree;
+    }
 
-	static boolean canUseRasterizedGeometry(Geometry geom) {
-		if (geom.isEmpty()
-				|| !(geom.getType() == Geometry.Type.Polyline || geom.getType() == Geometry.Type.Polygon)) {
-			return false;
-		}
+    static boolean canUseRasterizedGeometry(Geometry geom) {
+        if (geom.isEmpty()
+                || !(geom.getType() == Geometry.Type.Polyline || geom.getType() == Geometry.Type.Polygon)) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	static boolean canUseQuadTree(Geometry geom) {
-		if (geom.isEmpty()
-				|| !(geom.getType() == Geometry.Type.Polyline || geom.getType() == Geometry.Type.Polygon)) {
-			return false;
-		}
+    static boolean canUseQuadTree(Geometry geom) {
+        if (geom.isEmpty()
+                || !(geom.getType() == Geometry.Type.Polyline || geom.getType() == Geometry.Type.Polygon)) {
+            return false;
+        }
 
-		if (((MultiVertexGeometry) geom).getPointCount() < 20) {
-			return false;
-		}
+        if (((MultiVertexGeometry) geom).getPointCount() < 20) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     static boolean canUseQuadTreeForPaths(Geometry geom) {
         if (geom.isEmpty() || !(geom.getType() == Geometry.Type.Polyline || geom.getType() == Geometry.Type.Polygon))

@@ -28,8 +28,8 @@
 package com.esri.core.geometry;
 
 abstract class ClassicSort {
-	public abstract void userSort(int begin, int end,
-			AttributeStreamOfInt32 indices);
+    public abstract void userSort(int begin, int end,
+                                  AttributeStreamOfInt32 indices);
 
-	public abstract double getValue(int index);
+    public abstract double getValue(int index);
 }

@@ -32,54 +32,54 @@ import java.util.stream.Collectors;
  */
 public class SimpleGeometryCursor extends GeometryCursor {
 
-	int m_index = -1;
-	MapGeometryCursor m_mapGeometryCursor = null;
-	MapGeometry mapGeometry = null;
-	ArrayDeque<Geometry> m_geometryDeque = null;
+    int m_index = -1;
+    MapGeometryCursor m_mapGeometryCursor = null;
+    MapGeometry mapGeometry = null;
+    ArrayDeque<Geometry> m_geometryDeque = null;
 
-	public SimpleGeometryCursor(Geometry geom) {
-		m_geometryDeque = new ArrayDeque<>(1);
-		m_geometryDeque.add(geom);
-	}
+    public SimpleGeometryCursor(Geometry geom) {
+        m_geometryDeque = new ArrayDeque<>(1);
+        m_geometryDeque.add(geom);
+    }
 
-	@Deprecated
-	public SimpleGeometryCursor(Geometry[] geoms) {
-		m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
-	}
+    @Deprecated
+    public SimpleGeometryCursor(Geometry[] geoms) {
+        m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
+    }
 
-	@Deprecated
-	public SimpleGeometryCursor(List<Geometry> geoms) {
-		m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
-		m_index = -1;
-	}
+    @Deprecated
+    public SimpleGeometryCursor(List<Geometry> geoms) {
+        m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
+        m_index = -1;
+    }
 
-	public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
-		m_geometryDeque = geoms;
-		m_index = -1;
-	}
+    public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
+        m_geometryDeque = geoms;
+        m_index = -1;
+    }
 
-	public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor){
-		m_mapGeometryCursor = mapGeometryCursor;
-	}
+    public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor) {
+        m_mapGeometryCursor = mapGeometryCursor;
+    }
 
-	@Override
-	public int getGeometryID() {
-		if (m_mapGeometryCursor != null)
-			return m_mapGeometryCursor.getGeometryID();
+    @Override
+    public int getGeometryID() {
+        if (m_mapGeometryCursor != null)
+            return m_mapGeometryCursor.getGeometryID();
 
-		return m_index;
-	}
+        return m_index;
+    }
 
-	@Override
-	public Geometry next() {
-		if (!m_geometryDeque.isEmpty()) {
-			m_index++;
-			return m_geometryDeque.pop();
-		}
-		if (m_mapGeometryCursor != null && (mapGeometry = m_mapGeometryCursor.next()) != null) {
-			return mapGeometry.m_geometry;
-		}
+    @Override
+    public Geometry next() {
+        if (!m_geometryDeque.isEmpty()) {
+            m_index++;
+            return m_geometryDeque.pop();
+        }
+        if (m_mapGeometryCursor != null && (mapGeometry = m_mapGeometryCursor.next()) != null) {
+            return mapGeometry.m_geometry;
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

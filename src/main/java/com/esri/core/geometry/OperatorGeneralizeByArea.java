@@ -14,7 +14,6 @@ public abstract class OperatorGeneralizeByArea extends Operator {
      * Performs the Generalize operation on a geometry set. Point and
      * multipoint geometries are left unchanged. An envelope is converted to a
      * polygon.
-     *
      */
     public abstract GeometryCursor execute(GeometryCursor geoms,
                                            double percentReduction,

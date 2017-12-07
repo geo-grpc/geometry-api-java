@@ -24,7 +24,7 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
                                ProgressTracker pr) {
         m_index = -1;
         m_inputGeoms = inputGeoms;
-        m_spatialReference = (SpatialReferenceImpl)sr;
+        m_spatialReference = (SpatialReferenceImpl) sr;
         m_pointsPerSquareKm = pointsPerSquareKm;
         // TODO, for distributed case geometries will be done in different order each time,
         // that is why the random number generator is started over with the same seed

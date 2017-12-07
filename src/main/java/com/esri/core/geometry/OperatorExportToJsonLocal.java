@@ -29,7 +29,7 @@ class OperatorExportToJsonLocal extends OperatorExportToJson {
 
     @Override
     public StringCursor execute(SpatialReference spatialReference,
-            GeometryCursor geometryCursor) {
+                                GeometryCursor geometryCursor) {
         return new OperatorExportToJsonCursor(spatialReference, geometryCursor);
     }
 
@@ -42,7 +42,7 @@ class OperatorExportToJsonLocal extends OperatorExportToJson {
 
     @Override
     public String execute(SpatialReference spatialReference,
-            Geometry geometry, Map<String, Object> exportProperties) {
+                          Geometry geometry, Map<String, Object> exportProperties) {
         return OperatorExportToJsonCursor.exportToString(geometry, spatialReference, exportProperties);
     }
 }

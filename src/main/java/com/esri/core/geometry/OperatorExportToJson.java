@@ -43,7 +43,7 @@ public abstract class OperatorExportToJson extends Operator {
      * @return Returns a StringCursor.
      */
     public abstract StringCursor execute(SpatialReference spatialReference,
-            GeometryCursor geometryCursor);
+                                         GeometryCursor geometryCursor);
 
     /**
      * Performs the ExportToJson operation
@@ -51,7 +51,7 @@ public abstract class OperatorExportToJson extends Operator {
      * @return Returns a String.
      */
     public abstract String execute(SpatialReference spatialReference,
-            Geometry geometry);
+                                   Geometry geometry);
 
     /**
      * Performs the ExportToJson operation
@@ -59,7 +59,7 @@ public abstract class OperatorExportToJson extends Operator {
      * @return Returns a String.
      */
     public abstract String execute(SpatialReference spatialReference,
-            Geometry geometry, Map<String, Object> exportProperties);
+                                   Geometry geometry, Map<String, Object> exportProperties);
 
     public static OperatorExportToJson local() {
         return (OperatorExportToJson) OperatorFactoryLocal.getInstance()

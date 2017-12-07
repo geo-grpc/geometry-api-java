@@ -77,7 +77,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 int n = editShape.getPathSize(iPath);
                 treap.setCapacity(n);
-                int ptCountToRemove = (int)(n * m_percentReduction / 100.0);
+                int ptCountToRemove = (int) (n * m_percentReduction / 100.0);
 
                 // if there are points that will remain after removals, then first create the treap
                 int iVertex = editShape.getFirstVertex(iPath);
@@ -101,7 +101,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                     }
 
                     if ((m_generalizeType == GeneralizeType.ResultContainsOriginal && triangle.queryOrientation() < 0) ||
-                        (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() > 0)) {
+                            (m_generalizeType == GeneralizeType.ResultWithinOriginal && triangle.queryOrientation() > 0)) {
                         break;
                     }
 

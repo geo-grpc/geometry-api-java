@@ -1,16 +1,22 @@
 package com.esri.core.geometry;
 
+import junit.framework.TestCase;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.json.*;
 
-import java.nio.charset.Charset;
-import java.nio.file.*;
 import java.net.URL;
-import java.util.*;
+import java.nio.charset.Charset;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -44,7 +50,6 @@ public class TestProjectionGigsData extends TestCase {
     private Polygon rightPolygon = new Polygon();
     private MultiPoint leftMultiPoint = new MultiPoint();
     private MultiPoint rightMultiPoint = new MultiPoint();
-
 
 
     public TestProjectionGigsData(Path path, String testName) throws java.io.IOException, org.json.JSONException {
@@ -98,8 +103,8 @@ public class TestProjectionGigsData extends TestCase {
 
         double tolObj1Index1 = testObj1.getJSONArray("tolerances").getDouble(0);
         double tolObj2Index1 = testObj2.getJSONArray("tolerances").getDouble(0);
-        double [] tolObj1Index2 = new double[3];
-        double [] tolObj2Index2 = new double[3];
+        double[] tolObj1Index2 = new double[3];
+        double[] tolObj2Index2 = new double[3];
 
         if (testObj1.getJSONArray("tolerances").optJSONArray(1) != null) {
             for (int i = 0; i < 3; i++) {
@@ -166,7 +171,6 @@ public class TestProjectionGigsData extends TestCase {
         assertEquals(errorMessages.toString(), 0, nonMatches);
 
 
-
 //        tolerances = kwargs.get('tolerances', [0.0000000000001, 0.0000000000001])
 //
 
@@ -181,19 +185,19 @@ public class TestProjectionGigsData extends TestCase {
     /**
      * counts coordinates in lists that match and don't match.
      * assumes that lists are the same length (they should be)
-
-     returns tuple (matches, non_matches)
-     """
-     matches, non_matches = 0, 0
-     iter_ex_coords = iter(ex_coords)
-     for c in coords:
-     ex_coord = next(iter_ex_coords)
-     if match_func(c, ex_coord, tolerance):
-     matches = matches + 1
-     else:
-     non_matches = non_matches + 1
-
-     return (matches, non_matches)
+     * <p>
+     * returns tuple (matches, non_matches)
+     * """
+     * matches, non_matches = 0, 0
+     * iter_ex_coords = iter(ex_coords)
+     * for c in coords:
+     * ex_coord = next(iter_ex_coords)
+     * if match_func(c, ex_coord, tolerance):
+     * matches = matches + 1
+     * else:
+     * non_matches = non_matches + 1
+     * <p>
+     * return (matches, non_matches)
      */
     public static int listCountMatches(Point[] actualPoints, Point[] expectedPoints, double[] tolerances, StringBuilder errorMessages) {
         // matches, non_matches = 0, 0
@@ -217,15 +221,16 @@ public class TestProjectionGigsData extends TestCase {
      * float coordinate elements will be checked based on this value
      * list/tuple coordinate elements will be checked based on the
      * corresponding values
-     * @return string
+     *
      * @param pt
      * @param expectedPoint
-     * @param tolerance error rate
+     * @param tolerance     error rate
+     * @return string
      */
-    public static String matchCheck(Point pt, Point expectedPoint, double [] tolerance) {
-        double[] coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY())};
+    public static String matchCheck(Point pt, Point expectedPoint, double[] tolerance) {
+        double[] coord_diff = new double[]{Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY())};
         if (pt.hasZ())
-            coord_diff = new double[] {Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY()), Math.abs(pt.getZ() - expectedPoint.getZ())};
+            coord_diff = new double[]{Math.abs(pt.getX() - expectedPoint.getX()), Math.abs(pt.getY() - expectedPoint.getY()), Math.abs(pt.getZ() - expectedPoint.getZ())};
 
         boolean matching = true;
         StringBuilder stringBuilder = new StringBuilder();
@@ -333,11 +338,11 @@ public class TestProjectionGigsData extends TestCase {
         // https://stackoverflow.com/a/36815191/445372
         Stream<Path> paths = Files.walk(gigsDir, 1, FileVisitOption.FOLLOW_LINKS);
 
-        Collection<Object []> data = paths
+        Collection<Object[]> data = paths
                 // https://stackoverflow.com/a/20533064/445372
                 .filter(p -> p.toString().toLowerCase().endsWith(".json"))
                 // https://www.mkyong.com/java8/java-8-filter-a-map-examples/
-                .map(p -> new Object[] {p, p.getFileName().toString().split(".json")[0].replace('.', '_')})
+                .map(p -> new Object[]{p, p.getFileName().toString().split(".json")[0].replace('.', '_')})
                 // https://www.javabrahman.com/java-8/java-8-how-to-use-collectors-tocollection-collector-with-examples/
                 .collect(Collectors.toCollection(ArrayList::new));
 

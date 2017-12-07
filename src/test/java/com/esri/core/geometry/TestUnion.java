@@ -25,28 +25,22 @@
 package com.esri.core.geometry;
 
 import junit.framework.TestCase;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.json.JSONObject;
-
 public class TestUnion extends TestCase {
-    public ArrayDeque<Geometry> pointList= null;
+    public ArrayDeque<Geometry> pointList = null;
     public ArrayDeque<Geometry> bufferedPointList = null;
+
     @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         Random random = new Random(1977);
         int max_size = 10000;
         pointList = new ArrayDeque<>(max_size);
         bufferedPointList = new ArrayDeque<>(max_size);
-        for (int i = 0; i < max_size; i++){
+        for (int i = 0; i < max_size; i++) {
             double x = randomWithRange(-20, 20, random);
             double y = randomWithRange(-20, 20, random);
             Geometry point = new Point(x, y);
@@ -54,40 +48,39 @@ public class TestUnion extends TestCase {
             bufferedPointList.add(OperatorBufferLocal.local().execute(point, null, 2.5, null));
         }
 
-		super.setUp();
-	}
+        super.setUp();
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	@Test
-	public void testUnion() {
-		Point pt = new Point(10, 20);
+    @Test
+    public void testUnion() {
+        Point pt = new Point(10, 20);
 
-		Point pt2 = new Point();
-		pt2.setXY(10, 10);
+        Point pt2 = new Point();
+        pt2.setXY(10, 10);
 
-		Envelope env1 = new Envelope(10, 10, 30, 50);
-		Envelope env2 = new Envelope(30, 10, 60, 50);
-		Geometry[] geomArray = new Geometry[] { env1, env2 };
-		SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(
-				geomArray);
-		OperatorUnion union = (OperatorUnion) OperatorFactoryLocal
-				.getInstance().getOperator(Operator.Type.Union);
+        Envelope env1 = new Envelope(10, 10, 30, 50);
+        Envelope env2 = new Envelope(30, 10, 60, 50);
+        Geometry[] geomArray = new Geometry[]{env1, env2};
+        SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(
+                geomArray);
+        OperatorUnion union = (OperatorUnion) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.Union);
 
-		SpatialReference sr = SpatialReference.create(4326);
+        SpatialReference sr = SpatialReference.create(4326);
 
-		GeometryCursor outputCursor = union.execute(inputGeometries, sr, null);
-		Geometry result = outputCursor.next();
-	}
+        GeometryCursor outputCursor = union.execute(inputGeometries, sr, null);
+        Geometry result = outputCursor.next();
+    }
 
-	static double randomWithRange(double min, double max, Random random)
-	{
-		double range = Math.abs(max - min);
-		return (random.nextDouble() * range) + (min <= max ? min : max);
-	}
+    static double randomWithRange(double min, double max, Random random) {
+        double range = Math.abs(max - min);
+        return (random.nextDouble() * range) + (min <= max ? min : max);
+    }
 
 
 //	@Test
@@ -129,7 +122,7 @@ public class TestUnion extends TestCase {
 //        assertTrue(result.calculateArea2D() > 40 * 40);
 //    }
 
-	@Test
+    @Test
     public void testQuadTreeIterator() {
         int size = 1000;
         SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(bufferedPointList.stream().collect(Collectors.toList()).subList(0, size));

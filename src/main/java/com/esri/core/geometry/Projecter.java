@@ -13,7 +13,7 @@ class Projecter {
     }
 
     public static int transform(ProjectionTransformation projectionTransformation, Point[] pointsIn,
-                         int count, Point[] pointsOut) throws org.proj4.PJException {
+                                int count, Point[] pointsOut) throws org.proj4.PJException {
         if (pointsIn[0].hasZ())
             return __transform3D(projectionTransformation, pointsIn, count, pointsOut);
         return __transform2D(projectionTransformation, pointsIn, count, pointsOut);
@@ -120,7 +120,7 @@ class Projecter {
         Point outpoint = new Point();
         // TODO clean this idea up
         Point[] outputs = {outpoint};
-        Point[] inputs = {(Point)geometry};
+        Point[] inputs = {(Point) geometry};
         transform(projectionTransformation, inputs, 1, outputs);
         return outputs[0];
     }
@@ -128,12 +128,12 @@ class Projecter {
     static Geometry projectMultiPoint(Geometry geometry,
                                       ProjectionTransformation projectionTransformation,
                                       ProgressTracker progressTracker) throws org.proj4.PJException {
-        MultiPoint multiPoint = (MultiPoint)clipGeometry(geometry, projectionTransformation, progressTracker);
+        MultiPoint multiPoint = (MultiPoint) clipGeometry(geometry, projectionTransformation, progressTracker);
 
         int pointCount = multiPoint.getPointCount();
-        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)multiPoint._getImpl();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl) multiPoint._getImpl();
 
-        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
@@ -150,14 +150,14 @@ class Projecter {
     }
 
     static Geometry projectPolyline(Geometry geometry,
-                                      ProjectionTransformation projectionTransformation,
-                                      ProgressTracker progressTracker) throws org.proj4.PJException {
-        Polyline polyline = (Polyline)clipGeometry(geometry, projectionTransformation, progressTracker);
+                                    ProjectionTransformation projectionTransformation,
+                                    ProgressTracker progressTracker) throws org.proj4.PJException {
+        Polyline polyline = (Polyline) clipGeometry(geometry, projectionTransformation, progressTracker);
 
         int pointCount = polyline.getPointCount();
-        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polyline._getImpl();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl) polyline._getImpl();
 
-        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
@@ -173,13 +173,13 @@ class Projecter {
     }
 
     static Geometry projectPolygon(Geometry geometry,
-                                    ProjectionTransformation projectionTransformation,
-                                    ProgressTracker progressTracker) throws org.proj4.PJException {
-        Polygon polygon = (Polygon)clipGeometry(geometry, projectionTransformation, progressTracker);
+                                   ProjectionTransformation projectionTransformation,
+                                   ProgressTracker progressTracker) throws org.proj4.PJException {
+        Polygon polygon = (Polygon) clipGeometry(geometry, projectionTransformation, progressTracker);
 
-        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)polygon._getImpl();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl) polygon._getImpl();
 
-        AttributeStreamOfDbl xyPositions =  (AttributeStreamOfDbl)multiVertexGeometry.getAttributeStreamRef(0);
+        AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
@@ -197,7 +197,7 @@ class Projecter {
     static Geometry projectEnvelope(Geometry geometry,
                                     ProjectionTransformation projectionTransformation,
                                     ProgressTracker progressTracker) throws org.proj4.PJException {
-        Envelope envelope = (Envelope)geometry;
+        Envelope envelope = (Envelope) geometry;
         // TODO how to properly copy envelope into polygon
         Polygon polygon = new Polygon();
         polygon.addEnvelope(envelope, false);

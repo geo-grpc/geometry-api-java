@@ -36,75 +36,77 @@ import com.esri.core.geometry.Polyline;
 import com.esri.core.geometry.SpatialReference;
 import com.esri.core.geometry.WkbExportFlags;
 import com.esri.core.geometry.WktExportFlags;
+
 import java.nio.ByteBuffer;
 
 public class OGCMultiLineString extends OGCMultiCurve {
 
-	public OGCMultiLineString(Polyline poly, SpatialReference sr) {
-		polyline = poly;
-		esriSR = sr;
-	}
+    public OGCMultiLineString(Polyline poly, SpatialReference sr) {
+        polyline = poly;
+        esriSR = sr;
+    }
 
-	@Override
-	public String asText() {
-		return GeometryEngine.geometryToWkt(getEsriGeometry(),
-				WktExportFlags.wktExportMultiLineString);
-	}
-	@Override
+    @Override
+    public String asText() {
+        return GeometryEngine.geometryToWkt(getEsriGeometry(),
+                WktExportFlags.wktExportMultiLineString);
+    }
+
+    @Override
     public String asGeoJson() {
         OperatorExportToGeoJson op = (OperatorExportToGeoJson) OperatorFactoryLocal
                 .getInstance().getOperator(Operator.Type.ExportToGeoJson);
         return op.execute(GeoJsonExportFlags.geoJsonExportPreferMultiGeometry, null, getEsriGeometry());
     }
-	@Override
-	public ByteBuffer asBinary() {
-		OperatorExportToWkb op = (OperatorExportToWkb) OperatorFactoryLocal
-				.getInstance().getOperator(Operator.Type.ExportToWkb);
-		return op.execute(WkbExportFlags.wkbExportMultiLineString,
-				getEsriGeometry(), null);
-	}
 
-	@Override
-	public OGCGeometry geometryN(int n) {
-		OGCLineString ls = new OGCLineString(polyline, n, esriSR);
-		return ls;
-	}
+    @Override
+    public ByteBuffer asBinary() {
+        OperatorExportToWkb op = (OperatorExportToWkb) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.ExportToWkb);
+        return op.execute(WkbExportFlags.wkbExportMultiLineString,
+                getEsriGeometry(), null);
+    }
 
-	@Override
-	public String geometryType() {
-		return "MultiLineString";
-	}
+    @Override
+    public OGCGeometry geometryN(int n) {
+        OGCLineString ls = new OGCLineString(polyline, n, esriSR);
+        return ls;
+    }
 
-	@Override
-	public OGCGeometry boundary() {
-		OperatorBoundary op = (OperatorBoundary) OperatorFactoryLocal
-				.getInstance().getOperator(Operator.Type.Boundary);
-		Geometry g = op.execute(polyline, null);
-		return OGCGeometry.createFromEsriGeometry(g, esriSR, true);
-	}
+    @Override
+    public String geometryType() {
+        return "MultiLineString";
+    }
 
-	@Override
-	public OGCGeometry locateAlong(double mValue) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public OGCGeometry boundary() {
+        OperatorBoundary op = (OperatorBoundary) OperatorFactoryLocal
+                .getInstance().getOperator(Operator.Type.Boundary);
+        Geometry g = op.execute(polyline, null);
+        return OGCGeometry.createFromEsriGeometry(g, esriSR, true);
+    }
 
-	@Override
-	public OGCGeometry locateBetween(double mStart, double mEnd) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public OGCGeometry locateAlong(double mValue) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public Geometry getEsriGeometry() {
-		return polyline;
-	}
+    @Override
+    public OGCGeometry locateBetween(double mStart, double mEnd) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public OGCGeometry convertToMulti()
-	{
-		return this;
-	}
-	
-	Polyline polyline;
+    @Override
+    public Geometry getEsriGeometry() {
+        return polyline;
+    }
+
+    @Override
+    public OGCGeometry convertToMulti() {
+        return this;
+    }
+
+    Polyline polyline;
 }

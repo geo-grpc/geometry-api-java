@@ -10,6 +10,7 @@ class RandomPointMaker {
 
     /**
      * This assumes an equal area projection
+     *
      * @param geometry
      * @param pointsPerSquareKm
      * @param sr
@@ -32,7 +33,7 @@ class RandomPointMaker {
             polygon = new Polygon();
             polygon.addEnvelope((Envelope) geometry, false);
         } else {
-            polygon = (Polygon)geometry;
+            polygon = (Polygon) geometry;
         }
 
         // TODO should iterate over paths
@@ -89,8 +90,8 @@ class RandomPointMaker {
         //http://stackoverflow.com/questions/3038392/do-java-arrays-have-a-maximum-size
         if (pointCount * 2 > Integer.MAX_VALUE - 8)
             throw new GeometryException("Random Point count outside of available");
-            // TODO if the area of the envelope is more than twice that of the initial polygon, maybe a raster creation
-            // of random multipoints would be required...?
+        // TODO if the area of the envelope is more than twice that of the initial polygon, maybe a raster creation
+        // of random multipoints would be required...?
 
         double[] xy = new double[pointCount * 2];
 
@@ -109,7 +110,7 @@ class RandomPointMaker {
         // Create Multipoint from vertices
         MultiPoint multiPoint = new MultiPoint();
         multiPoint.add(4, 4);
-        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl)multiPoint._getImpl();
+        MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl) multiPoint._getImpl();
         AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 
         // TODO it would be better if we could just std::move the array.

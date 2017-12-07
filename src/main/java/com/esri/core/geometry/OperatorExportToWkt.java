@@ -25,22 +25,22 @@ package com.esri.core.geometry;
 
 
 public abstract class OperatorExportToWkt extends Operator {
-	@Override
-	public Type getType() {
-		return Type.ExportToWkt;
-	}
+    @Override
+    public Type getType() {
+        return Type.ExportToWkt;
+    }
 
-	public abstract StringCursor execute(int exportFlags,
-                                               GeometryCursor geometryCursor,
-                                               ProgressTracker progressTracker);
+    public abstract StringCursor execute(int exportFlags,
+                                         GeometryCursor geometryCursor,
+                                         ProgressTracker progressTracker);
 
-	public abstract String execute(int exportFlags,
-								   Geometry geometry,
-								   ProgressTracker progress_tracker);
+    public abstract String execute(int exportFlags,
+                                   Geometry geometry,
+                                   ProgressTracker progress_tracker);
 
-	public static OperatorExportToWkt local() {
-		return (OperatorExportToWkt) OperatorFactoryLocal.getInstance()
-				.getOperator(Type.ExportToWkt);
-	}
+    public static OperatorExportToWkt local() {
+        return (OperatorExportToWkt) OperatorFactoryLocal.getInstance()
+                .getOperator(Type.ExportToWkt);
+    }
 
 }

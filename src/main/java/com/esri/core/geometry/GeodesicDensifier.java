@@ -81,14 +81,14 @@ class GeodesicDensifier {
         double height = geodesicDistanceOnWGS84(env2D.getUpperLeft(), env2D.getLowerLeft());// height on right is same as left. meridians are geodesics
 
         if (wTop <= m_maxLength && wBottom <= m_maxLength && height <= m_maxLength)
-            return (Geometry)polygon;
+            return (Geometry) polygon;
 
         return densifyMultiPath((MultiPath) polygon);
     }
 
     private Geometry densifyMultiPath(MultiPath geom) {
         PeDouble distanceMeters = new PeDouble();
-        PeDouble az12= new PeDouble();
+        PeDouble az12 = new PeDouble();
         PeDouble lam2 = new PeDouble();
         PeDouble phi2 = new PeDouble();
 
@@ -130,7 +130,7 @@ class GeodesicDensifier {
                         densifiedPoly.startPath(point);
                     }
 
-                    int n = (int)dcount - 1;
+                    int n = (int) dcount - 1;
                     double distanceAlongGeodesic = 0.0;
 
                     for (int i = 0; i < n; i++) {

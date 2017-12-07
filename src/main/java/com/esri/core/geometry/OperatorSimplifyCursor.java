@@ -25,57 +25,57 @@ package com.esri.core.geometry;
 
 class OperatorSimplifyCursor extends GeometryCursor {
 
-	GeometryCursor m_inputGeometryCursor;
-	SpatialReference m_spatialReference;
-	ProgressTracker m_progressTracker;
+    GeometryCursor m_inputGeometryCursor;
+    SpatialReference m_spatialReference;
+    ProgressTracker m_progressTracker;
 
-	int m_index;
-	boolean m_bForceSimplify;
+    int m_index;
+    boolean m_bForceSimplify;
 
-	// Reviewed vs. Feb 8 2011
-	OperatorSimplifyCursor(GeometryCursor geoms, SpatialReference spatialRef,
-			boolean bForceSimplify, ProgressTracker progressTracker) {
-		m_progressTracker = progressTracker;
-		m_bForceSimplify = bForceSimplify;
-		m_index = -1;
-		if (geoms == null)
-			throw new IllegalArgumentException();
+    // Reviewed vs. Feb 8 2011
+    OperatorSimplifyCursor(GeometryCursor geoms, SpatialReference spatialRef,
+                           boolean bForceSimplify, ProgressTracker progressTracker) {
+        m_progressTracker = progressTracker;
+        m_bForceSimplify = bForceSimplify;
+        m_index = -1;
+        if (geoms == null)
+            throw new IllegalArgumentException();
 
-		m_inputGeometryCursor = geoms;
+        m_inputGeometryCursor = geoms;
 
-		m_spatialReference = spatialRef;
-	}
+        m_spatialReference = spatialRef;
+    }
 
-	// Reviewed vs. Feb 8 2011
-	@Override
-	public Geometry next() {
-		Geometry geometry;
-		if ((geometry = m_inputGeometryCursor.next()) != null)// if (geometry =
-																// m_inputGeometryCursor->Next())
-		{
-			m_index = m_inputGeometryCursor.getGeometryID();
-			if ((m_progressTracker != null)
-					&& !(m_progressTracker.progress(-1, -1)))
-				throw new RuntimeException("user_canceled");
-			return simplify(geometry);
-		}
-		return null;
-	}
+    // Reviewed vs. Feb 8 2011
+    @Override
+    public Geometry next() {
+        Geometry geometry;
+        if ((geometry = m_inputGeometryCursor.next()) != null)// if (geometry =
+        // m_inputGeometryCursor->Next())
+        {
+            m_index = m_inputGeometryCursor.getGeometryID();
+            if ((m_progressTracker != null)
+                    && !(m_progressTracker.progress(-1, -1)))
+                throw new RuntimeException("user_canceled");
+            return simplify(geometry);
+        }
+        return null;
+    }
 
-	// Reviewed vs. Feb 8 2011
-	@Override
-	public int getGeometryID() {
-		return m_index;
-	}
+    // Reviewed vs. Feb 8 2011
+    @Override
+    public int getGeometryID() {
+        return m_index;
+    }
 
-	// Reviewed vs. Feb 8 2011
-	Geometry simplify(Geometry geometry) {
-		if (geometry == null)
-			throw new IllegalArgumentException();
+    // Reviewed vs. Feb 8 2011
+    Geometry simplify(Geometry geometry) {
+        if (geometry == null)
+            throw new IllegalArgumentException();
 
-		// Geometry.Type type = geometry.getType();
+        // Geometry.Type type = geometry.getType();
 
-		return OperatorSimplifyLocalHelper.simplifyAsFeature(geometry,
-				m_spatialReference, m_bForceSimplify, m_progressTracker);
-	}
+        return OperatorSimplifyLocalHelper.simplifyAsFeature(geometry,
+                m_spatialReference, m_bForceSimplify, m_progressTracker);
+    }
 }
