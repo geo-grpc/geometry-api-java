@@ -108,7 +108,17 @@ class Projecter {
     }
 
     static Geometry clipGeometry(Geometry geometry, ProjectionTransformation projectionTransformation, ProgressTracker progressTracker) {
-        // TODO clip geometry by toTransformation Horizon
+        // TODO implement a real horizon
+        if (projectionTransformation.m_fromSpatialReference.getID() == 4326) {
+            // Fold Geometries into a space that ranges from -180 - 180
+            Geometry folded = OperatorProjectLocal.foldInto360Range(geometry, projectionTransformation.m_fromSpatialReference);
+
+
+            // Cut geometries at longitudes
+
+            // union rings
+
+        }
 
         return geometry;
     }

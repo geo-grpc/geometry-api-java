@@ -88,7 +88,9 @@ public abstract class OperatorProject extends Operator {
      * @param pannableSR The pannable Spatial Reference.
      * @return Folded geometry.
      */
-    public abstract Geometry foldInto360Range(Geometry geom, SpatialReference pannableSR);
+    public static Geometry foldInto360Range(Geometry geom, SpatialReference pannableSR) {
+        return geom;
+    }
 
     /**
      * Same as fold_into_360_range. The difference is that this function preserves geodetic area of polygons and geodetic length of polylines. It does not preserve regular area and length or perimeter

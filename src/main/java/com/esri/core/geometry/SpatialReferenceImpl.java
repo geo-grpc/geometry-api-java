@@ -53,8 +53,6 @@ class SpatialReferenceImpl extends SpatialReference {
         Integer32, Integer64, FloatingPoint
     }
 
-    ;
-
     int m_userWkid;// this wkid is provided by user to the create method.
     int m_userLatestWkid;
     int m_userOldestWkid;

@@ -2,6 +2,7 @@ package com.esri.core.geometry;
 
 import junit.framework.TestCase;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.proj4.PJ;
 
@@ -16,8 +17,14 @@ public class TestProjection extends TestCase {
         System.loadLibrary("proj");
     }
 
+    SpatialReference spatialReferenceWGS = SpatialReference.create(4326);
+    SpatialReference spatialReferenceMerc = SpatialReference.create(3857);
+    ProjectionTransformation projectionTransformationToMerc = new ProjectionTransformation(spatialReferenceWGS, spatialReferenceMerc);
+    ProjectionTransformation projectionTransformationToWGS = new ProjectionTransformation(spatialReferenceMerc, spatialReferenceWGS);
+
     @Before
     public void setUp() {
+
     }
 
     @Test
@@ -176,4 +183,51 @@ public class TestProjection extends TestCase {
 
         assertNotNull(geometry);
     }
+
+    @Test
+    public void testFoldInto360() {
+        String wktGeom = "POLYGON((120 48.2246726495652,140 48.2246726495652,140 25.799891182088334,120 25.799891182088334,120 48.2246726495652))";
+        SimpleStringCursor result = new SimpleStringCursor(wktGeom);
+
+        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, result);
+        Geometry expectedGeometry = wktCursor.next();
+
+        String wktGeom360 = "POLYGON((480 48.2246726495652,500 48.2246726495652,500 25.799891182088334,480 25.799891182088334,480 48.2246726495652))";
+        SimpleStringCursor test = new SimpleStringCursor(wktGeom360);
+        wktCursor = new OperatorImportFromWktCursor(0, test);
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, this.projectionTransformationToMerc, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, this.projectionTransformationToWGS, null);
+
+        Polygon actualGeometry = (Polygon) reProjectCursor.next();
+
+        assertTrue(GeometryEngine.equals(actualGeometry, expectedGeometry, spatialReferenceWGS));
+    }
+
+//    @Ignore
+//    @Test
+//    public void testWrap() {
+//        String wktGeom = "POLYGON((167.87109375 30.751277776257812," +
+//                                 "201.43359375 49.38237278700955," +
+//                                 "232.49609375 -5.266007882805485," +
+//                                 "116.19500625 -17.308687886770024," +
+//                                 "199.54296875 18.979025953255267," +
+//                                 "126.03515625 12.897489183755892," +
+//                                 "167.87109375 30.751277776257812))";
+//        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
+//        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+//        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, this.projectionTransformationToMerc, null);
+//        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, this.projectionTransformationToWGS, null);
+//
+//        Polygon result = (Polygon) reProjectCursor.next();
+//        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+//        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+//        boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
+//
+//        simpleStringCursor = new SimpleStringCursor(wktGeom);
+//        wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+//        Polygon expected = (Polygon) wktCursor.next();
+//        assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
+//
+//        assertTrue(GeometryEngine.equals(result, expected, spatialReferenceWGS));
+//    }
 }

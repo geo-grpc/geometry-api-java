@@ -30,7 +30,7 @@ interface GeodeticCurveType {
     /**
      * Shortest distance between two points on an ellipsoide
      */
-    public final static int Geodesic = 0;
+    int Geodesic = 0;
     /**
      * A line of constant bearing or azimuth. Also known as a rhmub line
      */

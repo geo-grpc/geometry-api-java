@@ -25,6 +25,7 @@
 package com.esri.core.geometry.ogc;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -302,8 +303,9 @@ public abstract class OGCGeometry {
         // then produces OGCGeometry from the result.
         // Can produce OGCConcreteGoemetryCollection
         MultiPoint dstMultiPoint = null;
-        ArrayList<Geometry> dstPolylines = new ArrayList<Geometry>();
-        ArrayList<Geometry> dstPolygons = new ArrayList<Geometry>();
+        ArrayDeque<Geometry> dstPolylines = new ArrayDeque<>();
+//        ArrayList<Geometry> dstPolylines = new ArrayList<Geometry>();
+        ArrayDeque<Geometry> dstPolygons = new ArrayDeque<>();
         for (com.esri.core.geometry.Geometry g = gc.next(); g != null; g = gc
                 .next()) {
             switch (g.getType()) {
@@ -337,12 +339,10 @@ public abstract class OGCGeometry {
 
         if (dstPolylines.size() > 0) {
             if (dstPolylines.size() == 1) {
-                Geometry resMP = OperatorSimplifyOGC.local().execute(
-                        dstPolylines.get(0), esriSR, true, null);
+                Geometry resMP = OperatorSimplifyOGC.local().execute(dstPolylines.pop(), esriSR, true, null);
                 result.add(resMP);
             } else {
-                GeometryCursor res = OperatorUnion.local().execute(
-                        new SimpleGeometryCursor(dstPolylines), esriSR, null);
+                GeometryCursor res = OperatorUnion.local().execute(new SimpleGeometryCursor(dstPolylines), esriSR, null);
                 Geometry resPolyline = res.next();
                 Geometry resMP = OperatorSimplifyOGC.local().execute(
                         resPolyline, esriSR, true, null);
@@ -352,12 +352,10 @@ public abstract class OGCGeometry {
 
         if (dstPolygons.size() > 0) {
             if (dstPolygons.size() == 1) {
-                Geometry resMP = OperatorSimplifyOGC.local().execute(
-                        dstPolygons.get(0), esriSR, true, null);
+                Geometry resMP = OperatorSimplifyOGC.local().execute(dstPolygons.pop(), esriSR, true, null);
                 result.add(resMP);
             } else {
-                GeometryCursor res = OperatorUnion.local().execute(
-                        new SimpleGeometryCursor(dstPolygons), esriSR, null);
+                GeometryCursor res = OperatorUnion.local().execute(new SimpleGeometryCursor(dstPolygons), esriSR, null);
                 Geometry resPolygon = res.next();
                 Geometry resMP = OperatorSimplifyOGC.local().execute(
                         resPolygon, esriSR, true, null);
@@ -365,8 +363,7 @@ public abstract class OGCGeometry {
             }
         }
 
-        return OGCGeometry.createFromEsriCursor(
-                new SimpleGeometryCursor(result), esriSR);
+        return OGCGeometry.createFromEsriCursor(new SimpleGeometryCursor(result), esriSR);
     }
 
     public OGCGeometry buffer(double distance) {

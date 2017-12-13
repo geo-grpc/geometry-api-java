@@ -168,8 +168,7 @@ class OperatorSimplifyLocalHelper {
         int minsize = multiPathImpl.m_bPolygon ? 3 : 2;
         for (int ipath = 0, npath = multiPathImpl.getPathCount(); ipath < npath; ipath++) {
             if (multiPathImpl.getPathSize(ipath) < minsize) {
-                m_nonSimpleResult = new NonSimpleResult(
-                        NonSimpleResult.Reason.Structure, ipath, 0);
+                m_nonSimpleResult = new NonSimpleResult(NonSimpleResult.Reason.Structure, ipath, 0);
                 return false;
             }
         }

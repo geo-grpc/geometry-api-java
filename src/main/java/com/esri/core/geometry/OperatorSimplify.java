@@ -55,8 +55,10 @@ public abstract class OperatorSimplify extends Operator {
      * @param progressTracker Allows cancellation of a long operation. Can be null.
      **/
     public abstract boolean isSimpleAsFeature(Geometry geom,
-                                              SpatialReference spatialRef, boolean bForceTest,
-                                              NonSimpleResult result, ProgressTracker progressTracker);
+                                              SpatialReference spatialRef,
+                                              boolean bForceTest,
+                                              NonSimpleResult result,
+                                              ProgressTracker progressTracker);
 
     /**
      * Tests if the Geometry is simple (second call will use a cached IsKnownSimple flag and immediately return).
@@ -66,8 +68,7 @@ public abstract class OperatorSimplify extends Operator {
      *                        very small tolerance value is derived from the geometry bounds.
      * @param progressTracker Allows cancellation of a long operation. Can be null.
      */
-    public boolean isSimpleAsFeature(Geometry geom,
-                                     SpatialReference spatialRef, ProgressTracker progressTracker) {
+    public boolean isSimpleAsFeature(Geometry geom, SpatialReference spatialRef, ProgressTracker progressTracker) {
         return isSimpleAsFeature(geom, spatialRef, false, null, progressTracker);
     }
 

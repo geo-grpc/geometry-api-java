@@ -634,6 +634,17 @@ public class GeometryEngine {
         }
     }
 
+    public static Polygon geodesicBuffer(Geometry geometry, SpatialReference spatialReference, double d) {
+        OperatorGeodesicBuffer operatorGeodesicBuffer = (OperatorGeodesicBuffer)factory.getOperator(Operator.Type.GeodesicBuffer);
+        return (Polygon) operatorGeodesicBuffer.execute(geometry, spatialReference, 0, d, Double.NaN, false, null);
+    }
+
+    public static Geometry project(Geometry geometry, SpatialReference spatialReferenceInput, SpatialReference spatialReferenceOutput) {
+        OperatorProject operatorProject = (OperatorProject) factory.getOperator(Operator.Type.Project);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReferenceInput, spatialReferenceOutput);
+        return operatorProject.execute(geometry, projectionTransformation, null);
+    }
+
     /**
      * Calculates a buffer polygon of the geometry as specified by the
      * distance input. The buffer is implemented in the xy-plane.
