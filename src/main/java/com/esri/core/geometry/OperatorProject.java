@@ -89,7 +89,56 @@ public abstract class OperatorProject extends Operator {
      * @return Folded geometry.
      */
     public static Geometry foldInto360Range(Geometry geom, SpatialReference pannableSR) {
-        return geom;
+        Envelope2D envelope2D = new Envelope2D();
+        geom.queryEnvelope2D(envelope2D);
+        if (envelope2D.xmax <= 180.0 && envelope2D.xmin >= -180.0) {
+            return geom;
+        }
+
+        // clip by -180 and 180
+        MultiPath foldedGeometry = null;
+
+        if (geom.getType() != Geometry.Type.Polyline && geom.getType() != Geometry.Type.Polygon)
+            return geom;
+
+        MultiPathImpl multiPath = (MultiPathImpl)geom._getImpl();
+        if (geom.getType() == Geometry.Type.Polygon) {
+            foldedGeometry = new Polygon(multiPath.m_description);
+        } else if (geom.getType() == Geometry.Type.Polyline) {
+            foldedGeometry = new Polyline(multiPath.m_description);
+        }
+
+        Polyline cuttee1 = new Polyline();
+        cuttee1.startPath(-180, 90);
+        cuttee1.lineTo(-180, -90);
+        cuttee1.startPath(180, 90);
+        cuttee1.lineTo(180, -90);
+        Geometry[] parts = GeometryEngine.cut(geom, cuttee1, pannableSR);
+
+        if (parts.length == 0) {
+            parts = new Geometry[] {geom};
+        }
+
+        for (Geometry geometryPart : parts) {
+            geometryPart.queryEnvelope2D(envelope2D);
+            MultiPathImpl multiPathPart = (MultiPathImpl)geometryPart._getImpl();
+            // TODO this only accounts for geometries with lat lon rang of -540 to 540
+            if (envelope2D.xmin < -180) {
+                // add 180 to all vertices in geometry
+                Transformation2D transformation2D = new Transformation2D();
+                transformation2D.xd = 360;
+                geometryPart.applyTransformation(transformation2D);
+            }
+            if (envelope2D.xmax > 180) {
+                Transformation2D transformation2D = new Transformation2D();
+                transformation2D.xd = -360;
+                geometryPart.applyTransformation(transformation2D);
+            }
+            foldedGeometry.add((MultiPath) geometryPart, false);
+        }
+
+
+        return foldedGeometry;
     }
 
     /**

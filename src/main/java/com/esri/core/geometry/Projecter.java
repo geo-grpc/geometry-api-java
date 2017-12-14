@@ -1,5 +1,6 @@
 package com.esri.core.geometry;
 
+import com.sun.javafx.sg.prism.NGNode;
 import org.proj4.PJException;
 
 import java.util.Arrays;
@@ -117,7 +118,7 @@ class Projecter {
             // Cut geometries at longitudes
 
             // union rings
-
+            return folded;
         }
 
         return geometry;
@@ -132,6 +133,7 @@ class Projecter {
         Point[] outputs = {outpoint};
         Point[] inputs = {(Point) geometry};
         transform(projectionTransformation, inputs, 1, outputs);
+        // TODO setDirtyFlag?
         return outputs[0];
     }
 
@@ -146,6 +148,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
@@ -170,6 +173,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 
@@ -192,6 +196,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
@@ -200,7 +205,7 @@ class Projecter {
 //
 //        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
 //        multiVertexGeometryOut._resizeImpl(pointCount);
-
+        multiVertexGeometry._updateAllDirtyIntervals(true);
         return polygon;
     }
 

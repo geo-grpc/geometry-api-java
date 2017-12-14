@@ -203,31 +203,52 @@ public class TestProjection extends TestCase {
         assertTrue(GeometryEngine.equals(actualGeometry, expectedGeometry, spatialReferenceWGS));
     }
 
-//    @Ignore
-//    @Test
-//    public void testWrap() {
-//        String wktGeom = "POLYGON((167.87109375 30.751277776257812," +
-//                                 "201.43359375 49.38237278700955," +
-//                                 "232.49609375 -5.266007882805485," +
-//                                 "116.19500625 -17.308687886770024," +
-//                                 "199.54296875 18.979025953255267," +
-//                                 "126.03515625 12.897489183755892," +
-//                                 "167.87109375 30.751277776257812))";
-//        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
-//        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
-//        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, this.projectionTransformationToMerc, null);
-//        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, this.projectionTransformationToWGS, null);
-//
-//        Polygon result = (Polygon) reProjectCursor.next();
-//        NonSimpleResult nonSimpleResult = new NonSimpleResult();
-//        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
-//        boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
-//
-//        simpleStringCursor = new SimpleStringCursor(wktGeom);
-//        wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
-//        Polygon expected = (Polygon) wktCursor.next();
-//        assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
-//
-//        assertTrue(GeometryEngine.equals(result, expected, spatialReferenceWGS));
-//    }
+
+    @Test
+    public void testWrapTriangle() {
+        String wktGeom = "POLYGON((167 30, 201 49, 199 18, 167 30))";
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
+        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, this.projectionTransformationToMerc, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, this.projectionTransformationToWGS, null);
+
+        Polygon result = (Polygon) reProjectCursor.next();
+        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+        boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
+
+        simpleStringCursor = new SimpleStringCursor(wktGeom);
+        wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        Polygon expected = (Polygon) wktCursor.next();
+        assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
+
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 10);
+    }
+
+    @Test
+    public void testWrap() {
+        String wktGeom = "POLYGON((167.87109375 30.751277776257812," +
+                                 "201.43359375 49.38237278700955," +
+                                 "232.49609375 -5.266007882805485," +
+                                 "116.19500625 -17.308687886770024," +
+                                 "199.54296875 18.979025953255267," +
+                                 "126.03515625 12.897489183755892," +
+                                 "167.87109375 30.751277776257812))";
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
+        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, this.projectionTransformationToMerc, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, this.projectionTransformationToWGS, null);
+
+        Polygon result = (Polygon) reProjectCursor.next();
+        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+        boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
+
+        simpleStringCursor = new SimpleStringCursor(wktGeom);
+        wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        Polygon expected = (Polygon) wktCursor.next();
+        assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
+
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 10);
+    }
 }
