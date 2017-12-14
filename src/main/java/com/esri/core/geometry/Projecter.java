@@ -1,6 +1,5 @@
 package com.esri.core.geometry;
 
-import com.sun.javafx.sg.prism.NGNode;
 import org.proj4.PJException;
 
 import java.util.Arrays;
