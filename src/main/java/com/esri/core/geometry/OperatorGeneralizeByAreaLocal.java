@@ -10,12 +10,14 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
                                   double percentReduction,
                                   boolean bRemoveDegenerateParts,
                                   GeneralizeType generalizeType,
+                                  SpatialReference spatialReference,
                                   ProgressTracker progressTracker) {
 
         return new OperatorGeneralizeByAreaCursor(geoms,
                 percentReduction,
                 bRemoveDegenerateParts,
                 generalizeType,
+                spatialReference,
                 progressTracker);
     }
 
@@ -24,13 +26,17 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
                             double percentReduction,
                             boolean bRemoveDegenerateParts,
                             GeneralizeType generalizeType,
+                            SpatialReference spatialReference,
                             ProgressTracker progressTracker) {
 
         SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
 
-        GeometryCursor geometryCursor = execute(inputGeomCurs, percentReduction,
-                bRemoveDegenerateParts, generalizeType,
-                progressTracker);
+        GeometryCursor geometryCursor = execute(inputGeomCurs,
+                                                percentReduction,
+                                                bRemoveDegenerateParts,
+                                                generalizeType,
+                                                spatialReference,
+                                                progressTracker);
 
         return geometryCursor.next();
     }

@@ -12,18 +12,21 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     boolean m_bRemoveDegenerateParts;
     GeneralizeType m_generalizeType;
     double m_percentReduction;
+    SpatialReference m_spatialReference;
     int m_ptRemovalGoal;
 
     public OperatorGeneralizeByAreaCursor(GeometryCursor geoms,
                                           double percentReduction,
                                           boolean bRemoveDegenerateParts,
                                           GeneralizeType generalizeType,
+                                          SpatialReference spatialReference,
                                           ProgressTracker progressTracker) {
         m_geoms = geoms;
         m_progressTracker = progressTracker;
         m_bRemoveDegenerateParts = bRemoveDegenerateParts;
         m_generalizeType = generalizeType;
         m_percentReduction = percentReduction;
+        m_spatialReference = spatialReference;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
         GeneralizeAreaPath(editShape);
 
-        return editShape.getGeometry(editShape.getFirstGeometry());
+        return GeometryEngine.simplify(editShape.getGeometry(editShape.getFirstGeometry()), m_spatialReference);
     }
 
 

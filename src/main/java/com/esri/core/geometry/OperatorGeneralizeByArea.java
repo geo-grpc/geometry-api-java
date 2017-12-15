@@ -19,6 +19,7 @@ public abstract class OperatorGeneralizeByArea extends Operator {
                                            double percentReduction,
                                            boolean bRemoveDegenerateParts,
                                            GeneralizeType generalizeType,
+                                           SpatialReference spatialReference,
                                            ProgressTracker progressTracker);
 
     /**
@@ -30,6 +31,7 @@ public abstract class OperatorGeneralizeByArea extends Operator {
                                      double percentReduction,
                                      boolean bRemoveDegenerateParts,
                                      GeneralizeType generalizeType,
+                                     SpatialReference spatialReference,
                                      ProgressTracker progressTracker);
 
     public static OperatorGeneralizeByArea local() {
