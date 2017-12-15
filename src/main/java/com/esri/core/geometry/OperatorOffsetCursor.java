@@ -46,6 +46,9 @@ class OperatorOffsetCursor extends GeometryCursor {
         m_progressTracker = progressTracker;
     }
 
+    @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
     public Geometry next() {
         Geometry geom = m_inputGeoms.next();
         if (geom != null) {

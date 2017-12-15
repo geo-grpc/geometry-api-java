@@ -43,6 +43,9 @@ class OperatorConvexHullCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
+    @Override
     public Geometry next() {
         if (m_b_merge) {
             if (!m_b_done) {

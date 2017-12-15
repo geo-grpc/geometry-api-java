@@ -46,6 +46,9 @@ class OperatorSimplifyCursor extends GeometryCursor {
         m_spatialReference = spatialRef;
     }
 
+    @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
     // Reviewed vs. Feb 8 2011
     @Override
     public Geometry next() {

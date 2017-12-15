@@ -51,6 +51,9 @@ public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
+    @Override
     public ByteBuffer next() {
         Geometry geometry = m_inputGeometryCursor.next();
         if (geometry != null) {

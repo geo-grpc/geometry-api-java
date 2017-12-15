@@ -36,6 +36,9 @@ public class GeometryCursorAppend extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return  m_cur != null && m_cur.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry g = m_cur.next();
         if (g == null && m_cur != m_cur2) {

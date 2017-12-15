@@ -27,6 +27,9 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_geoms != null && m_geoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry geom = m_geoms.next();
         if (geom == null)

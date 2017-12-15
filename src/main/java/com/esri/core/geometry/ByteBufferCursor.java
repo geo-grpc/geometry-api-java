@@ -47,4 +47,6 @@ public abstract class ByteBufferCursor {
      */
     public abstract int getByteBufferID();
 
+    public abstract boolean hasNext();
+
 }

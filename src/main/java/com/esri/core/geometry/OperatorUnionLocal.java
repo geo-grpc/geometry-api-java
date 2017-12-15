@@ -24,6 +24,8 @@
 
 package com.esri.core.geometry;
 
+import java.util.ArrayDeque;
+
 class OperatorUnionLocal extends OperatorUnion {
 
     @Override
@@ -35,12 +37,10 @@ class OperatorUnionLocal extends OperatorUnion {
     @Override
     public Geometry execute(Geometry geom1, Geometry geom2,
                             SpatialReference sr, ProgressTracker progressTracker) {
-        Geometry[] geomArray = new Geometry[]{geom1, geom2};
-
-        SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(
-                geomArray);
-        GeometryCursor outputCursor = execute(inputGeometries, sr,
-                progressTracker);
+        ArrayDeque<Geometry> geometryArrayDeque = new ArrayDeque<>();
+        geometryArrayDeque.add(geom1);geometryArrayDeque.add(geom2);
+        SimpleGeometryCursor inputGeometries = new SimpleGeometryCursor(geometryArrayDeque);
+        GeometryCursor outputCursor = execute(inputGeometries, sr, progressTracker);
 
         return outputCursor.next();
     }

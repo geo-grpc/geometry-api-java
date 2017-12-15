@@ -25,32 +25,38 @@
 package com.esri.core.geometry;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimpleByteBufferCursor extends ByteBufferCursor {
 
-    ByteBuffer m_byteBuffer;
-    List<ByteBuffer> m_byteBufferArray;
-    int m_index;
-    int m_count;
+    ArrayDeque<ByteBuffer> m_byteBufferDeque;
+    int m_index = -1;
 
     public SimpleByteBufferCursor(ByteBuffer byteBuffer) {
-        m_byteBuffer = byteBuffer;
-        m_index = -1;
-        m_count = 1;
+        m_byteBufferDeque = new ArrayDeque<>();
+        m_byteBufferDeque.add(byteBuffer);
     }
 
+    @Deprecated
     public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
-        m_byteBufferArray = Arrays.asList(byteBufferArray);
-        m_index = -1;
-        m_count = byteBufferArray.length;
+        m_byteBufferDeque = Arrays.stream(byteBufferArray).collect(Collectors.toCollection(ArrayDeque::new));
     }
 
+    @Deprecated
     public SimpleByteBufferCursor(List<ByteBuffer> byteBufferArray) {
-        m_byteBufferArray = byteBufferArray;
-        m_index = -1;
-        m_count = byteBufferArray.size();
+        m_byteBufferDeque = new ArrayDeque<>(byteBufferArray);
+    }
+
+    public SimpleByteBufferCursor(ArrayDeque<ByteBuffer> byteBufferArrayDeque) {
+        m_byteBufferDeque = byteBufferArrayDeque;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return m_byteBufferDeque.size() > 0;
     }
 
     @Override
@@ -60,9 +66,9 @@ public class SimpleByteBufferCursor extends ByteBufferCursor {
 
     @Override
     public ByteBuffer next() {
-        if (m_index < m_count - 1) {
+        if (!m_byteBufferDeque.isEmpty()) {
             m_index++;
-            return m_byteBuffer != null ? m_byteBuffer : m_byteBufferArray.get(m_index);
+            return m_byteBufferDeque.pop();
         }
 
         return null;

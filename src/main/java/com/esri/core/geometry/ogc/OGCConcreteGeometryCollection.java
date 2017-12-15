@@ -326,6 +326,9 @@ public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
         }
 
         @Override
+        public boolean hasNext() { return m_curs != null && m_curs.hasNext(); }
+
+        @Override
         public Geometry next() {
             while (true) {
                 if (m_curs != null) {

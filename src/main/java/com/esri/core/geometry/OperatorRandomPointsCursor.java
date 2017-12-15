@@ -34,6 +34,9 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry geom;
         while ((geom = m_inputGeoms.next()) != null) {

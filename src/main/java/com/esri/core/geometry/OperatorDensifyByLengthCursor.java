@@ -44,6 +44,9 @@ class OperatorDensifyByLengthCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry geom;
         if ((geom = m_inputGeoms.next()) != null) {

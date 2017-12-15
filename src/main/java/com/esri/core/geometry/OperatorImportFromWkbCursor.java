@@ -18,6 +18,9 @@ public class OperatorImportFromWkbCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputWkbBuffers != null && m_inputWkbBuffers.hasNext(); }
+
+    @Override
     public Geometry next() {
         ByteBuffer wkbBuffer = m_inputWkbBuffers.next();
         if (wkbBuffer != null) {

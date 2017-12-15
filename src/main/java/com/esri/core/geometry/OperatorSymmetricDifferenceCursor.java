@@ -44,6 +44,9 @@ class OperatorSymmetricDifferenceCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         if (m_bEmpty)
             return null;

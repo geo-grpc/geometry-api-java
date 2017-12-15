@@ -48,6 +48,9 @@ public class OperatorImportFromESRIShapeCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputShapeBuffers != null && m_inputShapeBuffers.hasNext(); }
+
+    @Override
     public Geometry next() {
         ByteBuffer shapeBuffer = m_inputShapeBuffers.next();
         if (shapeBuffer != null) {

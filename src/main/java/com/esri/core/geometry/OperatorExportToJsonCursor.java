@@ -45,6 +45,9 @@ public class OperatorExportToJsonCursor extends StringCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
+    @Override
     public int getID() {
         return m_index;
     }

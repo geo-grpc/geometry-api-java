@@ -49,17 +49,20 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
     @Deprecated
     public SimpleGeometryCursor(List<Geometry> geoms) {
-        m_geometryDeque = geoms.stream().collect(Collectors.toCollection(ArrayDeque::new));
-        m_index = -1;
+        m_geometryDeque = new ArrayDeque<>(geoms);
     }
 
     public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
         m_geometryDeque = geoms;
-        m_index = -1;
     }
 
     public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor) {
         m_mapGeometryCursor = mapGeometryCursor;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return m_geometryDeque.size() > 0;
     }
 
     @Override

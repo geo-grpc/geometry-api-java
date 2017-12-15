@@ -47,6 +47,9 @@ class OperatorSimplifyCursorOGC extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry geometry;
         if ((geometry = m_inputGeometryCursor.next()) != null)// if (geometry =

@@ -249,8 +249,7 @@ class Bufferer {
         // (0, 0), following clockwise direction (0, -1), (-1, 0), (1, 0)
     }
 
-    private static final class GeometryCursorForMultiPoint extends
-            GeometryCursor {
+    private static final class GeometryCursorForMultiPoint extends GeometryCursor {
         private Bufferer m_parent;
         private int m_index;
         private Geometry m_buffered_polygon;
@@ -323,6 +322,10 @@ class Bufferer {
 
             return res;
         }
+
+        @Override
+        // TODO unclear how this might work
+        public boolean hasNext() { return m_mp.getPointCount() > m_index; }
 
         @Override
         public int getGeometryID() {
@@ -398,6 +401,9 @@ class Bufferer {
         }
 
         @Override
+        public boolean hasNext() { return m_current_path_index < ((MultiPathImpl)m_polyline._getImpl()).getPathCount(); }
+
+        @Override
         public int getGeometryID() {
             return 0;
         }
@@ -438,6 +444,9 @@ class Bufferer {
             m_geometry = null;
             return next();
         }
+
+        @Override
+        public boolean hasNext() { return m_geometry != null && m_index < ((MultiPath)m_geometry).getPathCount(); }
 
         @Override
         public int getGeometryID() {
@@ -481,6 +490,9 @@ class Bufferer {
 
             return null;
         }
+
+        @Override
+        public boolean hasNext() {return m_index < ((Polygon)m_bufferer.m_geometry).getPathCount();}
 
         @Override
         public int getGeometryID() {

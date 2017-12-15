@@ -56,4 +56,6 @@ public abstract class GeometryCursor {
     public boolean tock() {
         return true;
     }
+
+    public abstract boolean hasNext();
 }

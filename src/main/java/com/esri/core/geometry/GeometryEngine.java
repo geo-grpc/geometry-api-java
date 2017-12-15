@@ -283,10 +283,8 @@ public class GeometryEngine {
      */
     public static Geometry difference(Geometry geometry1, Geometry substractor,
                                       SpatialReference spatialReference) {
-        OperatorDifference op = (OperatorDifference) factory
-                .getOperator(Operator.Type.Difference);
-        Geometry result = op.execute(geometry1, substractor, spatialReference,
-                null);
+        OperatorDifference op = (OperatorDifference) factory.getOperator(Operator.Type.Difference);
+        Geometry result = op.execute(geometry1, substractor, spatialReference,null);
         return result;
     }
 

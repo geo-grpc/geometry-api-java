@@ -20,6 +20,9 @@ public class OperatorProjectCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         Geometry geometry;
         while ((geometry = m_inputGeoms.next()) != null) {

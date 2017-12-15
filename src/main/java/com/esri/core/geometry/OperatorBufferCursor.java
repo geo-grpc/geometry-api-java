@@ -77,6 +77,9 @@ class OperatorBufferCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public int getGeometryID() {
         return m_index;
     }

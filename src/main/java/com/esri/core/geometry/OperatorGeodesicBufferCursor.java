@@ -41,6 +41,9 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         if (m_bUnion) {
             OperatorGeodesicBufferCursor cursor = new OperatorGeodesicBufferCursor(m_inputGeoms, m_spatialReference, m_distances, m_maxDeviation, false, false, m_progressTracker);

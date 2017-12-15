@@ -59,6 +59,9 @@ class OperatorCutCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_cutIndex < m_cuts.size(); }
+
+    @Override
     public Geometry next() {
         generateCuts_();
         if (++m_cutIndex < m_cuts.size()) {

@@ -38,6 +38,9 @@ final class OperatorGeneralizeCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_geoms != null && m_geoms.hasNext(); }
+
+    @Override
     public Geometry next() {
         // TODO Auto-generated method stub
         Geometry geom = m_geoms.next();

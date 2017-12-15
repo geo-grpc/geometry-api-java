@@ -25,6 +25,9 @@ public class OperatorImportFromWktCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_wktStringCursor != null && m_wktStringCursor.hasNext(); }
+
+    @Override
     public int getGeometryID() {
         return m_index;
     }

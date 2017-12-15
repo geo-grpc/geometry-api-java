@@ -53,6 +53,9 @@ final class OperatorBoundaryLocalCursor extends GeometryCursor {
     }
 
     @Override
+    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+
+    @Override
     public int getGeometryID() {
         return m_index;
     }

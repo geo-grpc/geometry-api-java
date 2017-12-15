@@ -184,6 +184,9 @@ class GeodesicBufferer {
         }
 
         @Override
+        public boolean hasNext() { return m_index < m_mp.getPointCount(); }
+
+        @Override
         public Geometry next() {
             Point point = new Point();
             while (true) {
@@ -222,6 +225,9 @@ class GeodesicBufferer {
             m_index = 0;
             m_bfilter = bfilter;
         }
+
+        @Override
+        public boolean hasNext() { return m_index < ((MultiPath)m_bufferer.m_geometry).getPathCount(); }
 
         @Override
         public Geometry next() {
