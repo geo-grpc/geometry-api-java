@@ -304,7 +304,6 @@ public abstract class OGCGeometry {
         // Can produce OGCConcreteGoemetryCollection
         MultiPoint dstMultiPoint = null;
         ArrayDeque<Geometry> dstPolylines = new ArrayDeque<>();
-//        ArrayList<Geometry> dstPolylines = new ArrayList<Geometry>();
         ArrayDeque<Geometry> dstPolygons = new ArrayDeque<>();
         for (com.esri.core.geometry.Geometry g = gc.next(); g != null; g = gc
                 .next()) {
@@ -330,7 +329,7 @@ public abstract class OGCGeometry {
             }
         }
 
-        ArrayList<Geometry> result = new ArrayList<Geometry>(3);
+        ArrayDeque<Geometry> result = new ArrayDeque<>(3);
         if (dstMultiPoint != null) {
             Geometry resMP = OperatorSimplifyOGC.local().execute(dstMultiPoint,
                     esriSR, true, null);

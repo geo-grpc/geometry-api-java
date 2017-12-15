@@ -40,7 +40,6 @@ public class SimpleByteBufferCursor extends ByteBufferCursor {
         m_byteBufferDeque.add(byteBuffer);
     }
 
-    @Deprecated
     public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
         m_byteBufferDeque = Arrays.stream(byteBufferArray).collect(Collectors.toCollection(ArrayDeque::new));
     }

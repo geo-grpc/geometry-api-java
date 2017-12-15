@@ -24,11 +24,12 @@
 package com.esri.core.geometry;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 /**
  * An abstract ByteBuffer Cursor class.
  */
-public abstract class ByteBufferCursor {
+public abstract class ByteBufferCursor implements Iterator<ByteBuffer> {
 
     /**
      * Moves the cursor to the next ByteBuffer. Returns null when reached the

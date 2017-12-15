@@ -1,6 +1,8 @@
 package com.esri.core.geometry;
 
-public abstract class StringCursor {
+import java.util.Iterator;
+
+public abstract class StringCursor implements Iterator<String> {
     public abstract String next();
 
     public abstract int getID();

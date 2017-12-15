@@ -20,6 +20,7 @@ public class SimpleStringCursor extends StringCursor {
         m_arrayDeque = Arrays.stream(inputStringArray).collect(Collectors.toCollection(ArrayDeque::new));
     }
 
+    @Deprecated
     public SimpleStringCursor(List<String> inputStringArray) {
         m_arrayDeque = new ArrayDeque<>(inputStringArray);
     }
