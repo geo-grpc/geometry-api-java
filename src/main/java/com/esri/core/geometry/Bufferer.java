@@ -114,15 +114,12 @@ class Bufferer {
             densify_dist = max_dd;// the densify distance has to agree with the
             // max_vertex_in_complete_circle
         else {
-            double vertex_count = Math.PI
-                    / Math.acos(1.0 - densify_dist / Math.abs(distance));
+            double vertex_count = Math.PI / Math.acos(1.0 - densify_dist / Math.abs(distance));
             if (vertex_count < (double) max_vertex_in_complete_circle - 1.0) {
                 max_vertex_in_complete_circle = (int) vertex_count;
                 if (max_vertex_in_complete_circle < 12) {
                     max_vertex_in_complete_circle = 12;
-                    densify_dist = Math.abs(distance)
-                            * (1 - Math.cos(Math.PI
-                            / max_vertex_in_complete_circle));
+                    densify_dist = Math.abs(distance) * (1 - Math.cos(Math.PI / max_vertex_in_complete_circle));
                 }
             }
         }

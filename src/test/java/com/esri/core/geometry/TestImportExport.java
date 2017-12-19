@@ -1862,8 +1862,8 @@ public class TestImportExport extends TestCase {
         int index = 0;
         while (geom != null) {
             Point point_orig = pointList.get(index);
-            assertEquals(point_orig.getX(), geom.getX(), 7);
-            assertEquals(point_orig.getY(), geom.getY(), 7);
+            assertEquals(point_orig.getX(), geom.getX(), 0.000001);
+            assertEquals(point_orig.getY(), geom.getY(), 0.000001);
 
             geom = (Point) operatorImportFromWktCursor.next();
             index++;

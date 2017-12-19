@@ -65,6 +65,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
         GeneralizeAreaPath(editShape);
 
+        // TODO  this simplify is a cheat. maybe there's a better way for making sure our geometry isn't screwed up.
         return GeometryEngine.simplify(editShape.getGeometry(editShape.getFirstGeometry()), m_spatialReference);
     }
 

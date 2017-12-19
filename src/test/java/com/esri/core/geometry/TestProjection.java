@@ -222,7 +222,7 @@ public class TestProjection extends TestCase {
         Polygon expected = (Polygon) wktCursor.next();
         assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
 
-        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 10);
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 1e-10);
     }
 
     @Test
@@ -243,7 +243,7 @@ public class TestProjection extends TestCase {
         Polygon expected = (Polygon) wktCursor.next();
         assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
 
-        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 10);
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), .00000000001);
     }
 
     @Test
@@ -270,6 +270,6 @@ public class TestProjection extends TestCase {
         Polygon expected = (Polygon) wktCursor.next();
         assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
 
-        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 10);
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 1e-10);
     }
 }

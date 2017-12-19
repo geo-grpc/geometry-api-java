@@ -53,7 +53,7 @@ public abstract class Operator {
 
         ExportToWkb, ImportFromWkb, ExportToWkt, ImportFromWkt, ImportFromGeoJson, ExportToGeoJson, SymmetricDifference, ConvexHull, Boundary,
 
-        RandomPoints
+        RandomPoints, EnclosingCircle
 
     }
 
