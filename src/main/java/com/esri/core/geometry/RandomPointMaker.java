@@ -4,6 +4,8 @@ package com.esri.core.geometry;
  * Created by davidraleigh on 5/10/17.
  */
 
+import org.proj4.PJException;
+
 import java.util.Random;
 
 class RandomPointMaker {
@@ -21,7 +23,7 @@ class RandomPointMaker {
                              double pointsPerSquareKm,
                              Random numberGenerator,
                              SpatialReference sr,
-                             ProgressTracker progressTracker) {
+                             ProgressTracker progressTracker) throws PJException {
         if (geometry.getType() != Geometry.Type.Polygon && geometry.getType() != Geometry.Type.Envelope)
             throw new GeometryException("Geometry input must be of type Polygon or Envelope");
 
@@ -48,13 +50,11 @@ class RandomPointMaker {
                                        double pointsPerSquareKm,
                                        Random numberGenerator,
                                        SpatialReference sr,
-                                       ProgressTracker progressTracker) {
+                                       ProgressTracker progressTracker) throws PJException {
+        // TODO for each ring project
+
         Envelope2D inputEnvelope2D = new Envelope2D();
         polygon.queryEnvelope2D(inputEnvelope2D);
-
-        // get center lat lon from envelope
-
-        // TODO If statement instead of forced project which assumes every input is PCS
 
         // From GCS Grab point
         // TODO change to work with other GCS
@@ -79,7 +79,6 @@ class RandomPointMaker {
         // or skew geometry
         // TODO, maybe it would be computationally cheaper or more accurate to project input polygon instead of it's envelope
         Geometry equalAreaEnvelopeGeom = OperatorProject.local().execute(new Envelope(inputEnvelope2D), forwardProjectionTransformation, progressTracker);
-
 
         Envelope2D equalAreaEnvelope = new Envelope2D();
         // envelope of projected envelope
@@ -109,7 +108,6 @@ class RandomPointMaker {
 
         // Create Multipoint from vertices
         MultiPoint multiPoint = new MultiPoint();
-        multiPoint.add(4, 4);
         MultiVertexGeometryImpl multiVertexGeometry = (MultiVertexGeometryImpl) multiPoint._getImpl();
         AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 
@@ -118,14 +116,17 @@ class RandomPointMaker {
         multiVertexGeometry.setAttributeStreamRef(0, attributeStreamOfDbl);
         //multiVertexGeometry._resizeImpl(pointCount);
         multiPoint.resize(pointCount);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
 
         ProjectionTransformation backProjectionTransformation = new ProjectionTransformation(spatialReferenceAzi, sr);
-        Geometry projectedMultiPoint = OperatorProject.local().execute(multiPoint, backProjectionTransformation, progressTracker);
+        // project inplace instead of projecting a copy using OperatorProject::execute
+        Projecter.projectMultiPoint(multiPoint, backProjectionTransformation, progressTracker);
+
 
         // TODO project multipoint back to input spatial reference (it is necessary to do it here,
         // because if we projected the above array, then we wouldn't benefit from clipping
 
         // Intersect by input geometry
-        return GeometryEngine.intersect(projectedMultiPoint, polygon, sr);
+        return GeometryEngine.intersect(multiPoint, polygon, sr);
     }
 }

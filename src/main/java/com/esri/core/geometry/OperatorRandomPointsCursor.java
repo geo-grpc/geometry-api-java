@@ -1,5 +1,7 @@
 package com.esri.core.geometry;
 
+import org.proj4.PJException;
+
 import java.util.Random;
 
 /**
@@ -17,7 +19,7 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
     private int m_index;
     private int m_PPSKmindex;
 
-    OperatorRandomPointsCursor(GeometryCursor inputGeoms,
+    public OperatorRandomPointsCursor(GeometryCursor inputGeoms,
                                double[] pointsPerSquareKm,
                                long seed,
                                SpatialReference sr,
@@ -45,7 +47,11 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
                 m_PPSKmindex++;
 
             m_numberGenerator.setSeed(m_seed);
-            return RandomPointMaker.generate(geom, m_pointsPerSquareKm[m_PPSKmindex], m_numberGenerator, m_spatialReference, m_progressTracker);
+            try {
+                return RandomPointMaker.generate(geom, m_pointsPerSquareKm[m_PPSKmindex], m_numberGenerator, m_spatialReference, m_progressTracker);
+            } catch (PJException e) {
+                throw new GeometryException(e.getMessage());
+            }
         }
         return null;
     }

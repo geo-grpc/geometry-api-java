@@ -381,10 +381,8 @@ public class GeometryEngine {
      */
     public static Geometry intersect(Geometry geometry1, Geometry intersector,
                                      SpatialReference spatialReference) {
-        OperatorIntersection op = (OperatorIntersection) factory
-                .getOperator(Operator.Type.Intersection);
-        Geometry result = op.execute(geometry1, intersector, spatialReference,
-                null);
+        OperatorIntersection op = (OperatorIntersection) factory.getOperator(Operator.Type.Intersection);
+        Geometry result = op.execute(geometry1, intersector, spatialReference,null);
         return result;
     }
 

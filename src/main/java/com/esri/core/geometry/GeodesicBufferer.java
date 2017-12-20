@@ -90,11 +90,11 @@ class GeodesicBufferer {
 
     protected static final class GeodesicBufferCommand {
         protected interface Flags {
-            static final int enum_line = 1;
-            static final int enum_arc = 2;
-            static final int enum_dummy = 4;
-            static final int enum_concave_dip = 8;
-            static final int enum_connection = enum_arc | enum_line;
+            int enum_line = 1;
+            int enum_arc = 2;
+            int enum_dummy = 4;
+            int enum_concave_dip = 8;
+            int enum_connection = enum_arc | enum_line;
         }
 
         protected Point2D m_from;
@@ -268,11 +268,8 @@ class GeodesicBufferer {
                                 mp.getSegmentCount(i),
                                 false);
                     }
-//                    // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_ppp.txt",
-//                    // tmp_polyline, nullptr);
+
                     Polygon res = m_bufferer.bufferPolylinePath_(tmp_polyline, 0, m_bfilter);
-//                    // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_ppp_res.txt",
-//                    // *res, nullptr);
                     return res;
                 }
             }
@@ -378,9 +375,6 @@ class GeodesicBufferer {
                 // and any input other than polygon.
             }
         }
-
-//        // Operator_factory_local::SaveJSONToTextFileDbg("c:/temp/buffer_input.txt",
-//        // *m_geometry, nullptr);
 
         // Complex cases:
         switch (m_geometry.getType().value()) {
