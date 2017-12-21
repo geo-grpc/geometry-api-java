@@ -85,10 +85,13 @@ class RandomPointMaker {
         equalAreaEnvelopeGeom.queryEnvelope2D(equalAreaEnvelope);
 
         double areaKm = equalAreaEnvelope.getArea() / 1000.0;
-        int pointCount = (int) Math.ceil(areaKm * pointsPerSquareKm);
+        double pointCountNotCast = Math.ceil(areaKm * pointsPerSquareKm);
         //http://stackoverflow.com/questions/3038392/do-java-arrays-have-a-maximum-size
-        if (pointCount * 2 > Integer.MAX_VALUE - 8)
+        if (pointCountNotCast * 2 > Integer.MAX_VALUE - 8) {
             throw new GeometryException("Random Point count outside of available");
+        }
+        int pointCount = (int) pointCountNotCast;
+
         // TODO if the area of the envelope is more than twice that of the initial polygon, maybe a raster creation
         // of random multipoints would be required...?
 

@@ -63,4 +63,16 @@ public class TestRandomPoints extends TestCase {
         assertTrue(multiPoint.getPointCount() * 2 > 3179429);
         assertTrue(multiPoint2.getPointCount() * 2 > 3179429);
     }
+
+    @Test
+    public void testExcpetion() {
+        String wkt = "Polygon((0 0, 0 10, 10 10,10 0))";
+        Geometry geometry = GeometryEngine.geometryFromWkt(wkt, 0, Geometry.Type.Unknown);
+        try {
+            MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, 3, 1977, SpatialReference.create(4326), null);
+            fail("Expected an GeometryException to be thrown");
+        } catch (GeometryException geometryException) {
+            assertEquals(geometryException.getMessage(), "Random Point count outside of available");
+        }
+    }
 }
