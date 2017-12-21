@@ -24,8 +24,6 @@
 
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.Operator.Type;
-
 /**
  * Intersection of geometries by a given geometry.
  */
