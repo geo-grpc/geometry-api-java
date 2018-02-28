@@ -272,4 +272,69 @@ public class TestProjection extends TestCase {
 
         assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 1e-10);
     }
+
+    @Test
+    public void testAlbers() {
+        String wktGeom = "MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 45 20, 30 5, 10 10, 10 30, 20 35), (30 20, 20 25, 20 15, 30 20)))";
+        int wkid = 102003;
+
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReferenceWGS, SpatialReference.create(wkid));
+
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
+        OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(wktCursor, projectionTransformation, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, projectionTransformation.getReverse(), null);
+
+        Polygon result = (Polygon) reProjectCursor.next();
+        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+        boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
+        assertTrue(isSimple);
+
+        simpleStringCursor = new SimpleStringCursor(wktGeom);
+        wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        Polygon expected = (Polygon) wktCursor.next();
+        assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
+
+        assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 1e-10);
+    }
+
+    @Test
+    public void testProjectionTransformation() {
+        int count = 400;
+        Envelope e = new Envelope(0,0,40, 40);
+        RandomCoordinateGenerator randomCoordinateGenerator = new RandomCoordinateGenerator(count, e, SpatialReference.create(4326).getTolerance());
+        MultiPoint multiPoint = new MultiPoint();
+        for (int i = 0; i < count; i++) {
+            multiPoint.add(randomCoordinateGenerator._GenerateNewPoint());
+        }
+
+        ProjectionTransformation projectionTransformation = ProjectionTransformation.getEqualArea(multiPoint, spatialReferenceWGS);
+        Geometry projected = OperatorProject.local().execute(multiPoint, projectionTransformation, null);
+        Geometry reprojected = OperatorProject.local().execute(projected, projectionTransformation.getReverse(), null);
+
+        assertTrue(OperatorEquals.local().execute(reprojected, multiPoint, SpatialReference.create(104919), null));
+
+        Geometry reProjectedConvexhull = OperatorProject.local().execute(OperatorConvexHull.local().execute(projected, null), projectionTransformation.getReverse(), null);
+        Geometry convexHull = OperatorConvexHull.local().execute(multiPoint, null);
+
+        assertEquals(convexHull.calculateArea2D(), reProjectedConvexhull.calculateArea2D(), 1);
+    }
+
+    @Test
+    public void testGeometryEnvelope() {
+        MultiPoint multiPoint = new MultiPoint();
+        multiPoint.add(0,0);
+        multiPoint.add(0,20);
+        multiPoint.add(40,40);
+
+        ProjectionTransformation projectionTransformation = ProjectionTransformation.getEqualArea(multiPoint, spatialReferenceWGS);
+        Geometry projected = OperatorProject.local().execute(multiPoint, projectionTransformation, null);
+
+        Envelope2D envelope2D = new Envelope2D();
+        projected.queryEnvelope2D(envelope2D);
+
+        assertTrue(envelope2D.xmax != 40);
+
+    }
 }

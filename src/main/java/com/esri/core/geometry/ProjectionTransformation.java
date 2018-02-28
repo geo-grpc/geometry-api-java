@@ -37,11 +37,42 @@ public class ProjectionTransformation {
         m_toSpatialReference = toSpatialReference;
     }
 
+    public ProjectionTransformation getReverse() {
+        return new ProjectionTransformation(m_toSpatialReference, m_fromSpatialReference);
+    }
+
     PJ getFromProj() {
         return new PJ(m_fromSpatialReference.getProj4());
     }
 
+    SpatialReference getFrom() { return m_fromSpatialReference; }
+    SpatialReference getTo() { return m_toSpatialReference; }
+
     PJ getToProj() {
         return new PJ(m_toSpatialReference.getProj4());
+    }
+
+    public static ProjectionTransformation getEqualArea(Geometry geometry, SpatialReference spatialReference) {
+        Envelope2D inputEnvelope2D = new Envelope2D();
+        geometry.queryEnvelope2D(inputEnvelope2D);
+
+        // From GCS Grab point
+        // TODO change to work with other GCS
+        double a = 6378137.0; // radius of spheroid for WGS_1984
+        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+
+        Point2D ptCenter = new Point2D();
+        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
+        double longitude = ptCenter.x;
+        double latitude = ptCenter.y;
+
+        // create projection transformation that goes from input to input's equal area azimuthal projection
+        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        String proj4 = String.format(
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                longitude,
+                latitude);
+        SpatialReference spatialReferenceAzi = SpatialReference.createFromProj4(proj4);
+        return new ProjectionTransformation(spatialReference, spatialReferenceAzi);
     }
 }
