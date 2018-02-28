@@ -33,17 +33,22 @@ public class EnclosingCircler {
     private MultiVertexGeometryImpl m_multiVertexGeometry;
 
     private int m_circleCount = 96;
-    private SpatialReference m_spatialReference;
+    SpatialReference m_bufferSpatialReference = null;
+    private ProjectionTransformation m_projectionTransformation;
     private ProgressTracker m_progressTracker;
     private double m_tolerance = 1e-10;
 
     EnclosingCircler(Geometry geometry, SpatialReference spatialReference, ProgressTracker progressTracker) {
-        m_multiVertexGeometry = (MultiVertexGeometryImpl) geometry._getImpl();
-        m_spatialReference = spatialReference;
-        m_progressTracker = progressTracker;
-        if (m_spatialReference != null) {
-            m_tolerance = m_spatialReference.getTolerance();
+        if (spatialReference != null && !spatialReference.isLocal()) {
+            m_projectionTransformation = ProjectionTransformation.getEqualArea(geometry, spatialReference);
+            m_bufferSpatialReference = m_projectionTransformation.m_toSpatialReference;
+            m_tolerance = m_bufferSpatialReference.getTolerance();
+            m_multiVertexGeometry = (MultiVertexGeometryImpl)Projecter.project(geometry, m_projectionTransformation, progressTracker)._getImpl();
+            m_multiVertexGeometry._updateAllDirtyIntervals(true);
+        } else {
+            m_multiVertexGeometry = (MultiVertexGeometryImpl) geometry._getImpl();
         }
+        m_progressTracker = progressTracker;
         m_random = new Random(1977);
     }
 
@@ -62,12 +67,16 @@ public class EnclosingCircler {
 
         __updateCircle();
 
-        return __constructCircle();
+        if (m_projectionTransformation == null)
+            return __constructCircle();
+
+        return Projecter.project(__constructCircle(), m_projectionTransformation.getReverse(), m_progressTracker);
     }
 
     private Geometry __constructCircle() {
         Point point = new Point(m_circle.m_center);
-        return OperatorBuffer.local().execute(point, m_spatialReference, m_circle.m_radius, m_progressTracker);
+
+        return OperatorBuffer.local().execute(point, m_bufferSpatialReference, m_circle.m_radius, m_progressTracker);
     }
 
     private Point2D __getShuffledPoint(int index) {
@@ -91,7 +100,10 @@ public class EnclosingCircler {
     private Circle __updateCircle(Point2D newBoundaryPoint) {
         // two point option
         Point2D testCenter = new Point2D();
+
+        // TODO geodesic
         testCenter.interpolate(newBoundaryPoint, __getShuffledPoint(0), .5);
+
         Circle circle = new Circle(testCenter, Point2D.distance(testCenter, newBoundaryPoint));
         for (int i = 1; i < m_processedIndex; i++) {
             Point2D testPoint = __getShuffledPoint(i);
@@ -105,13 +117,33 @@ public class EnclosingCircler {
 
     private Circle __updateCircle(Point2D newBoundaryPoint, Point2D testPoint) {
         Point2D testCenter = new Point2D();
-        testCenter.interpolate(newBoundaryPoint, testPoint, .5);
-        Circle circle = new Circle(testCenter, Point2D.distance(testCenter, newBoundaryPoint));
 
+        // TODO geodesic
+        testCenter.interpolate(newBoundaryPoint, testPoint, .5);
+
+        Circle circle = new Circle(testCenter, Point2D.distance(testCenter, newBoundaryPoint));
         for (int i = 0; i < m_processedIndex; i++) {
             if (circle.contains(__getShuffledPoint(i))) {
                 continue;
             }
+
+            // test current index against testPoint
+            Point2D testCurrentCenter = new Point2D();
+            testCurrentCenter.interpolate(testPoint, __getShuffledPoint(i), .5);
+            Circle testCurrentCircle = new Circle(testCurrentCenter, Point2D.distance(testCurrentCenter, __getShuffledPoint(i)));
+            if (testCurrentCircle.contains(newBoundaryPoint)) {
+                circle = testCurrentCircle;
+                continue;
+            }
+
+            Point2D newCurrentCenter = new Point2D();
+            newCurrentCenter.interpolate(newBoundaryPoint, __getShuffledPoint(i), .5);
+            Circle newCurrentCircle = new Circle(newCurrentCenter, Point2D.distance(newCurrentCenter, __getShuffledPoint(i)));
+            if (newCurrentCircle.contains(testPoint)) {
+                circle = newCurrentCircle;
+                continue;
+            }
+
 
             // create circle from three points
             testCenter = Point2D.calculateCircleCenterFromThreePoints(newBoundaryPoint, testPoint, __getShuffledPoint(i));

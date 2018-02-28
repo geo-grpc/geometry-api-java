@@ -218,4 +218,26 @@ public class TestPoint extends TestCase {
         double area2 = pt.calculateTriangleArea2D(pt2, pt1);
         assertEquals(area, area2);
     }
+
+    @Test
+    public void testCircleCenter() {
+        Point2D pt = new Point2D(-2, -2);
+        Point2D pt2 = new Point2D(2, 2);
+        Point2D pt1 = new Point2D(-2, 2);
+        Point2D center = Point2D.calculateCircleCenterFromThreePoints(pt, pt2, pt1);
+        assertEquals(center.x, 0.0);
+        assertEquals(center.y, 0.0);
+
+        center = Point2D.calculateCircleCenterFromThreePoints(pt1, pt, pt2);
+        assertEquals(center.x, 0.0);
+        assertEquals(center.y, 0.0);
+
+        center = Point2D.calculateCircleCenterFromThreePoints(pt2, pt, pt1);
+        assertEquals(center.x, 0.0);
+        assertEquals(center.y, 0.0);
+
+        center = Point2D.calculateCircleCenterFromThreePoints(pt1, pt2, pt);
+        assertEquals(center.x, 0.0);
+        assertEquals(center.y, 0.0);
+    }
 }

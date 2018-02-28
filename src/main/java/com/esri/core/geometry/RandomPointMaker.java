@@ -53,32 +53,15 @@ class RandomPointMaker {
                                        ProgressTracker progressTracker) throws PJException {
         // TODO for each ring project
 
-        Envelope2D inputEnvelope2D = new Envelope2D();
-        polygon.queryEnvelope2D(inputEnvelope2D);
+        ProjectionTransformation forwardProjectionTransformation = ProjectionTransformation.getEqualArea(polygon, sr);
 
-        // From GCS Grab point
-        // TODO change to work with other GCS
-        double a = 6378137.0; // radius of spheroid for WGS_1984
-        double e2 = 0.0066943799901413165; // ellipticity for WGS_1984
-
-        Point2D ptCenter = new Point2D();
-        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
-        double longitude = ptCenter.x;
-        double latitude = ptCenter.y;
-
-        // create projection transformation that goes from input to input's equal area azimuthal projection
-        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
-        String proj4 = String.format(
-                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-                longitude, latitude);
-        SpatialReference spatialReferenceAzi = SpatialReference.createFromProj4(proj4);
-        ProjectionTransformation forwardProjectionTransformation = new ProjectionTransformation(sr, spatialReferenceAzi);
-
+        Envelope env = new Envelope();
+        polygon.queryEnvelope(env);
         // Project bounding coordinates to equal area
         // equalAreaEnvelopeGeom must be a geometry/polygon because projection of envelope will almost certainly
         // or skew geometry
         // TODO, maybe it would be computationally cheaper or more accurate to project input polygon instead of it's envelope
-        Geometry equalAreaEnvelopeGeom = OperatorProject.local().execute(new Envelope(inputEnvelope2D), forwardProjectionTransformation, progressTracker);
+        Geometry equalAreaEnvelopeGeom = OperatorProject.local().execute(env, forwardProjectionTransformation, progressTracker);
 
         Envelope2D equalAreaEnvelope = new Envelope2D();
         // envelope of projected envelope
@@ -121,7 +104,7 @@ class RandomPointMaker {
         multiPoint.resize(pointCount);
         multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
 
-        ProjectionTransformation backProjectionTransformation = new ProjectionTransformation(spatialReferenceAzi, sr);
+        ProjectionTransformation backProjectionTransformation = forwardProjectionTransformation.getReverse();
         // project inplace instead of projecting a copy using OperatorProject::execute
         Projecter.projectMultiPoint(multiPoint, backProjectionTransformation, progressTracker);
 

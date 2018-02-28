@@ -4,6 +4,7 @@ import com.esri.core.geometry.Geometry.GeometryAccelerationDegree;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,7 @@ public class TestRelation extends TestCase {
                 assertTrue(!result);
 
                 SimpleGeometryCursor simpleGeometryCursor1 = new SimpleGeometryCursor(poly1);
-                SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+                SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
                 HashMap<Integer, Boolean> relate_map =
                         operatorCrosses.execute(poly1, simpleGeometryCursor2, inputSR, null);
                 assertNotNull(relate_map);

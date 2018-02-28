@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1771,7 +1772,7 @@ public class TestImportExport extends TestCase {
         List<Geometry> list2 = new ArrayList<>();
         list2.add(poly1);
         list2.add(poly2);
-        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
 
         OperatorExportToESRIShapeCursor operatorExportToESRIShapeCursor = new OperatorExportToESRIShapeCursor(0, simpleGeometryCursor2);
         OperatorImportFromESRIShapeCursor operatorImportFromESRIShapeCursor = new OperatorImportFromESRIShapeCursor(0, 0, operatorExportToESRIShapeCursor);
@@ -1801,7 +1802,7 @@ public class TestImportExport extends TestCase {
         List<Geometry> list2 = new ArrayList<>();
         list2.add(poly1);
         list2.add(poly2);
-        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
 
         OperatorExportToWkbCursor operatorExportToWkbCursor = new OperatorExportToWkbCursor(0, simpleGeometryCursor2);
         OperatorImportFromWkbCursor operatorImportFromWkbCursor = new OperatorImportFromWkbCursor(0, operatorExportToWkbCursor);
@@ -1816,7 +1817,7 @@ public class TestImportExport extends TestCase {
         assertTrue(!relate_map.get(0));
         assertTrue(!relate_map.get(1));
 
-        simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
         operatorExportToWkbCursor = new OperatorExportToWkbCursor(0, simpleGeometryCursor2);
         operatorImportFromWkbCursor = new OperatorImportFromWkbCursor(0, operatorExportToWkbCursor);
         double[] distances = {400, 400};
@@ -1870,7 +1871,7 @@ public class TestImportExport extends TestCase {
         }
 
 
-        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
         OperatorExportToWktCursor operatorExportToWktCursor = new OperatorExportToWktCursor(0, simpleGeometryCursor2, null);
         operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, operatorExportToWktCursor);
 
@@ -1884,7 +1885,7 @@ public class TestImportExport extends TestCase {
         assertTrue(!relate_map.get(0));
         assertTrue(!relate_map.get(1));
 
-        simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
+        simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
         operatorExportToWktCursor = new OperatorExportToWktCursor(0, simpleGeometryCursor2, null);
         operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, operatorExportToWktCursor);
         double[] distances = {400, 400};

@@ -742,6 +742,13 @@ public final class Point2D implements Serializable {
         return Point2D.construct(NumberUtils.NaN(), NumberUtils.NaN());
     }
 
+    /**
+     * Calculate the center of a circle, whose perimeter contains the points from, mid_point and to
+     * @param from
+     * @param mid_point
+     * @param to
+     * @return
+     */
     static Point2D calculateCircleCenterFromThreePoints(Point2D from, Point2D mid_point, Point2D to) {
         if (from.isEqual(to) || from.isEqual(mid_point) || to.isEqual(mid_point)) {
             return new Point2D(NumberUtils.NaN(), NumberUtils.NaN());

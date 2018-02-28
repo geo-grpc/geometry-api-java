@@ -1,12 +1,10 @@
 package com.esri.core.geometry;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.HashMap;
-import java.util.List;
 
 public class TestCircles extends TestCase {
     @Test
@@ -71,7 +69,7 @@ public class TestCircles extends TestCase {
         }
 
         int run_count = 10;
-        List<Geometry> geometries = new ArrayList<>();
+        ArrayDeque<Geometry> geometries = new ArrayDeque<>();
         for (int i = 0; i < run_count; i++) {
             OperatorEnclosingCircleCursor operatorEnclosingCircleCursor = new OperatorEnclosingCircleCursor(new SimpleGeometryCursor(multiPoint), SpatialReference.create(4326), null);
             Geometry geometry = operatorEnclosingCircleCursor.next();
@@ -79,7 +77,9 @@ public class TestCircles extends TestCase {
         }
 
 
-        Geometry firstGeometry = geometries.get(0);
+//        http://opensourceconnections.com/blog/2014/04/11/indexing-polygons-in-lucene-with-accuracy/
+//        http://my-spatial4j-project.blogspot.be/2014/01/minimum-bounding-circle-algorithm-jts.html
+        Geometry firstGeometry = geometries.peekFirst();
         OperatorEquals operatorEquals = (OperatorEquals) (OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Equals));
         HashMap<Integer, Boolean> results = operatorEquals.execute(firstGeometry, new SimpleGeometryCursor(geometries), SpatialReference.create(4326), null);
         for (Integer key : results.keySet()) {
