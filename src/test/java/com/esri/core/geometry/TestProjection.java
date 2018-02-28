@@ -337,4 +337,47 @@ public class TestProjection extends TestCase {
         assertTrue(envelope2D.xmax != 40);
 
     }
+
+    @Test
+    public void testDateline() {
+        String wktGeom = "POLYGON((-185 0, -185 10, -170 10, -170 0),(-182 3, -172 3, -172 7, -182 7))";
+        Geometry original = OperatorImportFromWkt.local().execute(
+                0,
+                Geometry.Type.Unknown,
+                wktGeom,
+                null);
+        Geometry projected = OperatorProject.local().execute(
+                original,
+                projectionTransformationToMerc, null);
+
+        assertNotNull(projected);
+
+        Geometry reProjected = OperatorProject.local().execute(projected, projectionTransformationToWGS, null);
+        assertNotNull(reProjected);
+
+        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+        assertTrue(OperatorSimplify.local().isSimpleAsFeature(reProjected, spatialReferenceWGS, true, nonSimpleResult, null));
+
+        assertEquals(original.calculateArea2D(), reProjected.calculateArea2D(), 0.00001);
+    }
+
+    @Test
+    public void testWrapNotWGS84() {
+        String wktGeom = "POLYGON((-185 0, -185 10, -170 10, -170 0),(-182 3, -172 3, -172 7, -182 7))";
+        Geometry original = OperatorImportFromWkt.local().execute(0,Geometry.Type.Unknown, wktGeom,null);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4269), spatialReferenceMerc);
+        Geometry projected = OperatorProject.local().execute(
+                original,
+                projectionTransformation, null);
+
+        assertNotNull(projected);
+
+        Geometry reProjected = OperatorProject.local().execute(projected, projectionTransformation.getReverse(), null);
+        assertNotNull(reProjected);
+
+        NonSimpleResult nonSimpleResult = new NonSimpleResult();
+        assertTrue(OperatorSimplify.local().isSimpleAsFeature(reProjected, SpatialReference.create(4269), true, nonSimpleResult, null));
+
+        assertEquals(original.calculateArea2D(), reProjected.calculateArea2D(), 0.00001);
+    }
 }

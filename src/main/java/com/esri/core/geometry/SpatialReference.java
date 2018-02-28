@@ -41,6 +41,10 @@ public abstract class SpatialReference implements Serializable {
     // irrelevant. Needs to be removed after final.
     private static final long serialVersionUID = 2L;
 
+    enum CoordinateSystemType {
+        Uknown, Local, GCS, PCS
+    }
+
     /**
      * Creates an instance of the spatial reference based on the provided well
      * known ID for the horizontal coordinate system.
@@ -65,6 +69,8 @@ public abstract class SpatialReference implements Serializable {
     public static SpatialReference create(String wktext) {
         return SpatialReferenceImpl.createImpl(wktext);
     }
+
+
 
     public static SpatialReference createFromProj4(String proj4test) {
         return SpatialReferenceImpl.createFromProj4Impl(proj4test);
@@ -230,6 +236,8 @@ public abstract class SpatialReference implements Serializable {
         srSerializer.setSpatialReferenceByValue(this);
         return srSerializer;
     }
+
+    abstract CoordinateSystemType getCoordinateSystemType();
 
     /**
      * Returns string representation of the class for debugging purposes. The

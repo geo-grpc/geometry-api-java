@@ -43,15 +43,17 @@ import com.esri.core.geometry.SpatialReferenceImpl;
 import com.esri.core.geometry.VertexDescription.Semantics;
 
 class SpatialReferenceImpl extends SpatialReference {
-    static final boolean no_projection_engine = true;
     public final static int c_SULIMIT32 = 2147483645;
     public final static long c_SULIMIT64 = 9007199254740990L;
     //	https://regex101.com/r/F0FAUw/1
     public final static Pattern m_pattern = Pattern.compile("^([\\w\\W]+AUTHORITY[\\s]*\\[[\\s]*\"EPSG\"[\\s]*,[\\s]*[\"]*([\\d]+)[\"]*[\\s]*][\\s]*][\\s]*)$");
+    public final static Pattern m_proj4wkid = Pattern.compile("^\\+init=epsg:([\\d]+)");
+
 
     enum Precision {
         Integer32, Integer64, FloatingPoint
     }
+
 
     int m_userWkid;// this wkid is provided by user to the create method.
     int m_userLatestWkid;
@@ -108,6 +110,32 @@ class SpatialReferenceImpl extends SpatialReference {
 
     Precision getPrecision() {
         return Precision.Integer64;
+    }
+
+    CoordinateSystemType getCoordinateSystemType() {
+        if (m_userWkid != 0) {
+            if (Wkid.m_gcsToTol.containsKey(m_userWkid)) {
+                return CoordinateSystemType.GCS;
+            } else if (Wkid.m_pcsToTol.containsKey(m_userWkid)) {
+                return CoordinateSystemType.PCS;
+            }
+        }
+        if (m_proj4 != null) {
+            if (m_proj4.contains("proj=longlat")) {
+                return CoordinateSystemType.GCS;
+            } else {
+                return CoordinateSystemType.PCS;
+            }
+        }
+        if (m_userWkt != null) {
+            if (m_userWkt.contains("PROJCS")) {
+                return CoordinateSystemType.PCS;
+            } else {
+                return CoordinateSystemType.GCS;
+            }
+        }
+
+        return CoordinateSystemType.Uknown;
     }
 
     @Override
@@ -233,6 +261,11 @@ class SpatialReferenceImpl extends SpatialReference {
     protected static SpatialReferenceImpl createFromProj4Impl(String proj4Text) {
         SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
         spatRef.m_proj4 = proj4Text;
+
+        Matcher matcher = m_proj4wkid.matcher(spatRef.m_proj4);
+        if (matcher.find()) {
+            spatRef.m_userWkid = Integer.parseInt(matcher.group(1));
+        }
 
         return spatRef;
     }

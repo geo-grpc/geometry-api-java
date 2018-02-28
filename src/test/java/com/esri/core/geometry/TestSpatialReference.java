@@ -162,5 +162,46 @@ public class TestSpatialReference extends TestCase {
         assertNull(spatialReference5.getProj4());
         assertNotNull(spatialReference5.getText());
     }
+
+    @Test
+    public void testProj4EPSG() {
+        String epsg = "+init=epsg:26711";
+        SpatialReference spatialReference = SpatialReference.createFromProj4(epsg);
+        assertEquals(26711, spatialReference.getID());
+        assertEquals(SpatialReference.CoordinateSystemType.PCS, spatialReference.getCoordinateSystemType());
+
+        epsg = "+init=epsg:4326";
+        spatialReference = SpatialReference.createFromProj4(epsg);
+        assertEquals(4326, spatialReference.getID());
+        assertEquals(SpatialReference.CoordinateSystemType.GCS, spatialReference.getCoordinateSystemType());
+
+        String test4 = "PROJCS[\"WGS 84 / UTM zone 17N\",\n" +
+                "    GEOGCS[\"WGS 84\",\n" +
+                "        DATUM[\"WGS_1984\",\n" +
+                "            SPHEROID[\"WGS 84\",6378137,298.257223563,\n" +
+                "                AUTHORITY[\"EPSG\",\"7030\"]],\n" +
+                "            AUTHORITY[\"EPSG\",\"6326\"]],\n" +
+                "        PRIMEM[\"Greenwich\",0,\n" +
+                "            AUTHORITY[\"EPSG\",\"8901\"]],\n" +
+                "        UNIT[\"degree\",0.0174532925199433,\n" +
+                "            AUTHORITY[\"EPSG\",\"9122\"]],\n" +
+                "        AUTHORITY[\"EPSG\",\"4326\"]],\n" +
+                "    PROJECTION[\"Transverse_Mercator\"],\n" +
+                "    PARAMETER[\"latitude_of_origin\",0],\n" +
+                "    PARAMETER[\"central_meridian\",-81],\n" +
+                "    PARAMETER[\"scale_factor\",0.9996],\n" +
+                "    PARAMETER[\"false_easting\",500000],\n" +
+                "    PARAMETER[\"false_northing\",0],\n" +
+                "    UNIT[\"metre\",1,\n" +
+                "        AUTHORITY[\"EPSG\",\"9001\"]],\n" +
+                "    AXIS[\"Easting\",EAST],\n" +
+                "    AXIS[\"Northing\",NORTH]]]\n" +
+                "    ";
+        SpatialReference spatialReference4 = SpatialReference.create(test4);
+        assertEquals(SpatialReference.CoordinateSystemType.PCS, spatialReference4.getCoordinateSystemType());
+
+        spatialReference = SpatialReference.createFromProj4("+proj=longlat +datum=WGS84 +no_defs ");
+        assertEquals(SpatialReference.CoordinateSystemType.GCS, spatialReference.getCoordinateSystemType());
+    }
 }
 
