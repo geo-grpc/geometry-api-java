@@ -16,7 +16,7 @@ public abstract class OperatorEnclosingCircle extends Operator {
      */
     public abstract Geometry execute(Geometry geom, SpatialReference spatialReference, ProgressTracker progressTracker);
 
-    public static OperatorGeneralize local() {
-        return (OperatorGeneralize) OperatorFactoryLocal.getInstance().getOperator(Type.EnclosingCircle);
+    public static OperatorEnclosingCircle local() {
+        return (OperatorEnclosingCircle) OperatorFactoryLocal.getInstance().getOperator(Type.EnclosingCircle);
     }
 }

@@ -28,7 +28,7 @@ public class TestRandomPoints extends TestCase {
         SpatialReference sr = SpatialReference.create(4326);
         MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, .0013, 1977, sr, null);
         assertNotNull(geometry);
-        assertEquals(geometry.getPointCount(), 793194);
+        assertEquals(geometry.getPointCount(), 793185);
         assertNotNull(geometry.getXY(0));
         assertNotNull(geometry.getXY(geometry.getPointCount() - 1));
         Polygon bufferedpoly = (Polygon) OperatorBuffer.local().execute(poly, sr, sr.getTolerance() * 2, null);

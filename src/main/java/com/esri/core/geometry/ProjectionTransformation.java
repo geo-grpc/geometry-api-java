@@ -69,9 +69,9 @@ public class ProjectionTransformation {
         // create projection transformation that goes from input to input's equal area azimuthal projection
         // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
         String proj4 = String.format(
-                "+proj=laea +lat_0=%f +lon_0=%f +x_0=0.0 +y_0=0.0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-                longitude,
-                latitude);
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                latitude,
+                longitude);
         SpatialReference spatialReferenceAzi = SpatialReference.createFromProj4(proj4);
         return new ProjectionTransformation(spatialReference, spatialReferenceAzi);
     }
