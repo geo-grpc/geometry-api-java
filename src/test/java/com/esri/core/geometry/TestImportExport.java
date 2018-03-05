@@ -1896,6 +1896,19 @@ public class TestImportExport extends TestCase {
         assertTrue(relate_map.get(1));
     }
 
+    @Test
+    public void testMultiPointOrdering() {
+        MultiPoint multiPoint = new MultiPoint();
+        for (double longitude = -180; longitude < 180; longitude+=10.0) {
+            for (double latitude = -80; latitude < 80; latitude+=10.0) {
+                multiPoint.add(longitude, latitude);
+            }
+        }
+        String wktGeom = OperatorExportToWkt.local().execute(0, multiPoint, null);
+        Geometry roundTripGeom = OperatorImportFromWkt.local().execute(0, Geometry.Type.Unknown, wktGeom, null);
+        assertTrue(roundTripGeom.equals(multiPoint));
+    }
+
 
     public static Polygon makePolygon() {
         Polygon poly = new Polygon();

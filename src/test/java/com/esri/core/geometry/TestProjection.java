@@ -380,4 +380,20 @@ public class TestProjection extends TestCase {
 
         assertEquals(original.calculateArea2D(), reProjected.calculateArea2D(), 0.00001);
     }
+
+    @Test
+    public void testReProjectMultiPoint() {
+        MultiPoint multiPoint = new MultiPoint();
+        for (double longitude = -180; longitude < 180; longitude+=10.0) {
+            for (double latitude = -80; latitude < 80; latitude+=10.0) {
+                multiPoint.add(longitude, latitude);
+            }
+        }
+
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(3857));
+        Geometry projected = OperatorProject.local().execute(multiPoint, projectionTransformation, null);
+        Geometry reprojected = OperatorProject.local().execute(projected, projectionTransformation.getReverse(), null);
+
+        assertTrue(OperatorEquals.local().execute(multiPoint, reprojected, SpatialReference.create(4326), null));
+    }
 }
