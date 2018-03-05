@@ -146,7 +146,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
-        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyAll, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
@@ -156,6 +156,7 @@ class Projecter {
 //        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
 //        multiVertexGeometryOut._resizeImpl(pointCount);
 //        multiPointOut.resize(pointCount);
+        multiVertexGeometry._updateAllDirtyIntervals(true);
 
         return multiPoint;
     }
@@ -171,7 +172,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
-        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyAll, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 
@@ -180,6 +181,7 @@ class Projecter {
 //
 //        multiVertexGeometryOut.setAttributeStreamRef(0, attributeStreamOfDbl);
 //        multiVertexGeometryOut._resizeImpl(pointCount);
+        multiVertexGeometry._updateAllDirtyIntervals(true);
 
         return polyline;
     }
@@ -194,7 +196,7 @@ class Projecter {
         AttributeStreamOfDbl xyPositions = (AttributeStreamOfDbl) multiVertexGeometry.getAttributeStreamRef(0);
         // TODO check that there isn't a way for grabbing xyzPositions
         transform(projectionTransformation, xyPositions.m_buffer, false);
-        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyAll, true);
 //        AttributeStreamOfDbl attributeStreamOfDbl = new AttributeStreamOfDbl(pointCount * 2);
 //        attributeStreamOfDbl.writeRange(0, pointCount * 2, output, 0, true);
 //
