@@ -26,7 +26,7 @@ package com.esri.core.geometry;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-
+import java.lang.Math;
 import com.esri.core.geometry.SpatialReference;
 import com.esri.core.geometry.SpatialReferenceSerializer;
 import com.esri.core.geometry.VertexDescription;
@@ -58,6 +58,48 @@ public abstract class SpatialReference implements Serializable {
         return spatRef;
     }
 
+    /**
+     * From a lat long wgs84 geometry, get the utm zone for the geometries center
+     * @param geometry
+     * @return
+     */
+    public static SpatialReference createUTM(Geometry geometry) {
+        // TODO this will fail for multipart geometries on either side of the dateline
+        Envelope envelope = new Envelope();
+        geometry.queryEnvelope(envelope);
+
+        // if the geometry is outside of the -180 to 180 range shift it back into range
+        Point point = (Point)OperatorProjectLocal.foldInto360Range(envelope.getCenter(), SpatialReference.create(4326));
+        return createUTM(point.getX(), point.getY());
+    }
+
+    /**
+     * choose the UTM zone that contains the longitude and latitude
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public static SpatialReference createUTM(double longitude, double latitude) {
+        // epsg code for N1 32601
+        int epsg_code = 32601;
+        if (latitude < 0) {
+            // epsg code for S1 32701
+            epsg_code += 100;
+        }
+
+        double diff = longitude + 180.0;
+
+        // TODO ugly
+        if (diff == 0.0) {
+            return SpatialReference.create(epsg_code);
+        }
+
+        // 6 degrees of separation between zones, started with zone one, so subtract 1
+        Double interval_count = Math.ceil(diff / 6);
+        int bump = interval_count.intValue() - 1;
+
+        return SpatialReference.create(epsg_code + bump);
+    }
     /**
      * Creates an instance of the spatial reference based on the provided well
      * known text representation for the horizontal coordinate system.
