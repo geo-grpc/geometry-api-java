@@ -26,7 +26,7 @@ public class TestRandomPoints extends TestCase {
         poly.lineTo(10, 10);
         poly.closePathWithLine();
         SpatialReference sr = SpatialReference.create(4326);
-        MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, .0013, 1977, sr, null);
+        MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, 1.3, 1977, sr, null);
         assertNotNull(geometry);
         assertEquals(geometry.getPointCount(), 793185);
         assertNotNull(geometry.getXY(0));
@@ -54,11 +54,11 @@ public class TestRandomPoints extends TestCase {
     public void testMultiPartPolygonCreate() {
         String wktpolygon2 = "MULTIPOLYGON (((0 0, 0 10, 10 10, 10 0)), ((20 0, 20 10, 30 10, 30 0)))";
         Geometry geometry2 = GeometryEngine.geometryFromWkt(wktpolygon2, 0, Geometry.Type.Unknown);
-        MultiPoint multiPoint2 = (MultiPoint)OperatorRandomPoints.local().execute(geometry2, .0013, 1977, SpatialReference.create(4326), null);
+        MultiPoint multiPoint2 = (MultiPoint)OperatorRandomPoints.local().execute(geometry2, 1.3, 1977, SpatialReference.create(4326), null);
 
         String wktPolygon = "POLYGON((0 0, 0 10, 10 10, 10 0))";
         Geometry geometry = GeometryEngine.geometryFromWkt(wktPolygon, 0, Geometry.Type.Unknown);
-        MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, 0.0013, 1977, SpatialReference.create(4326), null);
+        MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, 1.3, 1977, SpatialReference.create(4326), null);
 
         assertTrue(multiPoint.getPointCount() * 2 > 3179429);
         assertTrue(multiPoint2.getPointCount() * 2 > 3179429);
@@ -69,10 +69,24 @@ public class TestRandomPoints extends TestCase {
         String wkt = "Polygon((0 0, 0 10, 10 10,10 0))";
         Geometry geometry = GeometryEngine.geometryFromWkt(wkt, 0, Geometry.Type.Unknown);
         try {
-            MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, 3, 1977, SpatialReference.create(4326), null);
+            // TODO exception java.lang.OutOfMemoryError: Java heap space for pointsPerSquareKm == 300
+            MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, 1000, 1977, SpatialReference.create(4326), null);
             fail("Expected an GeometryException to be thrown");
         } catch (GeometryException geometryException) {
             assertEquals(geometryException.getMessage(), "Random Point count outside of available");
         }
+    }
+
+    @Test
+    public void testSpecificArea() {
+        double pointsPerKmSquare = 1;
+        Double areaKm = 16207.53;
+        int lowEstimate = areaKm.intValue() - 7;
+        String wkt = "POLYGON ((46.030485054706105 26.017389342815264, 45.997526070331105 25.016021311217134, 47.469694039081105 24.996108304947285, 47.447721382831105 26.007515943484098, 46.030485054706105 26.017389342815264))";
+        Geometry geometry = GeometryEngine.geometryFromWkt(wkt, 0, Geometry.Type.Unknown);
+
+        MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, pointsPerKmSquare, 1977, SpatialReference.create(4326), null);
+        assertTrue(multiPoint.getPointCount() > lowEstimate);
+        assertTrue(multiPoint.getPointCount() < lowEstimate + 20);
     }
 }

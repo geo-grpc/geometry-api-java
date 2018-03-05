@@ -67,7 +67,7 @@ class RandomPointMaker {
         // envelope of projected envelope
         equalAreaEnvelopeGeom.queryEnvelope2D(equalAreaEnvelope);
 
-        double areaKm = equalAreaEnvelope.getArea() / 1000.0;
+        double areaKm = equalAreaEnvelope.getArea() / (1000.0 * 1000.0);
         double pointCountNotCast = Math.ceil(areaKm * pointsPerSquareKm);
         //http://stackoverflow.com/questions/3038392/do-java-arrays-have-a-maximum-size
         if (pointCountNotCast * 2 > Integer.MAX_VALUE - 8) {
@@ -113,6 +113,8 @@ class RandomPointMaker {
         // because if we projected the above array, then we wouldn't benefit from clipping
 
         // Intersect by input geometry
+        // TODO densify polygon for cutting
+//        double geodeticDensify = 1
         return GeometryEngine.intersect(multiPoint, polygon, sr);
     }
 }
