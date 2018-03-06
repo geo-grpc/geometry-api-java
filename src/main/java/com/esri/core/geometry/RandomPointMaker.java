@@ -102,7 +102,7 @@ class RandomPointMaker {
         multiVertexGeometry.setAttributeStreamRef(0, attributeStreamOfDbl);
         //multiVertexGeometry._resizeImpl(pointCount);
         multiPoint.resize(pointCount);
-        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyVerifiedStreams | DirtyFlags.dirtyIntervals | DirtyFlags.isStrongSimple, true);
+        multiVertexGeometry._setDirtyFlag(DirtyFlags.dirtyAll, true);
 
         ProjectionTransformation backProjectionTransformation = forwardProjectionTransformation.getReverse();
         // project inplace instead of projecting a copy using OperatorProject::execute
@@ -114,7 +114,8 @@ class RandomPointMaker {
 
         // Intersect by input geometry
         // TODO densify polygon for cutting
+        Geometry intersector = OperatorGeodeticDensifyByLength.local().execute(polygon, sr, areaKm, GeodeticCurveType.Geodesic, null);
 //        double geodeticDensify = 1
-        return GeometryEngine.intersect(multiPoint, polygon, sr);
+        return GeometryEngine.intersect(multiPoint, intersector, sr);
     }
 }

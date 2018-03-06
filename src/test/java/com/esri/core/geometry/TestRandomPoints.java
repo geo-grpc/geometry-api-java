@@ -28,7 +28,7 @@ public class TestRandomPoints extends TestCase {
         SpatialReference sr = SpatialReference.create(4326);
         MultiPoint geometry = (MultiPoint) operatorRandomPoints.execute(poly, 1.3, 1977, sr, null);
         assertNotNull(geometry);
-        assertEquals(geometry.getPointCount(), 793185);
+        assertEquals(788593, geometry.getPointCount());
         assertNotNull(geometry.getXY(0));
         assertNotNull(geometry.getXY(geometry.getPointCount() - 1));
         Polygon bufferedpoly = (Polygon) OperatorBuffer.local().execute(poly, sr, sr.getTolerance() * 2, null);
@@ -45,7 +45,9 @@ public class TestRandomPoints extends TestCase {
         String wktPolygonNoRing = "POLYGON((0 0, 0 10, 10 10, 10 0))";
         Geometry geometryNoRing = GeometryEngine.geometryFromWkt(wktPolygonNoRing, 0, Geometry.Type.Unknown);
         MultiPoint multiPointNoRing = (MultiPoint)OperatorRandomPoints.local().execute(geometryNoRing, 0.0013, 1977, SpatialReference.create(4326), null);
-        Geometry geom = GeometryEngine.intersect(geometry, multiPointNoRing, SpatialReference.create(4326));
+
+        Geometry intersector = OperatorGeodeticDensifyByLength.local().execute(geometry, SpatialReference.create(4326), 1232535.5660433513, GeodeticCurveType.Geodesic, null);
+        Geometry geom = GeometryEngine.intersect(intersector, multiPointNoRing, SpatialReference.create(4326));
 
         assertEquals(multiPoint.getPointCount(), ((MultiPoint)geom).getPointCount());
     }
@@ -81,11 +83,12 @@ public class TestRandomPoints extends TestCase {
     public void testSpecificArea() {
         double pointsPerKmSquare = 1;
         Double areaKm = 16207.53;
-        int lowEstimate = areaKm.intValue() - 7;
+        int lowEstimate = areaKm.intValue() - 20;
         String wkt = "POLYGON ((46.030485054706105 26.017389342815264, 45.997526070331105 25.016021311217134, 47.469694039081105 24.996108304947285, 47.447721382831105 26.007515943484098, 46.030485054706105 26.017389342815264))";
         Geometry geometry = GeometryEngine.geometryFromWkt(wkt, 0, Geometry.Type.Unknown);
 
         MultiPoint multiPoint = (MultiPoint)OperatorRandomPoints.local().execute(geometry, pointsPerKmSquare, 1977, SpatialReference.create(4326), null);
+
         assertTrue(multiPoint.getPointCount() > lowEstimate);
         assertTrue(multiPoint.getPointCount() < lowEstimate + 20);
     }
