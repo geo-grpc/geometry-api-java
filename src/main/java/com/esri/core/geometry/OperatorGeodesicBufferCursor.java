@@ -24,10 +24,6 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
                                  boolean bReserved,
                                  boolean b_union,
                                  ProgressTracker progressTracker) {
-
-        if (sr.getID() != 4326) {
-            throw new GeometryException("GeodesicBuffer only implemented for 4326, WGS84");
-        }
         m_index = -1;
         m_inputGeoms = inputGeoms;
         m_spatialReference = (SpatialReferenceImpl) sr;

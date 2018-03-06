@@ -168,12 +168,12 @@ public class TestSpatialReference extends TestCase {
         String epsg = "+init=epsg:26711";
         SpatialReference spatialReference = SpatialReference.createFromProj4(epsg);
         assertEquals(26711, spatialReference.getID());
-        assertEquals(SpatialReference.CoordinateSystemType.PCS, spatialReference.getCoordinateSystemType());
+        assertEquals(SpatialReference.CoordinateSystemType.PROJECTED, spatialReference.getCoordinateSystemType());
 
         epsg = "+init=epsg:4326";
         spatialReference = SpatialReference.createFromProj4(epsg);
         assertEquals(4326, spatialReference.getID());
-        assertEquals(SpatialReference.CoordinateSystemType.GCS, spatialReference.getCoordinateSystemType());
+        assertEquals(SpatialReference.CoordinateSystemType.GEOGRAPHIC, spatialReference.getCoordinateSystemType());
 
         String test4 = "PROJCS[\"WGS 84 / UTM zone 17N\",\n" +
                 "    GEOGCS[\"WGS 84\",\n" +
@@ -198,10 +198,10 @@ public class TestSpatialReference extends TestCase {
                 "    AXIS[\"Northing\",NORTH]]]\n" +
                 "    ";
         SpatialReference spatialReference4 = SpatialReference.create(test4);
-        assertEquals(SpatialReference.CoordinateSystemType.PCS, spatialReference4.getCoordinateSystemType());
+        assertEquals(SpatialReference.CoordinateSystemType.PROJECTED, spatialReference4.getCoordinateSystemType());
 
         spatialReference = SpatialReference.createFromProj4("+proj=longlat +datum=WGS84 +no_defs ");
-        assertEquals(SpatialReference.CoordinateSystemType.GCS, spatialReference.getCoordinateSystemType());
+        assertEquals(SpatialReference.CoordinateSystemType.GEOGRAPHIC, spatialReference.getCoordinateSystemType());
     }
 }
 

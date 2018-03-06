@@ -33,8 +33,8 @@ class GeodesicDensifier {
         m_maxLength = maxLength;
 
         // sr is used to define these:
-        m_a = 6378137.0; // radius of spheroid for WGS_1984
-        m_e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+        m_a = sr.getMajorAxis(); // radius of spheroid for WGS_1984
+        m_e2 = sr.getEccentricitySquared(); // ellipticity for WGS_1984
         m_rpu = Math.PI / 180.0;
         m_dpu = 180.0 / Math.PI;
     }

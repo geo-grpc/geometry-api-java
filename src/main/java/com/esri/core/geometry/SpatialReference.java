@@ -31,6 +31,7 @@ import com.esri.core.geometry.SpatialReference;
 import com.esri.core.geometry.SpatialReferenceSerializer;
 import com.esri.core.geometry.VertexDescription;
 import com.fasterxml.jackson.core.JsonParser;
+import org.proj4.PJ;
 
 /**
  * A class that represents the spatial reference for the geometry.
@@ -42,7 +43,7 @@ public abstract class SpatialReference implements Serializable {
     private static final long serialVersionUID = 2L;
 
     enum CoordinateSystemType {
-        Uknown, Local, GCS, PCS
+        Uknown, Local, GEOGRAPHIC, PROJECTED
     }
 
     /**
@@ -231,6 +232,11 @@ public abstract class SpatialReference implements Serializable {
     public abstract String getText();
 
     public abstract String getProj4();
+
+
+    public abstract double getMajorAxis();
+
+    public abstract double getEccentricitySquared();
 
     /**
      * Returns the oldest value of the well known ID for the horizontal

@@ -736,6 +736,27 @@ public class TestGeodetic extends TestCase {
         assertEquals(0, centerPoint.y, 1e-4);
     }
 
+    @Test
+    public void testDifferentDatums() {
+        SpatialReference spatialReferenceWgs = SpatialReference.create(4326);
+        SpatialReference spatialReferenceNad = SpatialReference.create(4269);
+
+        Polyline polyline = new Polyline();
+        polyline.startPath(-172.54, 23.81);
+        polyline.lineTo(-47.74, 86.46);
+
+        Geometry geometryW = OperatorGeodeticDensifyByLength.local().execute(polyline, spatialReferenceWgs, 5000, GeodeticCurveType.Geodesic, null);
+        Geometry geometryW2 = OperatorGeodeticDensifyByLength.local().execute(polyline, spatialReferenceWgs, 5000, GeodeticCurveType.Geodesic, null);
+        Geometry geometryN = OperatorGeodeticDensifyByLength.local().execute(polyline, spatialReferenceNad, 5000, GeodeticCurveType.Geodesic, null);
+        assertFalse(geometryN.equals(geometryW));
+        assertTrue(geometryW.equals(geometryW2));
+
+        Geometry geometryWBuff = OperatorGeodesicBuffer.local().execute(polyline, spatialReferenceWgs, GeodeticCurveType.Geodesic, 200, 20, false, null);
+        Geometry geometryNBuff = OperatorGeodesicBuffer.local().execute(polyline, spatialReferenceNad, GeodeticCurveType.Geodesic, 200, 20, false, null);
+        assertFalse(geometryNBuff.equals(geometryWBuff));
+
+    }
+
     public void testLengthAccurateCR191313() {
         /*
 		 * // random_test(); OperatorFactoryLocal engine =
@@ -755,5 +776,6 @@ public class TestGeodetic extends TestCase {
 		 * assertTrue(Math.abs(length - 2738362.3249366437) < 2e-9 * length);
 		 */
     }
+
 
 }

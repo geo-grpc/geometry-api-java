@@ -31,8 +31,8 @@ import org.junit.Test;
 
 public class TestIntersection extends TestCase {
     static OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
-    static int codeIn = 26910;// NAD_1983_UTM_Zone_10N : GCS 6269
-    static int codeOut = 32610;// WGS_1984_UTM_Zone_10N; : GCS 4326
+    static int codeIn = 26910;// NAD_1983_UTM_Zone_10N : GEOGRAPHIC 6269
+    static int codeOut = 32610;// WGS_1984_UTM_Zone_10N; : GEOGRAPHIC 4326
     static SpatialReference inputSR;
     static SpatialReference outputSR;
 
@@ -52,8 +52,8 @@ public class TestIntersection extends TestCase {
     @Test
     public void testIntersection1() {
         // OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
-        // int codeIn = 26910;//NAD_1983_UTM_Zone_10N : GCS 6269
-        // int codeOut = 32610;//WGS_1984_UTM_Zone_10N; : GCS 4326
+        // int codeIn = 26910;//NAD_1983_UTM_Zone_10N : GEOGRAPHIC 6269
+        // int codeOut = 32610;//WGS_1984_UTM_Zone_10N; : GEOGRAPHIC 4326
         // int codeIn = SpatialReference::PCS_WGS_1984_UTM_10N;
         // int codeOut = SpatialReference::PCS_WORLD_MOLLWEIDE;
         // int codeOut = 102100;

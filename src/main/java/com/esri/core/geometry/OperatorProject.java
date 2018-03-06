@@ -76,9 +76,9 @@ public abstract class OperatorProject extends Operator {
                                        boolean bHasZ) throws org.proj4.PJException;
 
     /**
-     * Folds a geometry into the 360 degree range of the associated spatial reference. If the spatial reference be a 'pannable' PCS or GCS. For other spatial types, the function throws an invalid
-     * argument exception. A pannable PCS it a Rectangular PCS where the x coordinate range is equivalent to a 360 degree range on the defining geographic Coordinate System(GCS). If the spatial
-     * reference is a GCS then it is always pannable(default 360 range for spatial reference in GCS coordinates is -180 to 180)
+     * Folds a geometry into the 360 degree range of the associated spatial reference. If the spatial reference be a 'pannable' PROJECTED or GEOGRAPHIC. For other spatial types, the function throws an invalid
+     * argument exception. A pannable PROJECTED it a Rectangular PROJECTED where the x coordinate range is equivalent to a 360 degree range on the defining geographic Coordinate System(GEOGRAPHIC). If the spatial
+     * reference is a GEOGRAPHIC then it is always pannable(default 360 range for spatial reference in GEOGRAPHIC coordinates is -180 to 180)
      * <p>
      * If the geometry is an Envelope fold_into_360_range returns a polygon, unless the Envelope is empty, in which case the empty envelope is returned. The result geometry will be completely inside of
      * the coordinate system extent. The folding happens where geometry intersects the min or max meridian of the spatial reference and when geometry is completely outside of the min-max meridian range.

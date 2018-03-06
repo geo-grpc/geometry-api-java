@@ -29,12 +29,19 @@ class GeodesicBufferer {
 
         Envelope2D env2D = new Envelope2D();
         geometry.queryLooseEnvelope2D(env2D);
-        if (distance > 0)
-            //         env2D.inflate(distance, distance);
-            GeoDist.inflateEnv2D(geodesicBufferer.m_a, geodesicBufferer.m_e2, env2D, distance, distance);
-
 
         geodesicBufferer.m_spatialReference = sr;
+
+        if (distance > 0){
+            //         env2D.inflate(distance, distance);
+            GeoDist.inflateEnv2D(
+                    geodesicBufferer.m_spatialReference.getMajorAxis(),
+                    geodesicBufferer.m_spatialReference.getEccentricitySquared(),
+                    env2D,
+                    distance,
+                    distance);
+        }
+
         geodesicBufferer.m_geometry = geometry;
         geodesicBufferer.m_tolerance = InternalUtils.calculateToleranceFromGeometry(sr, env2D, true);// conservative to have same effect as simplify
         geodesicBufferer.m_small_tolerance = InternalUtils.calculateToleranceFromGeometry(null, env2D, true);// conservative
@@ -147,8 +154,8 @@ class GeodesicBufferer {
     private double m_dA;
     private boolean m_b_output_loops;
     private boolean m_bfilter;
-    private double m_a;
-    private double m_e2;
+//    private double m_a;
+//    private double m_e2;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
     private static final double DEG_TO_RAD = Math.PI / 180.0;
 
@@ -341,8 +348,8 @@ class GeodesicBufferer {
         m_dA = -1;
         m_b_output_loops = true;
         m_bfilter = true;
-        m_a = 6378137.0; // radius of spheroid for WGS_1984
-        m_e2 = 0.0066943799901413165; // ellipticity for WGS_1984
+//        m_a = 6378137.0; // radius of spheroid for WGS_1984
+//        m_e2 = 0.0066943799901413165; // ellipticity for WGS_1984
     }
 
     private Geometry buffer_() {
@@ -365,9 +372,10 @@ class GeodesicBufferer {
                     Envelope2D env = new Envelope2D();
                     m_geometry.queryEnvelope2D(env);
 
-                    if (GeoDist.getEnvWidth(m_a, m_e2, env) <= -m_distance * 2 ||
-                            GeoDist.getEnvHeight(m_a, m_e2, env) <= m_distance * 2)
+                    if (GeoDist.getEnvWidth(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), env) <= -m_distance * 2 ||
+                            GeoDist.getEnvHeight(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), env) <= m_distance * 2) {
                         return new Polygon(m_geometry.getDescription());
+                    }
                 }
             } else {
                 return new Polygon(m_geometry.getDescription());
@@ -698,7 +706,7 @@ class GeodesicBufferer {
             else {
                 Envelope2D env = new Envelope2D();
                 m_geometry.queryEnvelope2D(env);
-                GeoDist.inflateEnv2D(m_a, m_e2, env, m_distance, m_distance);
+                GeoDist.inflateEnv2D(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), env, m_distance, m_distance);
 //                env.inflate(m_distance, m_distance);
                 polygon.addEnvelope(env, false);
             }
@@ -1033,9 +1041,9 @@ class GeodesicBufferer {
                 edit_shape.getXY(iprev, pt_before);
 
                 // not sure is this is the right direction. might want before to current
-                GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, null, az12, null);
+                GeoDist.geodesic_distance_ngs(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), pt_before.x * DEG_TO_RAD, pt_before.y * DEG_TO_RAD, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, null, az12, null);
                 // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
-                GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
+                GeoDist.geodesic_forward(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
                 pt_left_prev.x = lam2.val * RAD_TO_DEG;
                 pt_left_prev.y = phi2.val * RAD_TO_DEG;
 
@@ -1052,9 +1060,9 @@ class GeodesicBufferer {
             }
 
             // not sure is this is the right direction. might want before to current
-            GeoDist.geodesic_distance_ngs(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, null, az12, null);
+            GeoDist.geodesic_distance_ngs(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, null, az12, null);
             // not sure if this is the correct rotation (maybe should be -Math.PI/2.0)
-            GeoDist.geodesic_forward(m_a, m_e2, pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
+            GeoDist.geodesic_forward(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), pt_current.x * DEG_TO_RAD, pt_current.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
             pt.x = lam2.val * RAD_TO_DEG;
             pt.y = phi2.val * RAD_TO_DEG;
 
@@ -1101,7 +1109,7 @@ class GeodesicBufferer {
                                 "dummy"));
             }
 
-            GeoDist.geodesic_forward(m_a, m_e2, pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
+            GeoDist.geodesic_forward(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), pt_after.x * DEG_TO_RAD, pt_after.y * DEG_TO_RAD, abs_d, az12.val - Math.PI / 2.0, lam2, phi2);
             pt1.x = lam2.val * RAD_TO_DEG;
             pt1.y = phi2.val * RAD_TO_DEG;
 //            pt1.add(pt_after, v_left);
@@ -1467,8 +1475,8 @@ class GeodesicBufferer {
     }
 
     private boolean isDegenerateEnv2D(Envelope2D env2D) {
-        double width = GeoDist.getEnvWidth(m_a, m_e2, env2D);
-        double height = GeoDist.getEnvHeight(m_a, m_e2, env2D);
+        double width = GeoDist.getEnvWidth(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), env2D);
+        double height = GeoDist.getEnvHeight(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), env2D);
 
         if (Math.max(width, height) < m_densify_dist * 0.5)
             return true;
@@ -1539,13 +1547,13 @@ class GeodesicBufferer {
         if (arcStartPt != null && arcEndPt != null) {
             PeDouble az12 = new PeDouble();
             GeoDist.geodesic_distance_ngs(
-                    m_a, m_e2, lamCenter, phiCenter,
+                    m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), lamCenter, phiCenter,
                     arcStartPt.x * DEG_TO_RAD, arcStartPt.y * DEG_TO_RAD,
                     null, az12, null);
             startAzimuth = az12.val;
 
             GeoDist.geodesic_distance_ngs(
-                    m_a, m_e2, lamCenter, phiCenter,
+                    m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), lamCenter, phiCenter,
                     arcEndPt.x * DEG_TO_RAD, arcEndPt.y * DEG_TO_RAD,
                     null, az12, null);
             double endAzimuth = az12.val;
@@ -1569,7 +1577,7 @@ class GeodesicBufferer {
         PeDouble phi2 = new PeDouble();
 
         if (bStartPath) {
-            GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
+            GeoDist.geodesic_forward(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.startPath(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
             if (arcEndPt == null)
                 arcEndPt = new Point2D(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
@@ -1577,7 +1585,7 @@ class GeodesicBufferer {
         startAzimuth += dA;
 
         for (int i = 1; i < real_size; i++) {
-            GeoDist.geodesic_forward(m_a, m_e2, lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
+            GeoDist.geodesic_forward(m_spatialReference.getMajorAxis(), m_spatialReference.getEccentricitySquared(), lamCenter, phiCenter, m_abs_distance, startAzimuth, lam2, phi2);
             dst.lineTo(lam2.val * RAD_TO_DEG, phi2.val * RAD_TO_DEG);
             startAzimuth += dA;
         }

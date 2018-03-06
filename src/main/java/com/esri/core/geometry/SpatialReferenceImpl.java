@@ -25,22 +25,11 @@
 package com.esri.core.geometry;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.lang.ref.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.esri.core.geometry.Envelope2D;
-import com.esri.core.geometry.GeoDist;
-import com.esri.core.geometry.GeometryException;
-import com.esri.core.geometry.PeDouble;
-import com.esri.core.geometry.Point;
-import com.esri.core.geometry.Polyline;
-import com.esri.core.geometry.SpatialReference;
-import com.esri.core.geometry.SpatialReferenceImpl;
-import com.esri.core.geometry.VertexDescription.Semantics;
+import org.proj4.PJ;
 
 class SpatialReferenceImpl extends SpatialReference {
     public final static int c_SULIMIT32 = 2147483645;
@@ -60,7 +49,9 @@ class SpatialReferenceImpl extends SpatialReference {
     int m_userOldestWkid;
     String m_proj4;
     String m_userWkt;// a string, the well-known text.
-
+    PJ m_pj;
+    double m_a;
+    double m_e2;
     // public SgCoordRef m_sgCoordRef;
 
     private final static ReentrantLock m_lock = new ReentrantLock();
@@ -73,6 +64,9 @@ class SpatialReferenceImpl extends SpatialReference {
         m_userOldestWkid = -1;
         m_userWkt = null;
         m_proj4 = null;
+        m_pj = null;
+        m_a = Double.NEGATIVE_INFINITY;
+        m_e2 = Double.NEGATIVE_INFINITY;
     }
 
     @Override
@@ -112,27 +106,42 @@ class SpatialReferenceImpl extends SpatialReference {
         return Precision.Integer64;
     }
 
+
+    PJ getPJ() {
+        if (m_pj == null) {
+            m_pj = new PJ(this.getProj4());
+        }
+        return m_pj;
+    }
+
     CoordinateSystemType getCoordinateSystemType() {
-        if (m_userWkid != 0) {
-            if (Wkid.m_gcsToTol.containsKey(m_userWkid)) {
-                return CoordinateSystemType.GCS;
-            } else if (Wkid.m_pcsToTol.containsKey(m_userWkid)) {
-                return CoordinateSystemType.PCS;
-            }
-        }
-        if (m_proj4 != null) {
-            if (m_proj4.contains("proj=longlat")) {
-                return CoordinateSystemType.GCS;
-            } else {
-                return CoordinateSystemType.PCS;
-            }
-        }
+//        if (m_userWkid != 0) {
+//            if (Wkid.m_gcsToTol.containsKey(m_userWkid)) {
+//                return CoordinateSystemType.GEOGRAPHIC;
+//            } else if (Wkid.m_pcsToTol.containsKey(m_userWkid)) {
+//                return CoordinateSystemType.PROJECTED;
+//            }
+//        }
+//        if (m_proj4 != null) {
+//            if (m_proj4.contains("proj=longlat")) {
+//                return CoordinateSystemType.GEOGRAPHIC;
+//            } else {
+//                return CoordinateSystemType.PROJECTED;
+//            }
+//        }
+        // TODO GEOCENTRIC
         if (m_userWkt != null) {
             if (m_userWkt.contains("PROJCS")) {
-                return CoordinateSystemType.PCS;
-            } else {
-                return CoordinateSystemType.GCS;
+                return CoordinateSystemType.PROJECTED;
+            } else  {
+                return CoordinateSystemType.GEOGRAPHIC;
             }
+
+        }
+        if (getPJ().getType() == PJ.Type.GEOGRAPHIC) {
+            return CoordinateSystemType.GEOGRAPHIC;
+        } else if (getPJ().getType() == PJ.Type.PROJECTED) {
+            return CoordinateSystemType.PROJECTED;
         }
 
         return CoordinateSystemType.Uknown;
@@ -220,6 +229,22 @@ class SpatialReferenceImpl extends SpatialReference {
             return m_userLatestWkid;
 
         return ID_;
+    }
+
+    @Override
+    public double getMajorAxis() {
+        if (Double.isInfinite(m_a)) {
+            m_a = this.getPJ().getSemiMajorAxis();
+        }
+        return m_a;
+    }
+
+    @Override
+    public double getEccentricitySquared() {
+        if (Double.isInfinite(m_e2)) {
+            m_e2 = this.getPJ().getEccentricitySquared();
+        }
+        return m_e2;
     }
 
     public static SpatialReferenceImpl createImpl(int wkid) {
