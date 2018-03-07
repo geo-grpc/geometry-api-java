@@ -163,4 +163,12 @@ public class TestCircles extends TestCase {
 //        assertEquals(0.0, OperatorDifference.local().execute(encircled, geodesicBuffered, spatialReferenceWGS84, null).calculateArea2D(), 1e-8);
         assertTrue(GeometryEngine.contains(geodesicBuffered, encircled, spatialReferenceWGS84));
     }
+
+//    @Test
+//    public void testCircleVertexContain() {
+//        String wkt = "MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 45 20, 30 5, 10 10, 10 30, 20 35), (30 20, 20 25, 20 15, 30 20)))";
+//        Geometry input = OperatorImportFromWkt.local().execute(0, Geometry.Type.Unknown, wkt, null);
+//        Geometry encircled = OperatorEnclosingCircle.local().execute(input, SpatialReference.create(4326), null);
+//        assertTrue(GeometryEngine.contains(encircled, input, SpatialReference.create(4326)));
+//    }
 }

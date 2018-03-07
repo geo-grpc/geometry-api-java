@@ -71,6 +71,9 @@ class Projecter {
     static Geometry project(Geometry geometry,
                             ProjectionTransformation projectionTransformation,
                             ProgressTracker progressTracker) {
+        if (geometry.isEmpty()) {
+            return geometry;
+        }
         // TODO check that all project methods no longer use 'new Geometry'
         // TODO maybe push copy down to each geometry type? Envelope shouldn't create copy, right?
         // TODO is clipping creating a new cloned geometry? Should there should be a check so that there aren't too many unnecessary clones
@@ -98,8 +101,7 @@ class Projecter {
                     break;
             }
         } catch (PJException e) {
-            e.printStackTrace();
-            return result;
+            throw new GeometryException(String.format("Proj4 projection exception:\n{}\n{}", e.getLocalizedMessage(), e.getStackTrace()));
         }
 
         return result;

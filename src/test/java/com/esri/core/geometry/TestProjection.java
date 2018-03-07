@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.proj4.PJ;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 
 /**
@@ -483,5 +484,20 @@ public class TestProjection extends TestCase {
 //        assertEquals(encircled.calculateArea2D(), buffered.calculateArea2D(), 1e-8);
 //        assertEquals(0.0, OperatorDifference.local().execute(encircled, buffered, spatialReferenceWGS84, null).calculateArea2D(), 1e-8);
 //        assertTrue(GeometryEngine.contains(buffered, encircled, spatialReferenceWGS84));
+    }
+
+    @Test
+    public void testETRS() {
+        Point point = new Point(-180, -90);
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(point);
+
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(3035));
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(simpleGeometryCursor, projectionTransformation, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, projectionTransformation.getReverse(), null);
+
+        while (reProjectCursor.hasNext()) {
+            Geometry geometry = reProjectCursor.next();
+            assertTrue(geometry.isEmpty());
+        }
     }
 }

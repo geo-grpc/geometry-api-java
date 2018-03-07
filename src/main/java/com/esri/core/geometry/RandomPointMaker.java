@@ -51,7 +51,7 @@ class RandomPointMaker {
                                        Random numberGenerator,
                                        SpatialReference sr,
                                        ProgressTracker progressTracker) throws PJException {
-        // TODO for each ring project
+        // TODO for each ring project, in order to prevent from creating an excess of points if two parts of a polygon are on opposite sides of the globe.
 
         ProjectionTransformation forwardProjectionTransformation = ProjectionTransformation.getEqualArea(polygon, sr);
 
@@ -80,16 +80,13 @@ class RandomPointMaker {
 
         double[] xy = new double[pointCount * 2];
 
-        double val = 0.0;
         double xdiff = equalAreaEnvelope.xmax - equalAreaEnvelope.xmin;
         double ydiff = equalAreaEnvelope.ymax - equalAreaEnvelope.ymin;
         for (int i = 0; i < pointCount * 2; i++) {
             if (i % 2 == 0) // x val
-                val = numberGenerator.nextDouble() * xdiff + equalAreaEnvelope.xmin;
+                xy[i] = numberGenerator.nextDouble() * xdiff + equalAreaEnvelope.xmin;
             else            // y val
-                val = numberGenerator.nextDouble() * ydiff + equalAreaEnvelope.ymin;
-
-            xy[i] = val;
+                xy[i] = numberGenerator.nextDouble() * ydiff + equalAreaEnvelope.ymin;
         }
 
         // Create Multipoint from vertices
@@ -113,7 +110,7 @@ class RandomPointMaker {
         // because if we projected the above array, then we wouldn't benefit from clipping
 
         // Intersect by input geometry
-        // TODO densify polygon for cutting
+        // TODO reduce densify distance?
         Geometry intersector = OperatorGeodeticDensifyByLength.local().execute(polygon, sr, areaKm, GeodeticCurveType.Geodesic, null);
 //        double geodeticDensify = 1
         return GeometryEngine.intersect(multiPoint, intersector, sr);
