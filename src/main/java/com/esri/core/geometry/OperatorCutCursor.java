@@ -38,6 +38,7 @@ class OperatorCutCursor extends GeometryCursor {
     ProgressTracker m_progressTracker;
     int m_cutIndex;
     ArrayList<MultiPath> m_cuts = null;
+    boolean m_bFirstCall = false;
 
     OperatorCutCursor(boolean bConsiderTouch, Geometry cuttee, Polyline cutter,
                       SpatialReference spatialReference, ProgressTracker progressTracker) {
@@ -51,6 +52,7 @@ class OperatorCutCursor extends GeometryCursor {
         m_tolerance = InternalUtils.calculateToleranceFromGeometry(spatialReference, e, true);
         m_cutIndex = -1;
         m_progressTracker = progressTracker;
+        m_bFirstCall = true;
     }
 
     @Override
@@ -59,10 +61,13 @@ class OperatorCutCursor extends GeometryCursor {
     }
 
     @Override
-    public boolean hasNext() { return m_cutIndex < m_cuts.size(); }
+    public boolean hasNext() {
+        return m_bFirstCall || m_cutIndex < m_cuts.size();
+    }
 
     @Override
     public Geometry next() {
+        m_bFirstCall = false;
         generateCuts_();
         if (++m_cutIndex < m_cuts.size()) {
             return (Geometry) m_cuts.get(m_cutIndex);
