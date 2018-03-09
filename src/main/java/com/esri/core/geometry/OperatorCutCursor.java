@@ -62,7 +62,7 @@ class OperatorCutCursor extends GeometryCursor {
 
     @Override
     public boolean hasNext() {
-        return m_bFirstCall || m_cutIndex < m_cuts.size();
+        return m_bFirstCall || m_cutIndex + 1 < m_cuts.size();
     }
 
     @Override
