@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 
 
 package com.esri.core.geometry;
+
+import static com.esri.core.geometry.SizeOf.SIZE_OF_MAPGEOMETRY;
 
 import java.io.Serializable;
 
@@ -127,16 +129,32 @@ public class MapGeometry implements Serializable {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        SpatialReference sr = getSpatialReference();
-        Geometry g = getGeometry();
-        int hc = 0x2937912;
-        if (sr != null)
-            hc ^= sr.hashCode();
-        if (g != null)
-            hc ^= g.hashCode();
+	/**
+	 * Returns an estimate of this object size in bytes.
+	 * <p>
+	 * This estimate doesn't include the size of the {@link SpatialReference} object
+	 * because instances of {@link SpatialReference} are expected to be shared among
+	 * geometry objects.
+	 *
+	 * @return Returns an estimate of this object size in bytes.
+	 */
+	public long estimateMemorySize() {
+		long sz = SIZE_OF_MAPGEOMETRY;
+		if (m_geometry != null)
+			sz += m_geometry.estimateMemorySize();
+		return sz;
+	}
 
-        return hc;
-    }
+	@Override
+	public int hashCode() {
+		SpatialReference sr = getSpatialReference();
+		Geometry g = getGeometry();
+		int hc = 0x2937912;
+		if (sr != null)
+			hc ^= sr.hashCode();
+		if (g != null)
+			hc ^= g.hashCode();
+		
+		return hc;
+	}
 }

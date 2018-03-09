@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -59,56 +59,58 @@ public class GeometryEngine {
         return geom;
     }
 
-    /**
-     * Imports the MapGeometry from its JSON representation. M and Z values are
-     * not imported from JSON representation.
-     * <p>
-     * See OperatorImportFromJson.
-     *
-     * @param json The JSON representation of the geometry (with spatial
-     *             reference).
-     * @return The MapGeometry instance containing the imported geometry and its
-     * spatial reference.
-     */
-    public static MapGeometry jsonToGeometry(JsonReader json) {
-        MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
-        return geom;
-    }
-
-    /**
-     * Imports the MapGeometry from its JSON representation. M and Z values are
-     * not imported from JSON representation.
-     * <p>
-     * See OperatorImportFromJson.
-     *
-     * @param json The JSON representation of the geometry (with spatial
-     *             reference).
-     * @return The MapGeometry instance containing the imported geometry and its
-     * spatial reference.
-     * @throws IOException
-     * @throws JsonParseException
-     */
-    public static MapGeometry jsonToGeometry(String json) {
-        MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
-        return geom;
-    }
-
-    /**
-     * Exports the specified geometry instance to it's JSON representation.
-     * <p>
-     * See OperatorExportToJson.
-     *
-     * @param wkid     The spatial reference Well Known ID to be used for the JSON
-     *                 representation.
-     * @param geometry The geometry to be exported to JSON.
-     * @return The JSON representation of the specified Geometry.
-     * @see GeometryEngine#geometryToJson(SpatialReference spatialiReference,
-     * Geometry geometry)
-     */
-    public static String geometryToJson(int wkid, Geometry geometry) {
-        return GeometryEngine.geometryToJson(
-                wkid > 0 ? SpatialReference.create(wkid) : null, geometry);
-    }
+	/**
+	 * Imports the MapGeometry from its JSON representation. M and Z values are
+	 * not imported from JSON representation.
+	 * 
+	 * See OperatorImportFromJson.
+	 * 
+	 * @param json
+	 *            The JSON representation of the geometry (with spatial
+	 *            reference).
+	 * @return The MapGeometry instance containing the imported geometry and its
+	 *         spatial reference.
+	 */
+	public static MapGeometry jsonToGeometry(JsonReader json) {
+		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
+		return geom;
+	}
+	
+	/**
+	 * Imports the MapGeometry from its JSON representation. M and Z values are
+	 * not imported from JSON representation.
+	 * 
+	 * See OperatorImportFromJson.
+	 * 
+	 * @param json
+	 *            The JSON representation of the geometry (with spatial
+	 *            reference).
+	 * @return The MapGeometry instance containing the imported geometry and its
+	 *         spatial reference.
+	 */
+	public static MapGeometry jsonToGeometry(String json) {
+		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
+		return geom;
+	}
+	
+	/**
+	 * Exports the specified geometry instance to it's JSON representation.
+	 * 
+	 * See OperatorExportToJson.
+	 * 
+	 * @see GeometryEngine#geometryToJson(SpatialReference spatialiReference,
+	 *      Geometry geometry)
+	 * @param wkid
+	 *            The spatial reference Well Known ID to be used for the JSON
+	 *            representation.
+	 * @param geometry
+	 *            The geometry to be exported to JSON.
+	 * @return The JSON representation of the specified Geometry.
+	 */
+	public static String geometryToJson(int wkid, Geometry geometry) {
+		return GeometryEngine.geometryToJson(
+				wkid > 0 ? SpatialReference.create(wkid) : null, geometry);
+	}
 
     /**
      * Exports the specified geometry instance to it's JSON representation. M
@@ -135,22 +137,22 @@ public class GeometryEngine {
         return exporter.execute(geometry);
     }
 
-    /**
-     * Imports the MapGeometry from its JSON representation. M and Z values are
-     * not imported from JSON representation.
-     * <p>
-     * See OperatorImportFromJson.
-     *
-     * @param json The JSON representation of the geometry (with spatial
-     *             reference).
-     * @return The MapGeometry instance containing the imported geometry and its
-     * spatial reference.
-     * @throws IOException
-     */
-    public static MapGeometry geoJsonToGeometry(String json, int importFlags, Geometry.Type type) {
-        MapGeometry geom = OperatorImportFromGeoJson.local().execute(importFlags, type, json, null);
-        return geom;
-    }
+	/**
+	 * Imports the MapGeometry from its JSON representation. M and Z values are
+	 * not imported from JSON representation.
+	 * 
+	 * See OperatorImportFromJson.
+	 * 
+	 * @param json
+	 *            The JSON representation of the geometry (with spatial
+	 *            reference).
+	 * @return The MapGeometry instance containing the imported geometry and its
+	 *         spatial reference.
+	 */
+	public static MapGeometry geoJsonToGeometry(String json, int importFlags, Geometry.Type type) {
+		MapGeometry geom = OperatorImportFromGeoJson.local().execute(importFlags, type, json, null);
+		return geom;
+	}
 
     /**
      * Exports the specified geometry instance to its GeoJSON representation.
@@ -221,21 +223,24 @@ public class GeometryEngine {
         return op.execute(0, geometry).array();
     }
 
-    /**
-     * Imports a geometry from a WKT string.
-     * <p>
-     * See OperatorImportFromWkt.
-     *
-     * @param wkt          The string containing the geometry in WKT format.
-     * @param importFlags  Use the {@link WktImportFlags} interface.
-     * @param geometryType The required type of the Geometry to be imported. Use Geometry.Type.Unknown if the geometry type needs to be determined from the WKT context.
-     * @return The geometry.
-     * @throws GeometryException when the geometryType is not Geometry.Type.Unknown and the WKT contains a geometry that cannot be converted to the given geometryType.
-     */
-    public static Geometry geometryFromWkt(String wkt, int importFlags, Geometry.Type geometryType) {
-        OperatorImportFromWkt op = (OperatorImportFromWkt) factory.getOperator(Operator.Type.ImportFromWkt);
-        return op.execute(importFlags, geometryType, wkt, null);
-    }
+	/**
+	 * Imports a geometry from a WKT string.
+	 * 
+	 * See OperatorImportFromWkt.
+	 * 
+	 * @param wkt The string containing the geometry in WKT format.
+	 * @param importFlags Use the {@link WktImportFlags} interface.
+	 * @param geometryType The required type of the Geometry to be imported. Use Geometry.Type.Unknown if the geometry type needs to be determined from the WKT context.
+	 * @return The geometry.
+	 * @throws GeometryException when the geometryType is not Geometry.Type.Unknown and the WKT contains a geometry that cannot be converted to the given geometryType.
+	 * @throws IllegalArgumentException if an error is found while parsing the WKT string.
+	 */
+	public static Geometry geometryFromWkt(String wkt, int importFlags,
+			Geometry.Type geometryType) {
+		OperatorImportFromWkt op = (OperatorImportFromWkt) factory
+				.getOperator(Operator.Type.ImportFromWkt);
+		return op.execute(importFlags, geometryType, wkt, null);
+	}
 
     /**
      * Exports a geometry to a string in WKT format.

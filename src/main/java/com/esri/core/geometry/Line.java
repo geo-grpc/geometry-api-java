@@ -29,6 +29,8 @@ import com.esri.core.geometry.VertexDescription.Semantics;
 
 import java.io.Serializable;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_LINE;
+
 /**
  * A straight line between a pair of points.
  */
@@ -39,12 +41,18 @@ public final class Line extends Segment implements Serializable {
         return Type.Line;
     }
 
-    @Override
-    public double calculateLength2D() {
-        double dx = m_xStart - m_xEnd;
-        double dy = m_yStart - m_yEnd;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_LINE + estimateMemorySize(m_attributes);
+	}
+
+	@Override
+	public double calculateLength2D() {
+		double dx = m_xStart - m_xEnd;
+		double dy = m_yStart - m_yEnd;
+		return Math.sqrt(dx * dx + dy * dy);
+	}
 
     @Override
     boolean isDegenerate(double tolerance) {

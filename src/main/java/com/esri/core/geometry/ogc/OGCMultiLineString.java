@@ -39,6 +39,8 @@ import com.esri.core.geometry.WktExportFlags;
 
 import java.nio.ByteBuffer;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_MULTI_LINE_STRING;
+
 public class OGCMultiLineString extends OGCMultiCurve {
 
     public OGCMultiLineString(Polyline poly, SpatialReference sr) {
@@ -78,13 +80,19 @@ public class OGCMultiLineString extends OGCMultiCurve {
         return "MultiLineString";
     }
 
-    @Override
-    public OGCGeometry boundary() {
-        OperatorBoundary op = (OperatorBoundary) OperatorFactoryLocal
-                .getInstance().getOperator(Operator.Type.Boundary);
-        Geometry g = op.execute(polyline, null);
-        return OGCGeometry.createFromEsriGeometry(g, esriSR, true);
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_OGC_MULTI_LINE_STRING + (polyline != null ? polyline.estimateMemorySize() : 0);
+	}
+
+	@Override
+	public OGCGeometry boundary() {
+		OperatorBoundary op = (OperatorBoundary) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Boundary);
+		Geometry g = op.execute(polyline, null);
+		return OGCGeometry.createFromEsriGeometry(g, esriSR, true);
+	}
 
     @Override
     public OGCGeometry locateAlong(double mValue) {

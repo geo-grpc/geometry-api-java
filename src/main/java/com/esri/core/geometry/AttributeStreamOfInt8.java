@@ -29,6 +29,9 @@ import com.esri.core.geometry.VertexDescription.Persistence;
 
 import java.nio.ByteBuffer;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_ATTRIBUTE_STREAM_OF_INT8;
+import static com.esri.core.geometry.SizeOf.sizeOfByteArray;
+
 final class AttributeStreamOfInt8 extends AttributeStreamBase {
 
     private byte[] m_buffer = null;
@@ -148,10 +151,16 @@ final class AttributeStreamOfInt8 extends AttributeStreamBase {
         return size();
     }
 
-    @Override
-    public int getPersistence() {
-        return Persistence.enumInt8;
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_ATTRIBUTE_STREAM_OF_INT8 + sizeOfByteArray(m_buffer.length);
+	}
+
+	@Override
+	public int getPersistence() {
+		return Persistence.enumInt8;
+	}
 
     @Override
     public double readAsDbl(int offset) {

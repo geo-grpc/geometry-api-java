@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@
 
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.VertexDescription.Semantics;
-
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+
+import static com.esri.core.geometry.SizeOf.sizeOfDoubleArray;
 
 /**
  * Common properties and methods shared by all geometric objects. Geometries are
@@ -148,36 +148,55 @@ public abstract class Geometry implements Serializable {
      */
     public abstract int getDimension();
 
-    /**
-     * Returns the VertexDescription of this geomtry.
-     */
-    public VertexDescription getDescription() {
-        return m_description;
-    }
+	/**
+	 * Returns an estimate of this object size in bytes.
+	 * <p>
+	 * This estimate doesn't include the size of the {@link VertexDescription} object
+	 * because instances of {@link VertexDescription} are shared among
+	 * geometry objects.
+	 *
+	 * @return Returns an estimate of this object size in bytes.
+	 */
+	public abstract long estimateMemorySize();
 
-    /**
-     * Assigns the new VertexDescription by adding or dropping attributes. The
-     * Geometry will have the src description as a result.
-     */
-    public void assignVertexDescription(VertexDescription src) {
-        _touch();
-        if (src == m_description)
-            return;
+	protected static long estimateMemorySize(double[] attributes)
+	{
+		return attributes != null ? sizeOfDoubleArray(attributes.length) : 0;
+	}
+
+	/**
+	 * Returns the VertexDescription of this geometry.
+	 * @return VertexDescription
+	 */
+	public VertexDescription getDescription() {
+		return m_description;
+	}
+
+	/**
+	 * Assigns the new VertexDescription by adding or dropping attributes. The
+	 * Geometry will have the src description as a result.
+	 * @param src VertexDescription to assign.
+	 */
+	public void assignVertexDescription(VertexDescription src) {
+		_touch();
+		if (src == m_description)
+			return;
 
         _assignVertexDescriptionImpl(src);
     }
 
     protected abstract void _assignVertexDescriptionImpl(VertexDescription src);
 
-    /**
-     * Merges the new VertexDescription by adding missing attributes from the
-     * src. The Geometry will have a union of the current and the src
-     * descriptions.
-     */
-    public void mergeVertexDescription(VertexDescription src) {
-        _touch();
-        if (src == m_description)
-            return;
+	/**
+	 * Merges the new VertexDescription by adding missing attributes from the
+	 * src. The Geometry will have a union of the current and the src
+	 * descriptions.
+	 * @param src VertexDescription to merge.
+	 */
+	public void mergeVertexDescription(VertexDescription src) {
+		_touch();
+		if (src == m_description)
+			return;
 
         // check if we need to do anything (if the src has same attributes)
         VertexDescription newdescription = VertexDescriptionDesignerImpl.getMergedVertexDescription(m_description, src);
@@ -187,37 +206,40 @@ public abstract class Geometry implements Serializable {
         _assignVertexDescriptionImpl(newdescription);
     }
 
-    /**
-     * A shortcut for getDescription().hasAttribute()
-     */
-    public boolean hasAttribute(int semantics) {
-        return getDescription().hasAttribute(semantics);
-    }
+	/**
+	 * A shortcut for getDescription().hasAttribute()
+	 * @param semantics The VertexDescription.Semantics to check.
+	 * @return Return true if the attribute is present.
+	 */
+	public boolean hasAttribute(int semantics) {
+		return getDescription().hasAttribute(semantics);
+	}
 
-    /**
-     * Adds a new attribute to the Geometry.
-     *
-     * @param semantics
-     */
-    public void addAttribute(int semantics) {
-        _touch();
-        if (m_description.hasAttribute(semantics))
-            return;
+	/**
+	 * Adds a new attribute to the Geometry.
+	 * 
+	 * @param semantics The VertexDescription.Semantics to add.
+	 */
+	public void addAttribute(int semantics) {
+		_touch();
+		if (m_description.hasAttribute(semantics))
+			return;
+		
+		VertexDescription newvd = VertexDescriptionDesignerImpl.getMergedVertexDescription(m_description, semantics);
+		_assignVertexDescriptionImpl(newvd);
+	}
 
-        VertexDescription newvd = VertexDescriptionDesignerImpl.getMergedVertexDescription(m_description, semantics);
-        _assignVertexDescriptionImpl(newvd);
-    }
-
-    /**
-     * Drops an attribute from the Geometry. Dropping the attribute is
-     * equivalent to setting the attribute to the default value for each vertex,
-     * However, it is faster and the result Geometry has smaller memory
-     * footprint and smaller size when persisted.
-     */
-    public void dropAttribute(int semantics) {
-        _touch();
-        if (!m_description.hasAttribute(semantics))
-            return;
+	/**
+	 * Drops an attribute from the Geometry. Dropping the attribute is
+	 * equivalent to setting the attribute to the default value for each vertex,
+	 * However, it is faster and the result Geometry has smaller memory
+	 * footprint and smaller size when persisted.
+	 * @param semantics The VertexDescription.Semantics to drop.
+	 */
+	public void dropAttribute(int semantics) {
+		_touch();
+		if (!m_description.hasAttribute(semantics))
+			return;
 
         VertexDescription newvd = VertexDescriptionDesignerImpl.removeSemanticsFromVertexDescription(m_description, semantics);
         _assignVertexDescriptionImpl(newvd);
@@ -231,10 +253,13 @@ public abstract class Geometry implements Serializable {
                 .getDefaultDescriptor2D());
     }
 
-    /**
-     * Returns the min and max attribute values at the ordinate of the Geometry
-     */
-    public abstract Envelope1D queryInterval(int semantics, int ordinate);
+	/**
+	 * Returns the min and max attribute values at the ordinate of the Geometry.
+	 * @param semantics The semantics of the interval.
+	 * @param ordinate The ordinate of the interval.
+	 * @return The interval.
+	 */
+	public abstract Envelope1D queryInterval(int semantics, int ordinate);
 
     /**
      * Returns the axis aligned bounding box of the geometry.
@@ -243,39 +268,41 @@ public abstract class Geometry implements Serializable {
      */
     public abstract void queryEnvelope(Envelope env);
 
-    // {
-    // Envelope2D e2d = new Envelope2D();
-    // queryEnvelope2D(e2d);
-    // env.setEnvelope2D(e2d);
-    // }
+	/**
+	 * Returns tight bbox of the Geometry in X, Y plane.
+	 * @param env
+	 *            The envelope to return the result in.
+	 */
+	public abstract void queryEnvelope2D(Envelope2D env);
 
-    /**
-     * Returns tight bbox of the Geometry in X, Y plane.
-     */
-    public abstract void queryEnvelope2D(Envelope2D env);
+	/**
+	 * Returns tight bbox of the Geometry in 3D.
+	 * @param env
+	 *            The envelope to return the result in.
+	 */
+	abstract void queryEnvelope3D(Envelope3D env);
 
-    /**
-     * Returns tight bbox of the Geometry in 3D.
-     */
-    abstract void queryEnvelope3D(Envelope3D env);
+	/**
+	 * Returns the conservative bbox of the Geometry in X, Y plane. This is a
+	 * faster method than QueryEnvelope2D. However, the bbox could be larger
+	 * than the tight box.
+	 * @param env
+	 *            The envelope to return the result in.
+	 */
+	public void queryLooseEnvelope2D(Envelope2D env) {
+		queryEnvelope2D(env);
+	}
 
-    /**
-     * Returns the conservative bbox of the Geometry in X, Y plane. This is a
-     * faster method than QueryEnvelope2D. However, the bbox could be larger
-     * than the tight box.
-     */
-    public void queryLooseEnvelope2D(Envelope2D env) {
-        queryEnvelope2D(env);
-    }
-
-    /**
-     * Returns tight conservative box of the Geometry in 3D. This is a faster
-     * method than the QueryEnvelope3D. However, the box could be larger than
-     * the tight box.
-     */
-    void queryLooseEnvelope3D(Envelope3D env) {
-        queryEnvelope3D(env);
-    }
+	/**
+	 * Returns tight conservative box of the Geometry in 3D. This is a faster
+	 * method than the QueryEnvelope3D. However, the box could be larger than
+	 * the tight box.
+	 * @param env
+	 *            The envelope to return the result in.
+	 */
+	void queryLooseEnvelope3D(Envelope3D env) {
+		queryEnvelope3D(env);
+	}
 
     /**
      * IsEmpty returns TRUE when the Geometry object does not contain geometric
@@ -305,18 +332,20 @@ public abstract class Geometry implements Serializable {
      */
     abstract void applyTransformation(Transformation3D transform);
 
-    /**
-     * Creates an instance of an empty geometry of the same type.
-     */
-    public abstract Geometry createInstance();
+	/**
+	 * Creates an instance of an empty geometry of the same type.
+	 * @return The new instance.
+	 */
+	public abstract Geometry createInstance();
 
-    /**
-     * Copies this geometry to another geometry of the same type. The result
-     * geometry is an exact copy.
-     *
-     * @throws GeometryException invalid_argument if the geometry is of different type.
-     */
-    public abstract void copyTo(Geometry dst);
+	/**
+	 * Copies this geometry to another geometry of the same type. The result
+	 * geometry is an exact copy.
+	 * @param dst The geometry instance to copy to.
+	 * @exception GeometryException
+	 *                invalid_argument if the geometry is of different type.
+	 */
+	public abstract void copyTo(Geometry dst);
 
     /**
      * Calculates the area of the geometry. If the spatial reference is a
@@ -496,21 +525,24 @@ public abstract class Geometry implements Serializable {
         return geom;
     }
 
-    /**
-     * Returns boundary of this geometry.
-     * <p>
-     * Polygon and Envelope boundary is a Polyline. For Polyline and Line, the
-     * boundary is a Multi_point consisting of path endpoints. For Multi_point
-     * and Point NULL is returned.
-     */
-    public abstract Geometry getBoundary();
+	/**
+	 * Returns boundary of this geometry.
+	 *
+	 * Polygon and Envelope boundary is a Polyline. For Polyline and Line, the
+	 * boundary is a Multi_point consisting of path end points. For Multi_point and
+	 * Point null is returned.
+	 * @return The boundary geometry.
+	 */
+	public abstract Geometry getBoundary();
 
-    /**
-     * Replaces NaNs in the attribute with the given value.
-     * If the geometry is not empty, it adds the attribute if geometry does not have it yet, and replaces the values.
-     * If the geometry is empty, it adds the attribute and does not set any values.
-     */
-    public abstract void replaceNaNs(int semantics, double value);
+	/**
+	 * Replaces NaNs in the attribute with the given value.
+	 * If the geometry is not empty, it adds the attribute if geometry does not have it yet, and replaces the values.
+	 * If the geometry is empty, it adds the attribute and does not set any values.
+	 * @param semantics The semantics for which to replace the NaNs.
+	 * @param value The value to replace NaNs with.
+	 */
+	public abstract void replaceNaNs(int semantics, double value);
 
     static Geometry _clone(Geometry src) {
         Geometry geom = src.createInstance();
@@ -593,16 +625,17 @@ public abstract class Geometry implements Serializable {
         }
     }
 
-    /**
-     * Returns count of geometry vertices:
-     * 1 for Point, 4 for Envelope, get_point_count for MultiVertexGeometry types,
-     * 2 for segment types
-     * Returns 0 if geometry is empty.
-     */
-    public static int vertex_count(Geometry geom) {
-        Geometry.Type gt = geom.getType();
-        if (Geometry.isMultiVertex(gt.value()))
-            return ((MultiVertexGeometry) geom).getPointCount();
+	/**
+	 * Returns count of geometry vertices: 1 for Point, 4 for Envelope,
+	 * get_point_count for MultiVertexGeometry types, 2 for segment types Returns 0
+	 * if geometry is empty.
+	 * @param geom The geometry to get the vertex count for.
+	 * @return The vertex count.
+	 */
+	public static int vertex_count(Geometry geom) {
+		Geometry.Type gt = geom.getType();
+		if (Geometry.isMultiVertex(gt.value()))
+			return ((MultiVertexGeometry) geom).getPointCount();
 
         if (geom.isEmpty())
             return 0;

@@ -37,16 +37,19 @@ import com.esri.core.geometry.WktExportFlags;
 
 import java.nio.ByteBuffer;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_LINE_STRING;
+
 public class OGCLineString extends OGCCurve {
-    /**
-     * The number of Points in this LineString.
-     */
-    public int numPoints() {
-        if (multiPath.isEmpty())
-            return 0;
-        int d = multiPath.isClosedPath(0) ? 1 : 0;
-        return multiPath.getPointCount() + d;
-    }
+
+	/**
+	 * The number of Points in this LineString.
+	 */
+	public int numPoints() {
+		if (multiPath.isEmpty())
+			return 0;
+		int d = multiPath.isClosedPath(0) ? 1 : 0;
+		return multiPath.getPointCount() + d;
+	}
 
     @Override
     public String asText() {
@@ -118,10 +121,16 @@ public class OGCLineString extends OGCCurve {
         return "LineString";
     }
 
-    @Override
-    public OGCGeometry locateAlong(double mValue) {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_OGC_LINE_STRING + (multiPath != null ? multiPath.estimateMemorySize() : 0);
+	}
+
+	@Override
+	public OGCGeometry locateAlong(double mValue) {
+		throw new UnsupportedOperationException();
+	}
 
     @Override
     public OGCGeometry locateBetween(double mStart, double mEnd) {

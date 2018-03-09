@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,14 +27,15 @@ package com.esri.core.geometry;
 
 import java.io.Serializable;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_POLYGON;
+
 /**
  * A polygon is a collection of one or many interior or exterior rings.
  */
 public class Polygon extends MultiPath implements Serializable {
-
-    private static final long serialVersionUID = 2L;// TODO:remove as we use
-    // writeReplace and
-    // GeometrySerializer
+	private static final long serialVersionUID = 2L;// TODO:remove as we use
+													// writeReplace and
+													// GeometrySerializer
 
     /**
      * Creates a polygon.
@@ -62,15 +63,21 @@ public class Polygon extends MultiPath implements Serializable {
         return Type.Polygon;
     }
 
-    /**
-     * Calculates the ring area for this ring.
-     *
-     * @param ringIndex The index of this ring.
-     * @return The ring area for this ring.
-     */
-    public double calculateRingArea2D(int ringIndex) {
-        return m_impl.calculateRingArea2D(ringIndex);
-    }
+	@Override
+	public long estimateMemorySize() {
+		return SIZE_OF_POLYGON + m_impl.estimateMemorySize();
+	}
+
+	/**
+	 * Calculates the ring area for this ring.
+	 * 
+	 * @param ringIndex
+	 *            The index of this ring.
+	 * @return The ring area for this ring.
+	 */
+	public double calculateRingArea2D(int ringIndex) {
+		return m_impl.calculateRingArea2D(ringIndex);
+	}
 
     /**
      * Returns TRUE if the ring is an exterior ring. Valid only for simple
@@ -131,45 +138,45 @@ public class Polygon extends MultiPath implements Serializable {
                 from_point_index, to_point_index);
     }
 
-    public int getExteriorRingCount() {
-        return m_impl.getOGCPolygonCount();
-    }
+	public int getExteriorRingCount() {
+		return m_impl.getOGCPolygonCount();
+	}
+	
+	public interface FillRule {
+		/**
+		 * odd-even fill rule. This is the default value. A point is in the polygon
+		 * interior if a ray from this point to infinity crosses odd number of segments
+		 * of the polygon.
+		 */
+		public final static int enumFillRuleOddEven = 0;
+		/**
+		 * winding fill rule (aka non-zero winding rule). A point is in the polygon
+		 * interior if a winding number is not zero. To compute a winding number for a
+		 * point, draw a ray from this point to infinity. If N is the number of times
+		 * the ray crosses segments directed up and the M is the number of times it
+		 * crosses segments directed down, then the winding number is equal to N-M.
+		 */
+		public final static int enumFillRuleWinding = 1;
+	};
 
-    public interface FillRule {
-        /**
-         * odd-even fill rule. This is the default value. A point is in the polygon interior if a ray
-         * from this point to infinity crosses odd number of segments of the polygon.
-         */
-        public final static int enumFillRuleOddEven = 0;
-        /**
-         * winding fill rule (aka non-zero winding rule). A point is in the polygon interior if a winding number is not zero.
-         * To compute a winding number for a point, draw a ray from this point to infinity. If N is the number of times the ray
-         * crosses segments directed up and the M is the number of times it crosses segments directed down,
-         * then the winding number is equal to N-M.
-         */
-        public final static int enumFillRuleWinding = 1;
-    }
+	/**
+	 * Fill rule for the polygon that defines the interior of the self intersecting
+	 * polygon. It affects the Simplify operation. Can be use by drawing code to
+	 * pass around the fill rule of graphic path. This property is not persisted in
+	 * any format yet. See also Polygon.FillRule.
+	 */
+	public void setFillRule(int rule) {
+		m_impl.setFillRule(rule);
+	}
 
-    ;
-
-    /**
-     * Fill rule for the polygon that defines the interior of the self intersecting polygon. It affects the Simplify operation.
-     * Can be use by drawing code to pass around the fill rule of graphic path.
-     * This property is not persisted in any format yet.
-     * See also Polygon.FillRule.
-     */
-    public void setFillRule(int rule) {
-        m_impl.setFillRule(rule);
-    }
-
-    /**
-     * Fill rule for the polygon that defines the interior of the self intersecting polygon. It affects the Simplify operation.
-     * Changing the fill rule on the polygon that has no self intersections has no physical effect.
-     * Can be use by drawing code to pass around the fill rule of graphic path.
-     * This property is not persisted in any format yet.
-     * See also Polygon.FillRule.
-     */
-    public int getFillRule() {
-        return m_impl.getFillRule();
-    }
+	/**
+	 * Fill rule for the polygon that defines the interior of the self intersecting
+	 * polygon. It affects the Simplify operation. Changing the fill rule on the
+	 * polygon that has no self intersections has no physical effect. Can be use by
+	 * drawing code to pass around the fill rule of graphic path. This property is
+	 * not persisted in any format yet. See also Polygon.FillRule.
+	 */
+	public int getFillRule() {
+		return m_impl.getFillRule();
+	}
 }

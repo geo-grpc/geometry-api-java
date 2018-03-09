@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,12 +24,43 @@
 
 package com.esri.core.geometry.ogc;
 
+import com.esri.core.geometry.Envelope;
+import com.esri.core.geometry.Envelope1D;
+import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.GeometryCursor;
+import com.esri.core.geometry.GeometryCursorAppend;
+import com.esri.core.geometry.GeometryEngine;
+import com.esri.core.geometry.JsonParserReader;
+import com.esri.core.geometry.MapGeometry;
+import com.esri.core.geometry.MapOGCStructure;
+import com.esri.core.geometry.MultiPoint;
+import com.esri.core.geometry.NumberUtils;
+import com.esri.core.geometry.OGCStructure;
+import com.esri.core.geometry.Operator;
+import com.esri.core.geometry.OperatorBuffer;
+import com.esri.core.geometry.OperatorConvexHull;
+import com.esri.core.geometry.OperatorExportToGeoJson;
+import com.esri.core.geometry.OperatorExportToWkb;
+import com.esri.core.geometry.OperatorFactoryLocal;
+import com.esri.core.geometry.OperatorImportFromESRIShape;
+import com.esri.core.geometry.OperatorImportFromGeoJson;
+import com.esri.core.geometry.OperatorImportFromWkb;
+import com.esri.core.geometry.OperatorImportFromWkt;
+import com.esri.core.geometry.OperatorIntersection;
+import com.esri.core.geometry.OperatorSimplify;
+import com.esri.core.geometry.OperatorSimplifyOGC;
+import com.esri.core.geometry.OperatorUnion;
+import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
+import com.esri.core.geometry.Polyline;
+import com.esri.core.geometry.SimpleGeometryCursor;
+import com.esri.core.geometry.SpatialReference;
+import com.esri.core.geometry.VertexDescription;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.esri.core.geometry.*;
 
 /**
  * OGC Simple Feature Access specification v.1.2.1
@@ -53,9 +84,20 @@ public abstract class OGCGeometry {
 
     abstract public String geometryType();
 
-    public int SRID() {
-        if (esriSR == null)
-            return 0;
+	/**
+	 * Returns an estimate of this object size in bytes.
+	 * <p>
+	 * This estimate doesn't include the size of the {@link SpatialReference} object
+	 * because instances of {@link SpatialReference} are expected to be shared among
+	 * geometry objects.
+	 *
+	 * @return Returns an estimate of this object size in bytes.
+	 */
+	public abstract long estimateMemorySize();
+
+	public int SRID() {
+		if (esriSR == null)
+			return 0;
 
         return esriSR.getID();
     }

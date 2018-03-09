@@ -38,6 +38,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_CONCRETE_GEOMETRY_COLLECTION;
+
 public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
     public OGCConcreteGeometryCollection(List<OGCGeometry> geoms,
                                          SpatialReference sr) {
@@ -105,17 +107,29 @@ public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
         return "GeometryCollection";
     }
 
-    @Override
-    public String asText() {
-        StringBuilder sb = new StringBuilder("GEOMETRYCOLLECTION ");
-        if (is3D()) {
-            sb.append('Z');
-        }
-        if (isMeasured()) {
-            sb.append('M');
-        }
-        if (is3D() || isMeasured())
-            sb.append(' ');
+	@Override
+	public long estimateMemorySize()
+	{
+		long size = SIZE_OF_OGC_CONCRETE_GEOMETRY_COLLECTION;
+		if (geometries != null) {
+			for (OGCGeometry geometry : geometries) {
+				size += geometry.estimateMemorySize();
+			}
+		}
+		return size;
+	}
+
+	@Override
+	public String asText() {
+		StringBuilder sb = new StringBuilder("GEOMETRYCOLLECTION ");
+		if (is3D()) {
+			sb.append('Z');
+		}
+		if (isMeasured()) {
+			sb.append('M');
+		}
+		if (is3D() || isMeasured())
+			sb.append(' ');
 
         int n = numGeometries();
 

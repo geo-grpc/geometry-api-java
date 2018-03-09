@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@
 
 package com.esri.core.geometry;
 
+import com.esri.core.geometry.VertexDescription.Semantics;
+
 import java.io.Serializable;
 
-import com.esri.core.geometry.VertexDescription.Semantics;
+import static com.esri.core.geometry.SizeOf.SIZE_OF_ENVELOPE;
 
 /**
  * An envelope is an axis-aligned rectangle.
@@ -426,10 +428,16 @@ public class Envelope extends Geometry implements Serializable {
         return 2;
     }
 
-    @Override
-    public void queryEnvelope(Envelope env) {
-        copyTo(env);
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_ENVELOPE + m_envelope.estimateMemorySize() + estimateMemorySize(m_attributes);
+	}
+
+	@Override
+	public void queryEnvelope(Envelope env) {
+		copyTo(env);
+	}
 
     @Override
     public void queryEnvelope2D(Envelope2D env) {

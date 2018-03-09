@@ -47,10 +47,17 @@ abstract class AttributeStreamBase {
      */
     public abstract int virtualSize();
 
-    /**
-     * Returns the Persistence type of the stream.
-     */
-    public abstract int getPersistence();
+	/**
+	 * Returns an estimate of this object size in bytes.
+	 *
+	 * @return Returns an estimate of this object size in bytes.
+	 */
+	public abstract long estimateMemorySize();
+
+	/**
+	 * Returns the Persistence type of the stream.
+	 */
+	public abstract int getPersistence();
 
     /**
      * Reads given element and returns it as double.

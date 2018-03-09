@@ -37,6 +37,8 @@ import com.esri.core.geometry.WktExportFlags;
 
 import java.nio.ByteBuffer;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_POLYGON;
+
 public class OGCPolygon extends OGCSurface {
     public OGCPolygon(Polygon src, int exteriorRing, SpatialReference sr) {
         polygon = new Polygon();
@@ -112,11 +114,17 @@ public class OGCPolygon extends OGCSurface {
         return "Polygon";
     }
 
-    @Override
-    public OGCGeometry locateAlong(double mValue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_OGC_POLYGON + (polygon != null ? polygon.estimateMemorySize() : 0);
+	}
+
+	@Override
+	public OGCGeometry locateAlong(double mValue) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
 
     @Override
     public OGCGeometry locateBetween(double mStart, double mEnd) {

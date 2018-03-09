@@ -39,6 +39,8 @@ import com.esri.core.geometry.WktExportFlags;
 
 import java.nio.ByteBuffer;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_MULTI_POLYGON;
+
 public class OGCMultiPolygon extends OGCMultiSurface {
 
     public OGCMultiPolygon(Polygon src, SpatialReference sr) {
@@ -92,13 +94,19 @@ public class OGCMultiPolygon extends OGCMultiSurface {
         return "MultiPolygon";
     }
 
-    @Override
-    public OGCGeometry boundary() {
-        Polyline polyline = new Polyline();
-        polyline.add(polygon, true); // adds reversed path
-        return (OGCMultiCurve) OGCGeometry.createFromEsriGeometry(polyline,
-                esriSR, true);
-    }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_OGC_MULTI_POLYGON + (polygon != null ? polygon.estimateMemorySize() : 0);
+	}
+
+	@Override
+	public OGCGeometry boundary() {
+		Polyline polyline = new Polyline();
+		polyline.add(polygon, true); // adds reversed path
+		return (OGCMultiCurve) OGCGeometry.createFromEsriGeometry(polyline,
+				esriSR, true);
+	}
 
     @Override
     public OGCGeometry locateAlong(double mValue) {

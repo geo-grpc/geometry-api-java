@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 package com.esri.core.geometry;
 
 import java.io.Serializable;
+
+import static com.esri.core.geometry.SizeOf.SIZE_OF_POLYLINE;
 
 /**
  * A polyline is a collection of one or many paths.
@@ -71,14 +73,19 @@ public class Polyline extends MultiPath implements Serializable {
         return Type.Polyline;
     }
 
-    /**
-     * Returns TRUE when this geometry has exactly same type, properties, and
-     * coordinates as the other geometry.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other == null)
-            return false;
+	@Override
+	public long estimateMemorySize() {
+		return SIZE_OF_POLYLINE + m_impl.estimateMemorySize();
+	}
+
+	/**
+	 * Returns TRUE when this geometry has exactly same type, properties, and
+	 * coordinates as the other geometry.
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other == null)
+			return false;
 
         if (other == this)
             return true;

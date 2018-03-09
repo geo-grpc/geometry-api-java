@@ -30,6 +30,10 @@ import com.esri.core.geometry.VertexDescription.Persistence;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_ATTRIBUTE_STREAM_OF_DBL;
+import static com.esri.core.geometry.SizeOf.SIZE_OF_ATTRIBUTE_STREAM_OF_INT32;
+import static com.esri.core.geometry.SizeOf.sizeOfDoubleArray;
+
 final class AttributeStreamOfDbl extends AttributeStreamBase {
 
     protected double[] m_buffer = null;
@@ -167,21 +171,27 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
         return size();
     }
 
-    // @Override
-    // public void addRange(AttributeStreamBase src, int srcStartIndex, int
-    // count) {
-    // if ((src == this) || !(src instanceof AttributeStreamOfDbl))
-    // throw new IllegalArgumentException();
-    //
-    // AttributeStreamOfDbl as = (AttributeStreamOfDbl) src;
-    //
-    // int len = as.size();
-    // int oldSize = m_size;
-    // resize(oldSize + len, 0);
-    // for (int i = 0; i < len; i++) {
-    // m_buffer[oldSize + i] = as.read(i);
-    // }
-    // }
+	@Override
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_ATTRIBUTE_STREAM_OF_DBL + sizeOfDoubleArray(m_buffer.length);
+	}
+
+	// @Override
+	// public void addRange(AttributeStreamBase src, int srcStartIndex, int
+	// count) {
+	// if ((src == this) || !(src instanceof AttributeStreamOfDbl))
+	// throw new IllegalArgumentException();
+	//
+	// AttributeStreamOfDbl as = (AttributeStreamOfDbl) src;
+	//
+	// int len = as.size();
+	// int oldSize = m_size;
+	// resize(oldSize + len, 0);
+	// for (int i = 0; i < len; i++) {
+	// m_buffer[oldSize + i] = as.read(i);
+	// }
+	// }
 
     @Override
     public int getPersistence() {
