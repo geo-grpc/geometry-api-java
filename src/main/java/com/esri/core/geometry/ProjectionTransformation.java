@@ -45,8 +45,8 @@ public class ProjectionTransformation {
         return ((SpatialReferenceImpl)m_fromSpatialReference).getPJ();
     }
 
-    SpatialReference getFrom() { return m_fromSpatialReference; }
-    SpatialReference getTo() { return m_toSpatialReference; }
+    public SpatialReference getFrom() { return m_fromSpatialReference; }
+    public SpatialReference getTo() { return m_toSpatialReference; }
 
     PJ getToProj() {
         return ((SpatialReferenceImpl)m_toSpatialReference).getPJ();
