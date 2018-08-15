@@ -57,8 +57,7 @@ public abstract class OperatorImportFromJson extends Operator {
     public abstract MapGeometry execute(Geometry.Type type, String string);
 
     public static OperatorImportFromJson local() {
-        return (OperatorImportFromJson) OperatorFactoryLocal.getInstance()
-                .getOperator(Type.ImportFromJson);
+        return (OperatorImportFromJson) OperatorFactoryLocal.getInstance().getOperator(Type.ImportFromJson);
     }
 
 }

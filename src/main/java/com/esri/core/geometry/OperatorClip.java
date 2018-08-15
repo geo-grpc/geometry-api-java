@@ -48,8 +48,7 @@ public abstract class OperatorClip extends Operator {
                                      SpatialReference spatialRef, ProgressTracker progressTracker);
 
     public static OperatorClip local() {
-        return (OperatorClip) OperatorFactoryLocal.getInstance().getOperator(
-                Type.Clip);
+        return (OperatorClip) OperatorFactoryLocal.getInstance().getOperator(Type.Clip);
     }
 
 }

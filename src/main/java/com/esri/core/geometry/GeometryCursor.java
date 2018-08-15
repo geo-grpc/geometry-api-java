@@ -29,7 +29,7 @@ import java.util.Iterator;
  * An abstract Geometry Cursor class.
  */
 public abstract class GeometryCursor implements Iterator<Geometry> {
-    //TODO add count
+    // TODO add count
     // TODO add extent
     // TODO add spatial reference
 
