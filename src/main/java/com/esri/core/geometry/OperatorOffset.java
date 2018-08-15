@@ -32,10 +32,18 @@ public abstract class OperatorOffset extends Operator {
     }
 
     /**
-     * Join types for the offset operation.
+     * Join types for the offset operation. Updated to match grpc int values
      */
     public enum JoinType {
-        Round, Bevel, Miter, Square,
+        Round(0), Bevel(1), Miter(2), Square(3);
+        private final int value;
+        JoinType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
     }
 
     ;
