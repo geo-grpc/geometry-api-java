@@ -22,6 +22,21 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
     }
 
     @Override
+    public GeometryCursor execute(GeometryCursor geoms,
+                                  boolean bRemoveDegenerateParts,
+                                  int maxPointCount,
+                                  GeneralizeType generalizeType,
+                                  SpatialReference spatialReference,
+                                  ProgressTracker progressTracker) {
+        return new OperatorGeneralizeByAreaCursor(geoms,
+                bRemoveDegenerateParts,
+                maxPointCount,
+                generalizeType,
+                spatialReference,
+                progressTracker);
+    }
+
+    @Override
     public Geometry execute(Geometry geom,
                             double percentReduction,
                             boolean bRemoveDegenerateParts,
@@ -39,5 +54,26 @@ final public class OperatorGeneralizeByAreaLocal extends OperatorGeneralizeByAre
                                                 progressTracker);
 
         return geometryCursor.next();
+    }
+
+    @Override
+    public Geometry execute(Geometry geom,
+                            boolean bRemoveDegenerateParts,
+                            int maxPointCount,
+                            GeneralizeType generalizeType,
+                            SpatialReference spatialReference,
+                            ProgressTracker progressTracker) {
+
+        SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(geom);
+
+        GeometryCursor geometryCursor = execute(inputGeomCurs,
+                bRemoveDegenerateParts,
+                maxPointCount,
+                generalizeType,
+                spatialReference,
+                progressTracker);
+
+        return geometryCursor.next();
+
     }
 }

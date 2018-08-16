@@ -2,6 +2,7 @@ package com.esri.core.geometry;
 
 
 import java.util.ArrayList;
+import java.util.stream.DoubleStream;
 
 /**
  * Created by davidraleigh on 4/17/16.
@@ -13,7 +14,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     GeneralizeType m_generalizeType;
     double m_percentReduction;
     SpatialReference m_spatialReference;
-    int m_ptRemovalGoal;
+    int m_maxPointCount;
 
     public OperatorGeneralizeByAreaCursor(GeometryCursor geoms,
                                           double percentReduction,
@@ -27,8 +28,24 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
         m_generalizeType = generalizeType;
         m_percentReduction = percentReduction;
         m_spatialReference = spatialReference;
+
+        m_maxPointCount = 0;
     }
 
+    public OperatorGeneralizeByAreaCursor(GeometryCursor geoms,
+                                          boolean bRemoveDegenerateParts,
+                                          int maxPointCount,
+                                          GeneralizeType generalizeType,
+                                          SpatialReference spatialReference,
+                                          ProgressTracker progressTracker) {
+        m_geoms = geoms;
+        m_progressTracker = progressTracker;
+        m_bRemoveDegenerateParts = bRemoveDegenerateParts;
+        m_generalizeType = generalizeType;
+        m_spatialReference = spatialReference;
+
+        m_maxPointCount = maxPointCount;
+    }
     @Override
     public boolean hasNext() { return m_geoms != null && m_geoms.hasNext(); }
 
@@ -60,6 +77,11 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
         if (geom.isEmpty())
             return geom;
 
+        if (m_maxPointCount > 0) {
+            int pointCount = ((MultiVertexGeometry)geom).getPointCount();
+            m_percentReduction = 100 - 100.0 * ((double)m_maxPointCount) / ((double)pointCount);
+        }
+
         EditShape editShape = new EditShape();
         editShape.addGeometry(geom);
 
@@ -84,7 +106,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
             for (int iPath = editShape.getFirstPath(iGeometry); iPath != -1; iPath = editShape.getNextPath(iPath)) {
                 int n = editShape.getPathSize(iPath);
                 treap.setCapacity(n);
-                int ptCountToRemove = (int) (n * m_percentReduction / 100.0);
+                int ptCountToRemove = (int)Math.ceil(n * m_percentReduction / 100.0);
 
                 // if there are points that will remain after removals, then first create the treap
                 int iVertex = editShape.getFirstVertex(iPath);

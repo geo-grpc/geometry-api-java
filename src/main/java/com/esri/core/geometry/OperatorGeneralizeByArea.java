@@ -23,6 +23,18 @@ public abstract class OperatorGeneralizeByArea extends Operator {
                                            ProgressTracker progressTracker);
 
     /**
+     * Performs the Generalize operation on a geometry set. Point and
+     * multipoint geometries are left unchanged. An envelope is converted to a
+     * polygon.
+     */
+    public abstract GeometryCursor execute(GeometryCursor geoms,
+                                           boolean bRemoveDegenerateParts,
+                                           int maxPointCount,
+                                           GeneralizeType generalizeType,
+                                           SpatialReference spatialReference,
+                                           ProgressTracker progressTracker);
+
+    /**
      * Performs the Generalize operation on a single geometry. Point and
      * multipoint geometries are left unchanged. An envelope is converted to a
      * polygon.
@@ -30,6 +42,18 @@ public abstract class OperatorGeneralizeByArea extends Operator {
     public abstract Geometry execute(Geometry geom,
                                      double percentReduction,
                                      boolean bRemoveDegenerateParts,
+                                     GeneralizeType generalizeType,
+                                     SpatialReference spatialReference,
+                                     ProgressTracker progressTracker);
+
+    /**
+     * Performs the Generalize operation on a single geometry. Point and
+     * multipoint geometries are left unchanged. An envelope is converted to a
+     * polygon.
+     */
+    public abstract Geometry execute(Geometry geom,
+                                     boolean bRemoveDegenerateParts,
+                                     int maxPointCount,
                                      GeneralizeType generalizeType,
                                      SpatialReference spatialReference,
                                      ProgressTracker progressTracker);
