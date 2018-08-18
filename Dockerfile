@@ -1,4 +1,7 @@
-FROM us.gcr.io/echoparklabs/proj.4:latest as builder
+ARG JDK_TAG=8-jdk-slim
+ARG JRE_TAG=${JDK_TAG}
+
+FROM us.gcr.io/echoparklabs/proj.4:${JDK_TAG} as builder
 
 RUN apt-get update
 
@@ -9,10 +12,8 @@ WORKDIR /opt/src/geometry-api-java
 RUN ./gradlew build install
 
 
+FROM us.gcr.io/echoparklabs/proj.4:${JRE_TAG}
 
-FROM us.gcr.io/echoparklabs/proj.4:latest
-
-RUN apt-get update
 
 WORKDIR /opt/src/geometry-api-java/build/libs
 
@@ -22,6 +23,3 @@ COPY --from=builder /opt/src/geometry-api-java/build/libs .
 WORKDIR /opt/src/geometry-api-java/build/test-results
 COPY --from=builder /opt/src/geometry-api-java/build/test-results .
 #COPY ./build/resources/main /opt/src/geometry-api-java/build/resources/main
-
-# TODO how to create an 'latest-apline' as well?
-
