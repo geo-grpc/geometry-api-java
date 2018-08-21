@@ -65,7 +65,7 @@ public class TestJSonToGeomFromWkiOrWkt_CR177613 extends TestCase {
     @Test
     public void testOnlyWKI() throws JsonParseException, IOException {
         String jsonStringSR = "{\"wkid\" : 4326}";
-        JsonParser jsonParserSR = factory.createJsonParser(jsonStringSR);
+        JsonParser jsonParserSR = factory.createParser(jsonStringSR);
         jsonParserSR.nextToken();
 
         MapGeometry mapGeom = GeometryEngine.jsonToGeometry(jsonParserSR);
@@ -92,7 +92,7 @@ public class TestJSonToGeomFromWkiOrWkt_CR177613 extends TestCase {
             String jSonStr = GeometryEngine.geometryToJson(4326, pg);
             JsonFactory jf = new JsonFactory();
 
-            JsonParser jp = jf.createJsonParser(jSonStr);
+            JsonParser jp = jf.createParser(jSonStr);
             jp.nextToken();
             MapGeometry mg = GeometryEngine.jsonToGeometry(jp);
             Geometry gm = mg.getGeometry();

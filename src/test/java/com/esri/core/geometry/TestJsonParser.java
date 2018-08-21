@@ -68,7 +68,7 @@ public class TestJsonParser extends TestCase {
         Point pointEmpty = new Point();
         {
             JsonParser pointWebMerc1Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWebMerc1, point1));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWebMerc1, point1));
             MapGeometry pointWebMerc1MP = GeometryEngine.jsonToGeometry(pointWebMerc1Parser);
             assertTrue(point1.getX() == ((Point) pointWebMerc1MP.getGeometry()).getX());
             assertTrue(point1.getY() == ((Point) pointWebMerc1MP.getGeometry()).getY());
@@ -76,12 +76,12 @@ public class TestJsonParser extends TestCase {
             int srIdAfter = pointWebMerc1MP.getSpatialReference().getID();
             assertTrue(srIdOri == srIdAfter || srIdAfter == 3857);
 
-            pointWebMerc1Parser = factory.createJsonParser(GeometryEngine.geometryToJson(null, point1));
+            pointWebMerc1Parser = factory.createParser(GeometryEngine.geometryToJson(null, point1));
             pointWebMerc1MP = GeometryEngine.jsonToGeometry(pointWebMerc1Parser);
             assertTrue(null == pointWebMerc1MP.getSpatialReference());
 
             String pointEmptyString = GeometryEngine.geometryToJson(spatialReferenceWebMerc1, pointEmpty);
-            pointWebMerc1Parser = factory.createJsonParser(pointEmptyString);
+            pointWebMerc1Parser = factory.createParser(pointEmptyString);
 
             pointWebMerc1MP = GeometryEngine.jsonToGeometry(pointWebMerc1Parser);
             assertTrue(pointWebMerc1MP.getGeometry().isEmpty());
@@ -96,7 +96,7 @@ public class TestJsonParser extends TestCase {
         {
             Point point1 = new Point(10.0, 20.0);
             JsonParser pointWebMerc2Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWebMerc2, point1));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWebMerc2, point1));
             MapGeometry pointWebMerc2MP = GeometryEngine.jsonToGeometry(pointWebMerc2Parser);
             assertTrue(point1.getX() == ((Point) pointWebMerc2MP.getGeometry()).getX());
             assertTrue(point1.getY() == ((Point) pointWebMerc2MP.getGeometry()).getY());
@@ -109,7 +109,7 @@ public class TestJsonParser extends TestCase {
         {
             Point point1 = new Point(10.0, 20.0);
             JsonParser pointWgs84Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, point1));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, point1));
             MapGeometry pointWgs84MP = GeometryEngine.jsonToGeometry(pointWgs84Parser);
             assertTrue(point1.getX() == ((Point) pointWgs84MP.getGeometry()).getX());
             assertTrue(point1.getY() == ((Point) pointWgs84MP.getGeometry()).getY());
@@ -127,7 +127,7 @@ public class TestJsonParser extends TestCase {
 
         {
             JsonParser mPointWgs84Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, multiPoint1));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, multiPoint1));
             MapGeometry mPointWgs84MP = GeometryEngine.jsonToGeometry(mPointWgs84Parser);
             assertTrue(multiPoint1.getPointCount() == ((MultiPoint) mPointWgs84MP.getGeometry()).getPointCount());
             assertTrue(multiPoint1.getPoint(0).getX() == ((MultiPoint) mPointWgs84MP.getGeometry()).getPoint(0).getX());
@@ -142,7 +142,7 @@ public class TestJsonParser extends TestCase {
 
             MultiPoint mPointEmpty = new MultiPoint();
             String mPointEmptyString = GeometryEngine.geometryToJson(spatialReferenceWGS84, mPointEmpty);
-            mPointWgs84Parser = factory.createJsonParser(mPointEmptyString);
+            mPointWgs84Parser = factory.createParser(mPointEmptyString);
 
             mPointWgs84MP = GeometryEngine.jsonToGeometry(mPointWgs84Parser);
             assertTrue(mPointWgs84MP.getGeometry().isEmpty());
@@ -164,7 +164,7 @@ public class TestJsonParser extends TestCase {
 
         {
             JsonParser polylinePathsWgs84Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, polyline));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, polyline));
             MapGeometry mPolylineWGS84MP = GeometryEngine.jsonToGeometry(polylinePathsWgs84Parser);
 
             assertTrue(polyline.getPointCount() == ((Polyline) mPolylineWGS84MP.getGeometry()).getPointCount());
@@ -186,7 +186,7 @@ public class TestJsonParser extends TestCase {
 
             Polyline emptyPolyline = new Polyline();
             String emptyString = GeometryEngine.geometryToJson(spatialReferenceWGS84, emptyPolyline);
-            mPolylineWGS84MP = GeometryEngine.jsonToGeometry(factory.createJsonParser(emptyString));
+            mPolylineWGS84MP = GeometryEngine.jsonToGeometry(factory.createParser(emptyString));
             assertTrue(mPolylineWGS84MP.getGeometry().isEmpty());
             assertTrue(spatialReferenceWGS84.getID() == mPolylineWGS84MP.getSpatialReference().getID());
         }
@@ -205,7 +205,7 @@ public class TestJsonParser extends TestCase {
 
         {
             JsonParser polygonPathsWgs84Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, polygon));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, polygon));
             MapGeometry mPolygonWGS84MP = GeometryEngine.jsonToGeometry(polygonPathsWgs84Parser);
 
             assertTrue(polygon.getPointCount() + 1 == ((Polygon) mPolygonWGS84MP.getGeometry()).getPointCount());
@@ -227,7 +227,7 @@ public class TestJsonParser extends TestCase {
 
             Polygon emptyPolygon = new Polygon();
             String emptyPolygonString = GeometryEngine.geometryToJson(spatialReferenceWGS84, emptyPolygon);
-            polygonPathsWgs84Parser = factory.createJsonParser(emptyPolygonString);
+            polygonPathsWgs84Parser = factory.createParser(emptyPolygonString);
             mPolygonWGS84MP = GeometryEngine.jsonToGeometry(polygonPathsWgs84Parser);
 
             assertTrue(mPolygonWGS84MP.getGeometry().isEmpty());
@@ -242,7 +242,7 @@ public class TestJsonParser extends TestCase {
 
         {
             JsonParser envelopeWGS84Parser = factory
-                    .createJsonParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, envelope));
+                    .createParser(GeometryEngine.geometryToJson(spatialReferenceWGS84, envelope));
             MapGeometry envelopeWGS84MP = GeometryEngine.jsonToGeometry(envelopeWGS84Parser);
             assertTrue(envelope.isEmpty() == envelopeWGS84MP.getGeometry().isEmpty());
             assertTrue(envelope.getXMax() == ((Envelope) envelopeWGS84MP.getGeometry()).getXMax());
@@ -253,7 +253,7 @@ public class TestJsonParser extends TestCase {
 
             Envelope emptyEnvelope = new Envelope();
             String emptyEnvString = GeometryEngine.geometryToJson(spatialReferenceWGS84, emptyEnvelope);
-            envelopeWGS84Parser = factory.createJsonParser(emptyEnvString);
+            envelopeWGS84Parser = factory.createParser(emptyEnvString);
             envelopeWGS84MP = GeometryEngine.jsonToGeometry(envelopeWGS84Parser);
 
             assertTrue(envelopeWGS84MP.getGeometry().isEmpty());
@@ -266,11 +266,11 @@ public class TestJsonParser extends TestCase {
         // CR181369
         {
             String jsonStringPointAndWKT = "{\"x\":10.0,\"y\":20.0,\"spatialReference\":{\"wkt\" : \"PROJCS[\\\"NAD83_UTM_zone_15N\\\",GEOGCS[\\\"GCS_North_American_1983\\\",DATUM[\\\"D_North_American_1983\\\",SPHEROID[\\\"GRS_1980\\\",6378137.0,298.257222101]],PRIMEM[\\\"Greenwich\\\",0.0],UNIT[\\\"Degree\\\",0.0174532925199433]],PROJECTION[\\\"Transverse_Mercator\\\"],PARAMETER[\\\"false_easting\\\",500000.0],PARAMETER[\\\"false_northing\\\",0.0],PARAMETER[\\\"central_meridian\\\",-93.0],PARAMETER[\\\"scale_factor\\\",0.9996],PARAMETER[\\\"latitude_of_origin\\\",0.0],UNIT[\\\"Meter\\\",1.0]]\"} }";
-            JsonParser jsonParserPointAndWKT = factory.createJsonParser(jsonStringPointAndWKT);
+            JsonParser jsonParserPointAndWKT = factory.createParser(jsonStringPointAndWKT);
             MapGeometry mapGeom2 = GeometryEngine.jsonToGeometry(jsonParserPointAndWKT);
             String jsonStringPointAndWKT2 = GeometryEngine.geometryToJson(mapGeom2.getSpatialReference(),
                     mapGeom2.getGeometry());
-            JsonParser jsonParserPointAndWKT2 = factory.createJsonParser(jsonStringPointAndWKT2);
+            JsonParser jsonParserPointAndWKT2 = factory.createParser(jsonStringPointAndWKT2);
             MapGeometry mapGeom3 = GeometryEngine.jsonToGeometry(jsonParserPointAndWKT2);
             assertTrue(((Point) mapGeom2.getGeometry()).getX() == ((Point) mapGeom3.getGeometry()).getX());
             assertTrue(((Point) mapGeom2.getGeometry()).getY() == ((Point) mapGeom3.getGeometry()).getY());
@@ -304,26 +304,26 @@ public class TestJsonParser extends TestCase {
         String jsonStringInvalidWKID = "{\"x\":10.0,\"y\":20.0},\"spatialReference\":{\"wkid\":35253523}}";
         String jsonStringOregon = "{\"xmin\":7531831.219849482,\"ymin\":585702.9799639136,\"xmax\":7750143.589982405,\"ymax\":733289.6299999952,\"spatialReference\":{\"wkid\":102726}}";
 
-        JsonParser jsonParserPt = factory.createJsonParser(jsonStringPt);
-        JsonParser jsonParserMpt = factory.createJsonParser(jsonStringMpt);
-        JsonParser jsonParserMpt3D = factory.createJsonParser(jsonStringMpt3D);
-        JsonParser jsonParserPl = factory.createJsonParser(jsonStringPl);
-        JsonParser jsonParserPl3D = factory.createJsonParser(jsonStringPl3D);
-        JsonParser jsonParserPg = factory.createJsonParser(jsonStringPg);
-        JsonParser jsonParserPg3D = factory.createJsonParser(jsonStringPg3D);
-        JsonParser jsonParserPg2 = factory.createJsonParser(jsonStringPg2);
+        JsonParser jsonParserPt = factory.createParser(jsonStringPt);
+        JsonParser jsonParserMpt = factory.createParser(jsonStringMpt);
+        JsonParser jsonParserMpt3D = factory.createParser(jsonStringMpt3D);
+        JsonParser jsonParserPl = factory.createParser(jsonStringPl);
+        JsonParser jsonParserPl3D = factory.createParser(jsonStringPl3D);
+        JsonParser jsonParserPg = factory.createParser(jsonStringPg);
+        JsonParser jsonParserPg3D = factory.createParser(jsonStringPg3D);
+        JsonParser jsonParserPg2 = factory.createParser(jsonStringPg2);
         @SuppressWarnings("unused")
-        JsonParser jsonParserSR = factory.createJsonParser(jsonStringSR);
-        JsonParser jsonParserEnv = factory.createJsonParser(jsonStringEnv);
-        JsonParser jsonParserPg3 = factory.createJsonParser(jsonStringPg3);
+        JsonParser jsonParserSR = factory.createParser(jsonStringSR);
+        JsonParser jsonParserEnv = factory.createParser(jsonStringEnv);
+        JsonParser jsonParserPg3 = factory.createParser(jsonStringPg3);
         @SuppressWarnings("unused")
-        JsonParser jsonParserCrazy1 = factory.createJsonParser(jsonString2SpatialReferences);
+        JsonParser jsonParserCrazy1 = factory.createParser(jsonString2SpatialReferences);
         @SuppressWarnings("unused")
-        JsonParser jsonParserCrazy2 = factory.createJsonParser(jsonString2SpatialReferences2);
-        JsonParser jsonParserInvalidWKID = factory.createJsonParser(jsonStringInvalidWKID);
+        JsonParser jsonParserCrazy2 = factory.createParser(jsonString2SpatialReferences2);
+        JsonParser jsonParserInvalidWKID = factory.createParser(jsonStringInvalidWKID);
         @SuppressWarnings("unused")
-        JsonParser jsonParseHongKon = factory.createJsonParser(jsonStringHongKon);
-        JsonParser jsonParseOregon = factory.createJsonParser(jsonStringOregon);
+        JsonParser jsonParseHongKon = factory.createParser(jsonStringHongKon);
+        JsonParser jsonParseOregon = factory.createParser(jsonStringOregon);
 
         MapGeometry mapGeom = GeometryEngine.jsonToGeometry(jsonParserPt);
         // showProjectedGeometryInfo(mapGeom);
@@ -422,7 +422,7 @@ public class TestJsonParser extends TestCase {
             String jSonStr = GeometryEngine.geometryToJson(spatialReference, pg);
             JsonFactory jf = new JsonFactory();
 
-            JsonParser jp = jf.createJsonParser(jSonStr);
+            JsonParser jp = jf.createParser(jSonStr);
             jp.nextToken();
             MapGeometry mg = GeometryEngine.jsonToGeometry(jp);
             Geometry gm = mg.getGeometry();
@@ -559,7 +559,7 @@ public class TestJsonParser extends TestCase {
         String correctPolygon = "{\"rings\":[[[-113,34],[-105,34],[-108,40],[-113,34]]],\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}";
         assertTrue(outputPolygon.equals(correctPolygon));
         JsonFactory jf = new JsonFactory();
-        JsonParser jp = jf.createJsonParser(outputPolygon);
+        JsonParser jp = jf.createParser(outputPolygon);
         jp.nextToken();
         MapGeometry mg = GeometryEngine.jsonToGeometry(jp);
         @SuppressWarnings("unused")
