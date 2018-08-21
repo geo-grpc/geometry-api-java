@@ -125,7 +125,8 @@ public class TestUnion extends TestCase {
     @Test
     public void testQuadTreeIterator() {
         int size = 1000;
-        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(bufferedPointList.stream().collect(Collectors.toList()).subList(0, size));
+        ArrayDeque<Geometry> bufferedArrayDequ = new ArrayDeque<>(new ArrayList<>(bufferedPointList).subList(0, size));
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(bufferedArrayDequ);
 
         HashMap<Integer, Geometry> m_quadTreeMap = new HashMap<>();
         Envelope2D quad_envelope2D = new Envelope2D();
@@ -195,46 +196,4 @@ public class TestUnion extends TestCase {
 //        Geometry result = operatorGeodesicBufferCursor.next();
 //        assertTrue(result.calculateArea2D() > 0);
 //    }
-//    /**
-//     * @since 1.7
-//     */
-//    @Ignore("This test requires data too large to keep in repo")
-//    @Test
-//    public static void testRicksSA() {
-//        try {
-//            OperatorImportFromGeoJson op = (OperatorImportFromGeoJson) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ImportFromGeoJson);
-//
-//            byte[] encoded = Files.readAllBytes(Paths.get("/Users/davidraleigh/data/descartes/crops/shapes_v1c.json"));
-//            String testData = new String(encoded, Charset.defaultCharset());
-//            JSONObject geoJsonObject = new JSONObject(testData);
-//            Iterator<String> iter = geoJsonObject.keys();
-//            List<Geometry> geometryList = new ArrayList<Geometry>();
-//            OperatorSimplify operatorSimplify = (OperatorSimplify.local());
-//            SpatialReference sr = SpatialReference.create(4326);
-//            while (iter.hasNext())
-//            {
-//                JSONObject jsonObject = geoJsonObject.getJSONObject(iter.next());
-//                MapGeometry mg = op.execute(0, Geometry.Type.Unknown, jsonObject.toString(), null);
-//                Geometry mgSimple = operatorSimplify.execute(mg.getGeometry(), sr, true, null);
-//                geometryList.add(mgSimple);
-//            }
-//            SimpleGeometryCursor sgc = new SimpleGeometryCursor(geometryList);
-//            OperatorUnion union = (OperatorUnion) OperatorFactoryLocal
-//                    .getInstance().getOperator(Operator.Type.Union);
-//
-//
-//
-//            GeometryCursor outputCursor = union.execute(sgc, sr, null);
-//            Geometry result = outputCursor.next();
-//            OperatorExportToGeoJson operatorExportToGeoJson = OperatorExportToGeoJson.local();
-//
-//            Geometry resSimple = operatorSimplify.execute(result, sr, true, null);
-//
-//            String s = operatorExportToGeoJson.execute(resSimple);
-//            int a = 0;
-//        } catch (Exception e) {
-//            assertNull(e);
-//        }
-//
-//	}
 }
