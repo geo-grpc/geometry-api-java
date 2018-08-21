@@ -83,14 +83,23 @@ public class TestProjectionGigsData extends TestCase {
 
             if (i == 0) {
                 leftPolyline.startPath(pt1);
+                leftPolygon.startPath(pt1);
+
                 rightPolyline.startPath(pt2);
+                rightPolygon.startPath(pt2);
             } else {
                 leftPolyline.lineTo(pt1);
+                leftPolygon.lineTo(pt1);
+
                 rightPolyline.lineTo(pt2);
+                rightPolygon.lineTo(pt2);
             }
             leftMultiPoint.add(pt1);
             rightMultiPoint.add(pt2);
         }
+
+        leftPolygon.closeAllPaths();
+        rightPolygon.closeAllPaths();
 
         /*
         * "tests": [
@@ -293,37 +302,32 @@ public class TestProjectionGigsData extends TestCase {
         assertTrue(this.description, true);
     }
 
-    @Ignore
+
     @Test
     public void testConversionMultiPoints() throws Exception {
         assertTrue(this.description, true);
     }
 
-    @Ignore
     @Test
     public void testRoundtripMultiPoints() throws Exception {
         assertTrue(this.description, true);
     }
 
-    @Ignore
     @Test
     public void testConversionPolyline() throws Exception {
         assertTrue(this.description, true);
     }
 
-    @Ignore
     @Test
     public void testRoundtripPolyline() throws Exception {
         assertTrue(this.description, true);
     }
 
-    @Ignore
     @Test
     public void testConversionPolygon() throws Exception {
         assertTrue(this.description, true);
     }
 
-    @Ignore
     @Test
     public void testRoundtripPolygon() throws Exception {
         assertTrue(this.description, true);
