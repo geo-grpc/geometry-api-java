@@ -143,10 +143,10 @@ public class TestQuadTree extends TestCase {
                     while ((element_handle = iterator.next()) != -1) {
                         count_upper++;
                         int index = quad_tree_blue.getElement(element_handle);
-                        Boolean iter = (Boolean) map1.get(new Integer(index));
+                        Boolean iter = (Boolean) map1.get(index);
                         if (iter == null) {
                             count++;
-                            map1.put(new Integer(index), new Boolean(true));
+                            map1.put(index, true);
                         }
 
                         intersections_per_query++;
@@ -179,17 +179,18 @@ public class TestQuadTree extends TestCase {
                     while ((element_handle = iterator_duplicates.next()) != -1) {
                         count_upper++;
                         int index = quad_tree_blue_duplicates.getElement(element_handle);
-                        Boolean iter = (Boolean) map2.get(new Integer(index));
+                        Boolean iter = (Boolean) map2.get(index);
                         if (iter == null) {
                             count_duplicates++;
-                            map2.put(new Integer(index), new Boolean(true));
+                            map2.put(index, true);
                         }
+
 
                         Boolean iter_lower = (Boolean) map_per_query.get(index);
                         if (iter_lower == null) {
                             count_lower++;
                             intersections_per_query_duplicates++;
-                            map_per_query.put(new Integer(index), new Boolean(true));
+                            map_per_query.put(index, true);
                         }
 
                         int q = quad_tree_blue_duplicates.getQuad(element_handle);
@@ -286,7 +287,7 @@ public class TestQuadTree extends TestCase {
                         Boolean iter = (Boolean) map1.get(index);
                         if (iter == null) {
                             count++;
-                            map1.put(new Integer(index), new Boolean(true));
+                            map1.put(index, true);
                         }
 
                         intersections_per_query++;
@@ -322,7 +323,7 @@ public class TestQuadTree extends TestCase {
                         Boolean iter = (Boolean) map2.get(index);
                         if (iter == null) {
                             count_sorted++;
-                            map2.put(new Integer(index), new Boolean(true));
+                            map2.put(index, true);
                         }
 
                         intersections_per_query_sorted++;
@@ -362,7 +363,7 @@ public class TestQuadTree extends TestCase {
                     continue;
 
                 int h = qt.insert(i, env);
-                data.put(new Integer(h), env);
+                data.put(h, env);
             }
 
             int ecount = 0;
@@ -375,7 +376,7 @@ public class TestQuadTree extends TestCase {
                 iter.resetIterator((Envelope2D) entry.getValue(), 0.001);
                 boolean remove_self = false;
                 for (int h = iter.next(); h != -1; h = iter.next()) {
-                    if (h != entry.getKey().intValue())
+                    if (h != entry.getKey())
                         handles.add(h);
                     else {
                         remove_self = true;
@@ -389,7 +390,7 @@ public class TestQuadTree extends TestCase {
                 }
 
                 if (remove_self)
-                    qt.removeElement(entry.getKey().intValue());
+                    qt.removeElement(entry.getKey());
                 handles.resize(0);
             }
 
