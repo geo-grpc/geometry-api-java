@@ -19,7 +19,23 @@ This library depends on the JNI enabled Proj.4 repo maintained [here](https://gi
 ./gradlew build install
 ```
 
+## Building for developement
+
 As of right now I've only debugged this library using Intellij. The .idea file is included in the repo, so if you'd like you can call `/usr/local/bin/idea .idea` to open up the project. You might have to go into your preferences `Build, Execution, Deployment` -> `Build Tools` -> `Gradle` -> `Runner` and for the "Run Tests using" drop down select `Gradle Test Runner`
+
+### Building Protobuf
+To compile the protobuf code you'll need to follow the below instructions
+https://github.com/grpc/grpc-java/blob/master/COMPILING.md#build-protobuf
+
+### Test Running and examples
+For Intellij set the `java.library.path`, [this StackOverflow post](http://stackoverflow.com/a/19311972/445372) describes debugging and building with it. And in the case of Gradle, I don't know where to set the following:
+```bash
+-Djava.library.path=<path to the libproj, if needed>
+```
+for example on my mac, in Intellij, I have set the `VM Options` in my test configuration to:
+```bash
+-ea  -Djava.library.path=/usr/local/lib/
+```
 
 ## Build Docker Image
 
