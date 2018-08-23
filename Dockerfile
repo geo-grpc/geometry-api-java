@@ -1,7 +1,9 @@
 ARG JDK_TAG=8-jdk-slim
 ARG JRE_TAG=${JDK_TAG}
 
-FROM us.gcr.io/echoparklabs/proj.4:${JDK_TAG} as builder
+FROM echoparklabs/proj.4:${JDK_TAG} as builder
+
+MAINTAINER David Raleigh <david@echoparklabs.io>
 
 RUN apt-get update
 

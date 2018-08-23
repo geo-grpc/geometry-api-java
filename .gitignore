@@ -56,3 +56,4 @@ gradle-app.setting
 *.orig
 docs
 *.log
+.idea/workspace.xml
