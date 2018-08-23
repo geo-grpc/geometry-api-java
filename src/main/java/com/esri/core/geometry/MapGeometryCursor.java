@@ -23,10 +23,12 @@
  */
 package com.esri.core.geometry;
 
+import java.util.Iterator;
+
 /**
  * An abstract Geometry Cursor class.
  */
-public abstract class MapGeometryCursor {
+public abstract class MapGeometryCursor implements Iterator<MapGeometry> {
 
     /**
      * Moves the cursor to the next ProjectedGeometry. Returns null when reached
@@ -44,4 +46,6 @@ public abstract class MapGeometryCursor {
      * preserve an ID during an operation.
      */
     public abstract int getGeometryID();
+
+    public abstract boolean hasNext();
 }

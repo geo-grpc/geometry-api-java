@@ -40,8 +40,6 @@ class OperatorImportFromGeoJsonLocal extends OperatorImportFromGeoJson {
         }
     }
 
-    ;
-
     static interface GeoJsonValues {
         public final static int Point = GeoJsonType.Point.geogsjonvalue();
         public final static int LineString = GeoJsonType.LineString.geogsjonvalue();

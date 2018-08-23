@@ -39,10 +39,12 @@
 
 package com.esri.core.geometry;
 
+import java.util.Iterator;
+
 /**
  * An abstract JsonReader Cursor class.
  */
-abstract class JsonReaderCursor {
+abstract class JsonReaderCursor implements Iterator<JsonReader> {
 
     /**
      * Moves the cursor to the next JsonReader. Returns null when reached the
@@ -61,4 +63,5 @@ abstract class JsonReaderCursor {
      */
     public abstract int getID();
 
+    public abstract boolean hasNext();
 }

@@ -34,7 +34,6 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
     int m_index = -1;
     MapGeometryCursor m_mapGeometryCursor = null;
-    MapGeometry mapGeometry = null;
     ArrayDeque<Geometry> m_geometryDeque = null;
 
     public SimpleGeometryCursor(Geometry geom) {
@@ -61,7 +60,7 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
     @Override
     public boolean hasNext() {
-        return m_geometryDeque.size() > 0;
+        return (m_geometryDeque != null && m_geometryDeque.size() > 0) || (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext());
     }
 
     @Override
@@ -74,12 +73,12 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
     @Override
     public Geometry next() {
-        if (!m_geometryDeque.isEmpty()) {
+        if (m_geometryDeque != null && !m_geometryDeque.isEmpty()) {
             m_index++;
             return m_geometryDeque.pop();
-        }
-        if (m_mapGeometryCursor != null && (mapGeometry = m_mapGeometryCursor.next()) != null) {
-            return mapGeometry.m_geometry;
+        } else if (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext()) {
+            m_index++;
+            return m_mapGeometryCursor.next().m_geometry;
         }
 
         return null;

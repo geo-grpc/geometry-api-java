@@ -23,28 +23,28 @@
  */
 package com.esri.core.geometry;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * A simple MapGeometryCursor implementation that wraps a single MapGeometry or
  * an array of MapGeometry classes
  */
 class SimpleMapGeometryCursor extends MapGeometryCursor {
-
     MapGeometry m_geom;
-    MapGeometry[] m_geomArray;
-
+    ArrayDeque<MapGeometry> m_geomDeque;
     int m_index;
-    int m_count;
 
     public SimpleMapGeometryCursor(MapGeometry geom) {
+        m_geomDeque = new ArrayDeque<>(1);
         m_geom = geom;
         m_index = -1;
-        m_count = 1;
     }
 
     public SimpleMapGeometryCursor(MapGeometry[] geoms) {
-        m_geomArray = geoms;
+        m_geomDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
         m_index = -1;
-        m_count = geoms.length;
     }
 
     @Override
@@ -53,10 +53,15 @@ class SimpleMapGeometryCursor extends MapGeometryCursor {
     }
 
     @Override
+    public boolean hasNext() {
+        return m_geomDeque.size() > 0;
+    }
+
+    @Override
     public MapGeometry next() {
-        if (m_index < m_count - 1) {
+        if (hasNext()) {
             m_index++;
-            return m_geom != null ? m_geom : m_geomArray[m_index];
+            return m_geomDeque.pop();
         }
 
         return null;

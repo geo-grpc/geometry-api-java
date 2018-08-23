@@ -49,6 +49,11 @@ public class OperatorImportFromJsonCursor extends MapGeometryCursor {
     }
 
     @Override
+    public boolean hasNext() {
+        return m_inputJsonParsers.hasNext();
+    }
+
+    @Override
     public MapGeometry next() {
         JsonReader jsonParser;
         if ((jsonParser = m_inputJsonParsers.next()) != null) {

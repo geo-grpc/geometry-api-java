@@ -2,7 +2,6 @@ package com.esri.core.geometry;
 
 public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
     StringCursor m_jsonStringCursor;
-//    String m_geoJsonString;
     int m_import_flags;
     int m_index;
     int m_count;
@@ -33,10 +32,13 @@ public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
         return null;
     }
 
-
-
     @Override
     public int getGeometryID() {
         return m_index;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return m_jsonStringCursor != null && m_jsonStringCursor.hasNext();
     }
 }
