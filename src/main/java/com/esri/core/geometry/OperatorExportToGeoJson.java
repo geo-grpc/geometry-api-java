@@ -40,7 +40,7 @@ public abstract class OperatorExportToGeoJson extends Operator {
      * @param geometryCursor   The cursor of geometries to write as GeoJson.
      * @return Returns a JsonCursor.
      */
-    public abstract JsonCursor execute(SpatialReference spatialReference, GeometryCursor geometryCursor);
+    public abstract StringCursor execute(SpatialReference spatialReference, GeometryCursor geometryCursor);
 
     /**
      * Performs the ExportToGeoJson operation
