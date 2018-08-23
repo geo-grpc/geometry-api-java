@@ -7,6 +7,7 @@ public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
     int m_index;
     int m_count;
 
+    // TODO, this was never implemented. Maybe remove?
 //    public OperatorImportFromGeoJsonCursor(int import_flags, String geoJsonString, ProgressTracker progressTracker) {
 //        m_geoJsonString = geoJsonString;
 //        m_import_flags = import_flags;

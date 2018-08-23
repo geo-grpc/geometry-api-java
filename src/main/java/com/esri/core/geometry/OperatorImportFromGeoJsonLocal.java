@@ -52,8 +52,8 @@ class OperatorImportFromGeoJsonLocal extends OperatorImportFromGeoJson {
         public final static int GeometryCollection = GeoJsonType.GeometryCollection.geogsjonvalue();
     }
 
-    ;
 
+    // TODO, this was never implemented. Maybe remove?
 //    @Override
 //    MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker) {
 //        return new OperatorImportFromGeoJsonCursor(import_flags, geoJsonString, progressTracker);
