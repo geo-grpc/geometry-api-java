@@ -215,6 +215,10 @@ public class TestGeomToGeoJson extends TestCase {
         OperatorExportToGeoJson exporter = (OperatorExportToGeoJson) factory.getOperator(Operator.Type.ExportToGeoJson);
         String result = exporter.execute(p);
         assertEquals("{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[100,1],[101,1],[101,0],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]}", result);
+        // TODO make a pull request on this bug
+        //        OperatorImportFromGeoJson importer = (OperatorImportFromGeoJson) factory.getOperator(Operator.Type.ImportFromGeoJson);
+        //        MapGeometry resultGeom = importer.execute(GeoJsonImportFlags.geoJsonImportSkipCRS, Geometry.Type.Unknown, result, null);
+        //        assertTrue(resultGeom.m_geometry.equals(p));
     }
 
     @Test
@@ -234,6 +238,37 @@ public class TestGeomToGeoJson extends TestCase {
         //String result = exporter.execute(parsedPoly.getGeometry());
         String result = exporter.execute(poly);
         assertEquals("{\"type\":\"MultiPolygon\",\"coordinates\":[[[[-100,-100],[100,-100],[100,100],[-100,100],[-100,-100]],[[-90,-90],[90,-90],[-90,90],[90,90],[-90,-90]]],[[[-10,-10],[10,-10],[10,10],[-10,10],[-10,-10]]]]}", result);
+    }
+
+    @Test
+    public void testMultiPolygonCursor() throws IOException {
+        Polygon p = new Polygon();
+
+        //exterior ring - has to be clockwise for Esri
+        p.startPath(100.0, 0.0);
+        p.lineTo(100.0, 1.0);
+        p.lineTo(101.0, 1.0);
+        p.lineTo(101.0, 0.0);
+        p.closePathWithLine();
+
+        //hole - counterclockwise for Esri
+        p.startPath(100.2, 0.2);
+        p.lineTo(100.8, 0.2);
+        p.lineTo(100.8, 0.8);
+        p.lineTo(100.2, 0.8);
+        p.closePathWithLine();
+
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(p);
+        OperatorExportToGeoJsonCursor exportToGeoJsonCursor = new OperatorExportToGeoJsonCursor(GeoJsonExportFlags.geoJsonExportSkipCRS, null, simpleGeometryCursor);
+        String result = exportToGeoJsonCursor.next();
+        assertEquals("{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.2,0.8],[100.8,0.8],[100.8,0.2],[100.2,0.2]]]}", result);
+
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(result);
+
+        OperatorImportFromGeoJsonCursor importFromGeoJsonCursor = new OperatorImportFromGeoJsonCursor(GeoJsonImportFlags.geoJsonImportSkipCRS, simpleStringCursor, null);
+        MapGeometry mapGeometry = importFromGeoJsonCursor.next();
+
+        assertTrue(p.equals(mapGeometry.m_geometry));
     }
 
 

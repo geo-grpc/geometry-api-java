@@ -30,7 +30,8 @@ public abstract class OperatorImportFromGeoJson extends Operator {
         return Type.ImportFromGeoJson;
     }
 
-    abstract MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker);
+    // TODO, this was never implemented. Maybe remove?
+//    abstract MapGeometryCursor execute(int import_flags, String geoJsonString, ProgressTracker progressTracker);
 
     abstract MapGeometryCursor execute(int import_flags, StringCursor stringCursor, ProgressTracker progressTracker);
 

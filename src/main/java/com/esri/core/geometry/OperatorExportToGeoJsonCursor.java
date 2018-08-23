@@ -47,7 +47,7 @@ package com.esri.core.geometry;
 
 import com.esri.core.geometry.VertexDescription.Semantics;
 
-class OperatorExportToGeoJsonCursor extends JsonCursor {
+public class OperatorExportToGeoJsonCursor extends JsonCursor {
     GeometryCursor m_inputGeometryCursor;
     SpatialReference m_spatialReference;
     int m_index;
