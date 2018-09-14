@@ -1922,23 +1922,31 @@ public class TestImportExport extends TestCase {
         int size = 1000;
         String[] points = new String[size];
         List<Point> pointList = new ArrayList<>(size);
+        List<String> stringList = new ArrayList<>(size);
         ArrayDeque<String> pointArrayDeque = new ArrayDeque<>(size);
         ArrayDeque<Long> ids = new ArrayDeque<>(size);
         for (int i = 0; i < size; i++) {
             pointList.add(new Point(randomWithRange(-20, 20), randomWithRange(-20, 20)));
-            ids.push((long) i + size);
+            ids.addLast((long) i + size);
             points[i] = (String.format("Point(%f %f)", pointList.get(i).getX(), pointList.get(i).getY()));
-            pointArrayDeque.push(points[i]);
+            pointArrayDeque.addLast(points[i]);
+            stringList.add(points[i]);
         }
 
         SimpleStringCursor simpleStringCursor1 = new SimpleStringCursor(points);
         SimpleStringCursor simpleStringCursor2 = new SimpleStringCursor(pointArrayDeque.clone(), ids.clone());
+        SimpleStringCursor simpleStringCursor3 = new SimpleStringCursor(stringList);
+
         OperatorImportFromWktCursor operatorImportFromWktCursor1 = new OperatorImportFromWktCursor(0, simpleStringCursor1);
         OperatorImportFromWktCursor operatorImportFromWktCursor2 = new OperatorImportFromWktCursor(0, simpleStringCursor2);
+        OperatorImportFromWktCursor operatorImportFromWktCursor3 = new OperatorImportFromWktCursor(0, simpleStringCursor3);
+
         while (operatorImportFromWktCursor1.hasNext()) {
             Geometry geometry1 = operatorImportFromWktCursor1.next();
             Geometry geometry2 = operatorImportFromWktCursor2.next();
-            assertFalse(geometry1.equals(geometry2));
+            Geometry geometry3 = operatorImportFromWktCursor3.next();
+            assertTrue(geometry1.equals(geometry3));
+            assertTrue(geometry1.equals(geometry2));
         }
 
         SimpleStringCursor simpleStringCursor = new SimpleStringCursor(pointArrayDeque, ids);
@@ -1949,10 +1957,10 @@ public class TestImportExport extends TestCase {
 
             Point geom = (Point) operatorImportFromWktCursor.next();
             long geometryID = operatorImportFromWktCursor.getGeometryID();
-//            assertEquals(geometryID, index + size);
+            assertEquals(geometryID, index + size);
             index++;
-//            assertEquals(point_orig.getX(), geom.getX(), 0.000001);
-//            assertEquals(point_orig.getY(), geom.getY(), 0.000001);
+            assertEquals(point_orig.getX(), geom.getX(), 0.000001);
+            assertEquals(point_orig.getY(), geom.getY(), 0.000001);
         }
 
 
