@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 class SimpleMapGeometryCursor extends MapGeometryCursor {
     MapGeometry m_geom;
     ArrayDeque<MapGeometry> m_geomDeque;
-    int m_index;
+    long m_index;
 
     public SimpleMapGeometryCursor(MapGeometry geom) {
         m_geomDeque = new ArrayDeque<>(1);
@@ -48,7 +48,7 @@ class SimpleMapGeometryCursor extends MapGeometryCursor {
     }
 
     @Override
-    public int getGeometryID() {
+    public long getGeometryID() {
         return m_index;
     }
 

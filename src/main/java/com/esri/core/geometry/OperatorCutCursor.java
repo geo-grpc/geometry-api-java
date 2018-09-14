@@ -55,8 +55,9 @@ class OperatorCutCursor extends GeometryCursor {
         m_bFirstCall = true;
     }
 
+    // TODO maybe return inputs geometry id?
     @Override
-    public int getGeometryID() {
+    public long getGeometryID() {
         return 0;
     }
 
@@ -70,7 +71,7 @@ class OperatorCutCursor extends GeometryCursor {
         m_bFirstCall = false;
         generateCuts_();
         if (++m_cutIndex < m_cuts.size()) {
-            return (Geometry) m_cuts.get(m_cutIndex);
+            return m_cuts.get(m_cutIndex);
         }
 
         return null;
@@ -80,7 +81,7 @@ class OperatorCutCursor extends GeometryCursor {
         if (m_cuts != null)
             return;
 
-        m_cuts = new ArrayList<MultiPath>();
+        m_cuts = new ArrayList<>();
 
         Geometry.Type type = m_cuttee.getType();
         switch (type.value()) {

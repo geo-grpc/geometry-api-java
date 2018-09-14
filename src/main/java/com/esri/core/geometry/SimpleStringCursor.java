@@ -3,19 +3,28 @@ package com.esri.core.geometry;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SimpleStringCursor extends StringCursor {
     ArrayDeque<String> m_arrayDeque;
-    int m_index = -1;
+    ArrayDeque<Long> m_ids;
+    long m_current_id = -1L;
 
+    @Deprecated
     public SimpleStringCursor(String inputString) {
-        this(Arrays.asList(inputString));
+        m_arrayDeque = new ArrayDeque<>(1);
+        m_arrayDeque.push(inputString);
     }
 
+    public SimpleStringCursor(String inputString, long id) {
+        m_arrayDeque = new ArrayDeque<>(1);
+        m_arrayDeque.push(inputString);
+        m_ids = new ArrayDeque<>(1);
+        m_ids.push(id);
+    }
 
+    @Deprecated
     public SimpleStringCursor(String[] inputStringArray) {
         m_arrayDeque = Arrays.stream(inputStringArray).collect(Collectors.toCollection(ArrayDeque::new));
     }
@@ -25,19 +34,27 @@ public class SimpleStringCursor extends StringCursor {
         m_arrayDeque = new ArrayDeque<>(inputStringArray);
     }
 
-    public SimpleStringCursor(ArrayDeque<String> arrayDeque) {
+    public SimpleStringCursor(ArrayDeque<String> arrayDeque, ArrayDeque<Long> ids) {
+        m_ids = ids;
         m_arrayDeque = arrayDeque;
     }
 
-    public int getID() {
-        return m_index;
+    public long getID() {
+        return m_current_id;
     }
 
     public boolean hasNext() { return m_arrayDeque.size() > 0; }
 
+    void __incrementID() {
+        if (m_ids != null && !m_ids.isEmpty())
+            m_current_id = m_ids.pop();
+        else
+            m_current_id++;
+    }
+
     public String next() {
-        if (this.hasNext()) {
-            m_index++;
+        if (hasNext()) {
+            __incrementID();
             return m_arrayDeque.pop();
         }
 

@@ -32,7 +32,7 @@ import java.nio.ByteOrder;
 public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
     GeometryCursor m_inputGeometryCursor;
     int m_exportFlags;
-    int m_index;
+    long m_index;
     ByteBuffer m_shapeBuffer;
 
     public OperatorExportToESRIShapeCursor(int exportFlags, GeometryCursor geometryCursor) {
@@ -46,7 +46,7 @@ public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
     }
 
     @Override
-    public int getByteBufferID() {
+    public long getByteBufferID() {
         return m_index;
     }
 

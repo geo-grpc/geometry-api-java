@@ -1780,12 +1780,13 @@ public class TestImportExport extends TestCase {
         SpatialReference inputSR = SpatialReference.create(3857);
         OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
         OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
-        HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+        HashMap<Long, Boolean> relate_map = operatorCrosses.execute(poly1,
                 operatorImportFromESRIShapeCursor, inputSR, null);
 
         assertNotNull(relate_map);
-        assertTrue(!relate_map.get(0));
-        assertTrue(!relate_map.get(1));
+
+        assertTrue(!relate_map.get(0L));
+        assertTrue(!relate_map.get(1L));
     }
 
     @Test
@@ -1810,12 +1811,12 @@ public class TestImportExport extends TestCase {
         SpatialReference inputSR = SpatialReference.create(3857);
         OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
         OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
-        HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+        HashMap<Long, Boolean> relate_map = operatorCrosses.execute(poly1,
                 operatorImportFromWkbCursor, inputSR, null);
 
         assertNotNull(relate_map);
-        assertTrue(!relate_map.get(0));
-        assertTrue(!relate_map.get(1));
+        assertTrue(!relate_map.get(0L));
+        assertTrue(!relate_map.get(1L));
 
         simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
         operatorExportToWkbCursor = new OperatorExportToWkbCursor(0, simpleGeometryCursor2);
@@ -1825,8 +1826,8 @@ public class TestImportExport extends TestCase {
         OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(operatorImportFromWkbCursor, null, distances, NumberUtils.NaN(), 96, false, null);
         relate_map = ((OperatorWithin) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Within)).execute(poly2, operatorBufferCursor, inputSR, null);
         assertNotNull(relate_map);
-        assertTrue(relate_map.get(0));
-        assertTrue(relate_map.get(1));
+        assertTrue(relate_map.get(0L));
+        assertTrue(relate_map.get(1L));
     }
 
     static double randomWithRange(double min, double max) {
@@ -1852,22 +1853,27 @@ public class TestImportExport extends TestCase {
         int size = 1000;
         String[] points = new String[size];
         List<Point> pointList = new ArrayList<>(size);
+        ArrayDeque<String> pointArrayDeque = new ArrayDeque<>(size);
+        ArrayDeque<Long> ids = new ArrayDeque<>(size);
         for (int i = 0; i < size; i++) {
             pointList.add(new Point(randomWithRange(-20, 20), randomWithRange(-20, 20)));
+            ids.push((long) i + size);
             points[i] = (String.format("Point(%f %f)", pointList.get(i).getX(), pointList.get(i).getY()));
+            pointArrayDeque.push(points[i]);
         }
 
         SimpleStringCursor simpleStringCursor = new SimpleStringCursor(points);
         OperatorImportFromWktCursor operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
-        Point geom = (Point) operatorImportFromWktCursor.next();
         int index = 0;
-        while (geom != null) {
+        while (operatorImportFromWktCursor.hasNext()) {
             Point point_orig = pointList.get(index);
+
+            Point geom = (Point) operatorImportFromWktCursor.next();
+            long geometryID = operatorImportFromWktCursor.getGeometryID();
+            assertEquals(geometryID, index);
+            index++;
             assertEquals(point_orig.getX(), geom.getX(), 0.000001);
             assertEquals(point_orig.getY(), geom.getY(), 0.000001);
-
-            geom = (Point) operatorImportFromWktCursor.next();
-            index++;
         }
 
 
@@ -1878,12 +1884,12 @@ public class TestImportExport extends TestCase {
         SpatialReference inputSR = SpatialReference.create(3857);
         OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
         OperatorCrosses operatorCrosses = (OperatorCrosses) (projEnv.getOperator(Operator.Type.Crosses));
-        HashMap<Integer, Boolean> relate_map = operatorCrosses.execute(poly1,
+        HashMap<Long, Boolean> relate_map = operatorCrosses.execute(poly1,
                 operatorImportFromWktCursor, inputSR, null);
 
         assertNotNull(relate_map);
-        assertTrue(!relate_map.get(0));
-        assertTrue(!relate_map.get(1));
+        assertTrue(!relate_map.get(0L));
+        assertTrue(!relate_map.get(1L));
 
         simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
         operatorExportToWktCursor = new OperatorExportToWktCursor(0, simpleGeometryCursor2, null);
@@ -1892,8 +1898,64 @@ public class TestImportExport extends TestCase {
         OperatorBufferCursor operatorBufferCursor = new OperatorBufferCursor(operatorImportFromWktCursor, null, distances, NumberUtils.NaN(), 96, false, null);
         relate_map = ((OperatorWithin) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Within)).execute(poly2, operatorBufferCursor, inputSR, null);
         assertNotNull(relate_map);
-        assertTrue(relate_map.get(0));
-        assertTrue(relate_map.get(1));
+        assertTrue(relate_map.get(0L));
+        assertTrue(relate_map.get(1L));
+
+
+    }
+
+    @Test
+    public void testWKTID() {
+        Polygon poly1 = new Polygon();
+        Envelope2D env1 = new Envelope2D();
+        env1.setCoords(855277, 3892059, 855277 + 100, 3892059 + 100);
+        poly1.addEnvelope(env1, false);
+
+        Polygon poly2 = new Polygon();
+        Envelope2D env2 = new Envelope2D();
+        env2.setCoords(855277, 3892059, 855277 + 300, 3892059 + 200);
+        poly2.addEnvelope(env2, false);
+        List<Geometry> list2 = new ArrayList<>();
+        list2.add(poly1);
+        list2.add(poly2);
+
+        int size = 1000;
+        String[] points = new String[size];
+        List<Point> pointList = new ArrayList<>(size);
+        ArrayDeque<String> pointArrayDeque = new ArrayDeque<>(size);
+        ArrayDeque<Long> ids = new ArrayDeque<>(size);
+        for (int i = 0; i < size; i++) {
+            pointList.add(new Point(randomWithRange(-20, 20), randomWithRange(-20, 20)));
+            ids.push((long) i + size);
+            points[i] = (String.format("Point(%f %f)", pointList.get(i).getX(), pointList.get(i).getY()));
+            pointArrayDeque.push(points[i]);
+        }
+
+        SimpleStringCursor simpleStringCursor1 = new SimpleStringCursor(points);
+        SimpleStringCursor simpleStringCursor2 = new SimpleStringCursor(pointArrayDeque.clone(), ids.clone());
+        OperatorImportFromWktCursor operatorImportFromWktCursor1 = new OperatorImportFromWktCursor(0, simpleStringCursor1);
+        OperatorImportFromWktCursor operatorImportFromWktCursor2 = new OperatorImportFromWktCursor(0, simpleStringCursor2);
+        while (operatorImportFromWktCursor1.hasNext()) {
+            Geometry geometry1 = operatorImportFromWktCursor1.next();
+            Geometry geometry2 = operatorImportFromWktCursor2.next();
+            assertFalse(geometry1.equals(geometry2));
+        }
+
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(pointArrayDeque, ids);
+        OperatorImportFromWktCursor operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        int index = 0;
+        while (operatorImportFromWktCursor.hasNext()) {
+            Point point_orig = pointList.get(index);
+
+            Point geom = (Point) operatorImportFromWktCursor.next();
+            long geometryID = operatorImportFromWktCursor.getGeometryID();
+//            assertEquals(geometryID, index + size);
+            index++;
+//            assertEquals(point_orig.getX(), geom.getX(), 0.000001);
+//            assertEquals(point_orig.getY(), geom.getY(), 0.000001);
+        }
+
+
     }
 
     @Test

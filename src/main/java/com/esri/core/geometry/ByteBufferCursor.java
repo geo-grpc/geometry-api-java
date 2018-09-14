@@ -46,7 +46,7 @@ public abstract class ByteBufferCursor implements Iterator<ByteBuffer> {
      * the input and output geometry classes. It is not always possible to
      * preserve an ID during an operation.
      */
-    public abstract int getByteBufferID();
+    public abstract long getByteBufferID();
 
     public abstract boolean hasNext();
 

@@ -4,8 +4,6 @@ package com.esri.core.geometry;
  * Created by davidraleigh on 2/20/16.
  */
 public class OperatorGeodesicBufferCursor extends GeometryCursor {
-
-    private GeometryCursor m_inputGeoms;
     private SpatialReferenceImpl m_spatialReference;
     private ProgressTracker m_progressTracker;
     private double[] m_distances;
@@ -13,7 +11,6 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
     private Envelope2D m_currentUnionEnvelope2D;
     private boolean m_bUnion;
 
-    private int m_index;
     private int m_dindex;
 
     // GeometryCursor inputGeometries, SpatialReference sr, int curveType, double[] distancesMeters, double maxDeviationMeters, boolean bReserved, boolean bUnion, ProgressTracker progressTracker
@@ -24,7 +21,6 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
                                  boolean bReserved,
                                  boolean b_union,
                                  ProgressTracker progressTracker) {
-        m_index = -1;
         m_inputGeoms = inputGeoms;
         m_spatialReference = (SpatialReferenceImpl) sr;
         m_distances = distances;
@@ -36,8 +32,6 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
         m_progressTracker = progressTracker;
     }
 
-    @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
 
     @Override
     public Geometry next() {
@@ -46,20 +40,14 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
             return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, m_spatialReference, m_progressTracker).next();
         }
 
-        Geometry geom;
-        while ((geom = m_inputGeoms.next()) != null) {
-            m_index = m_inputGeoms.getGeometryID();
+        if (hasNext()) {
             if (m_dindex + 1 < m_distances.length)
                 m_dindex++;
 
-            return geodesicBuffer(geom, m_distances[m_dindex]);
+            return geodesicBuffer(m_inputGeoms.next(), m_distances[m_dindex]);
         }
-        return null;
-    }
 
-    @Override
-    public int getGeometryID() {
-        return m_index;
+        return null;
     }
 
     // virtual bool IsRecycling() OVERRIDE { return false; }

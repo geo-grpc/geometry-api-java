@@ -6,10 +6,8 @@ import java.nio.ByteOrder;
 public class OperatorExportToWkbCursor extends ByteBufferCursor {
     GeometryCursor m_inputGeometryCursor;
     int m_exportFlags;
-    int m_index;
 
     public OperatorExportToWkbCursor(int exportFlags, GeometryCursor geometryCursor) {
-        m_index = -1;
         if (geometryCursor == null)
             throw new GeometryException("invalid argument");
 
@@ -24,7 +22,6 @@ public class OperatorExportToWkbCursor extends ByteBufferCursor {
     public ByteBuffer next() {
         Geometry geometry = m_inputGeometryCursor.next();
         if (geometry != null) {
-            m_index = m_inputGeometryCursor.getGeometryID();
             int size = OperatorExportToWkbLocal.exportToWKB(m_exportFlags, geometry, null);
             ByteBuffer wkbBuffer = ByteBuffer.allocate(size).order(ByteOrder.nativeOrder());
             OperatorExportToWkbLocal.exportToWKB(m_exportFlags, geometry, wkbBuffer);
@@ -34,8 +31,8 @@ public class OperatorExportToWkbCursor extends ByteBufferCursor {
     }
 
     @Override
-    public int getByteBufferID() {
-        return m_index;
+    public long getByteBufferID() {
+        return m_inputGeometryCursor.getGeometryID();
     }
 
 

@@ -35,7 +35,7 @@ import java.util.LinkedList;
 public final class ListeningGeometryCursor extends GeometryCursor {
 
     LinkedList<Geometry> m_geomList = new LinkedList<Geometry>();
-    int m_index = -1;
+    long m_index = -1;
 
     public ListeningGeometryCursor() {
     }
@@ -44,7 +44,7 @@ public final class ListeningGeometryCursor extends GeometryCursor {
     public boolean hasNext() { return !m_geomList.isEmpty(); }
 
     @Override
-    public int getGeometryID() {
+    public long getGeometryID() {
         return m_index;
     }
 

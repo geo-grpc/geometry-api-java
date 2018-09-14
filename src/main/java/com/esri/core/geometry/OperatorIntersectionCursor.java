@@ -24,11 +24,8 @@
 
 package com.esri.core.geometry;
 
-import java.util.ArrayList;
-
-class OperatorIntersectionCursor extends GeometryCursor {
-
-    GeometryCursor m_inputGeoms;
+// TODO test this
+public class OperatorIntersectionCursor extends GeometryCursor {
     GeometryCursor m_smallCursor;
     ProgressTracker m_progress_tracker;
     SpatialReference m_spatial_reference;
@@ -37,15 +34,15 @@ class OperatorIntersectionCursor extends GeometryCursor {
     // type.
     int m_geomIntersectorType;
     int m_currentGeomType;
-    int m_index;
     int m_dimensionMask;
     boolean m_bEmpty;
 
     OperatorIntersectionCursor(GeometryCursor inputGeoms,
-                               GeometryCursor geomIntersector, SpatialReference sr,
-                               ProgressTracker progress_tracker, int dimensionMask) {
+                               GeometryCursor geomIntersector,
+                               SpatialReference sr,
+                               ProgressTracker progress_tracker,
+                               int dimensionMask) {
         m_bEmpty = geomIntersector == null;
-        m_index = -1;
         m_inputGeoms = inputGeoms;
         m_spatial_reference = sr;
         m_geomIntersector = geomIntersector.next();
@@ -72,15 +69,12 @@ class OperatorIntersectionCursor extends GeometryCursor {
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
-    @Override
     public Geometry next() {
         if (m_bEmpty)
             return null;
 
         Geometry geom;
-        if (m_smallCursor != null) {// when dimension mask is used, we produce a
+        if (m_smallCursor != null && m_smallCursor.hasNext()) {// when dimension mask is used, we produce a
             geom = m_smallCursor.next();
             if (geom != null)
                 return geom;
@@ -88,8 +82,8 @@ class OperatorIntersectionCursor extends GeometryCursor {
                 m_smallCursor = null;// done with the small cursor
         }
 
-        while ((geom = m_inputGeoms.next()) != null) {
-            m_index = m_inputGeoms.getGeometryID();
+        if (m_inputGeoms.hasNext()) {
+            geom = m_inputGeoms.next();
             if (m_dimensionMask == -1) {
                 Geometry resGeom = intersect(geom);
                 assert (resGeom != null);
@@ -102,11 +96,6 @@ class OperatorIntersectionCursor extends GeometryCursor {
             }
         }
         return null;
-    }
-
-    @Override
-    public int getGeometryID() {
-        return m_index;
     }
 
     Geometry intersect(Geometry input_geom) {

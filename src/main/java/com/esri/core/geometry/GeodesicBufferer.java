@@ -217,7 +217,7 @@ class GeodesicBufferer {
         }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }
@@ -285,7 +285,7 @@ class GeodesicBufferer {
         }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }

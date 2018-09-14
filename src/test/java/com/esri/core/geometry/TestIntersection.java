@@ -839,8 +839,12 @@ public class TestIntersection extends TestCase {
             assertTrue(geom3.getType().value() == Geometry.GeometryType.Polygon);
             assertTrue(((Polygon) geom3).getPointCount() == 0);
 
-            Geometry geom4 = result_cursor.next();
-            assertTrue(geom4 == null);
+
+
+
+
+
+
         }
 
         {// crossing + overlapping intersection
@@ -873,9 +877,10 @@ public class TestIntersection extends TestCase {
                     .create(4326), null, 7);
 
             // dimension is 3, means it has to return a point and a polyline
+
             Geometry geom1 = result_cursor.next();
             assertTrue(geom1 != null);
-            assertTrue(geom1.getDimension() == 0);
+            assertEquals(geom1.getDimension(), 0);
             assertTrue(geom1.getType().value() == Geometry.GeometryType.MultiPoint);
             assertTrue(((MultiPoint) geom1).getPointCount() == 1);
 

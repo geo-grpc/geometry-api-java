@@ -41,8 +41,7 @@ public class TestGeneralize extends TestCase {
     @Test
     public void test1() {
         OperatorFactoryLocal engine = OperatorFactoryLocal.getInstance();
-        OperatorGeneralize op = (OperatorGeneralize) engine
-                .getOperator(Operator.Type.Generalize);
+        OperatorGeneralize op = (OperatorGeneralize) engine.getOperator(Operator.Type.Generalize);
 
         Polygon poly = new Polygon();
         poly.startPath(0, 0);
@@ -79,8 +78,7 @@ public class TestGeneralize extends TestCase {
     @Test
     public void test2() {
         OperatorFactoryLocal engine = OperatorFactoryLocal.getInstance();
-        OperatorGeneralize op = (OperatorGeneralize) engine
-                .getOperator(Operator.Type.Generalize);
+        OperatorGeneralize op = (OperatorGeneralize) engine.getOperator(Operator.Type.Generalize);
 
         Polyline polyline = new Polyline();
         polyline.startPath(0, 0);
@@ -123,13 +121,22 @@ public class TestGeneralize extends TestCase {
                     .addEnvelope(Envelope2D.construct(0, 0, 20, 10), false);
             Geometry densified_geom = OperatorDensifyByLength.local().execute(
                     input_polygon, 1, null);
-            Geometry geom = OperatorGeneralize.local().execute(densified_geom,
-                    1, true, null);
+
+            Geometry geom = OperatorGeneralize.local().execute(
+                    densified_geom,
+                    1,
+                    true,
+                    null);
+
             int pc = ((MultiPath) geom).getPointCount();
             assertTrue(pc == 4);
 
             Geometry large_dev1 = OperatorGeneralize.local().execute(
-                    densified_geom, 40, true, null);
+                    densified_geom,
+                    40,
+                    true,
+                    null);
+
             int pc1 = ((MultiPath) large_dev1).getPointCount();
             assertTrue(pc1 == 0);
 

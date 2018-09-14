@@ -23,20 +23,21 @@
  */
 package com.esri.core.geometry;
 
-class OperatorOffsetCursor extends GeometryCursor {
-    GeometryCursor m_inputGeoms;
+// TODO test this, never been public before
+public class OperatorOffsetCursor extends GeometryCursor {
     SpatialReferenceImpl m_spatialReference;
     ProgressTracker m_progressTracker;
     double m_distance;
     double m_miterLimit;
     OperatorOffset.JoinType m_joins;
     double m_flattenError;
-    int m_index;
 
-    OperatorOffsetCursor(GeometryCursor inputGeometries, SpatialReference sr,
-                         double distance, OperatorOffset.JoinType joins, double bevelRatio,
-                         double flattenError, ProgressTracker progressTracker) {
-        m_index = -1;
+    OperatorOffsetCursor(GeometryCursor inputGeometries,
+                         SpatialReference sr,
+                         double distance, OperatorOffset.JoinType joins,
+                         double bevelRatio,
+                         double flattenError,
+                         ProgressTracker progressTracker) {
         m_inputGeoms = inputGeometries;
         m_spatialReference = (SpatialReferenceImpl) sr;
         m_distance = distance;
@@ -47,19 +48,11 @@ class OperatorOffsetCursor extends GeometryCursor {
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
     public Geometry next() {
-        Geometry geom = m_inputGeoms.next();
-        if (geom != null) {
-            m_index = m_inputGeoms.getGeometryID();
-            return Offset(geom);
-        }
-        return null;
-    }
+        if (hasNext())
+            return Offset(m_inputGeoms.next());
 
-    public int getGeometryID() {
-        return m_index;
+        return null;
     }
 
     Geometry Offset(Geometry geom) {

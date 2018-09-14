@@ -111,8 +111,8 @@ public class TestCircles extends TestCase {
 //        http://my-spatial4j-project.blogspot.be/2014/01/minimum-bounding-circle-algorithm-jts.html
         Geometry firstGeometry = geometries.peekFirst();
         OperatorEquals operatorEquals = (OperatorEquals) (OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Equals));
-        HashMap<Integer, Boolean> results = operatorEquals.execute(firstGeometry, new SimpleGeometryCursor(geometries), SpatialReference.create(4326), null);
-        for (Integer key : results.keySet()) {
+        HashMap<Long, Boolean> results = operatorEquals.execute(firstGeometry, new SimpleGeometryCursor(geometries), SpatialReference.create(4326), null);
+        for (Long key : results.keySet()) {
             assertTrue(results.get(key));
         }
     }

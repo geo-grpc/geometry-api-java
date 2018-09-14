@@ -31,15 +31,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SimpleByteBufferCursor extends ByteBufferCursor {
-
+    private ArrayDeque<Long> m_ids;
     ArrayDeque<ByteBuffer> m_byteBufferDeque;
-    int m_index = -1;
+    long m_current_id = -1;
 
+    @Deprecated
     public SimpleByteBufferCursor(ByteBuffer byteBuffer) {
         m_byteBufferDeque = new ArrayDeque<>();
         m_byteBufferDeque.add(byteBuffer);
     }
 
+    public SimpleByteBufferCursor(ByteBuffer byteBuffer, long id) {
+        m_byteBufferDeque = new ArrayDeque<>(1);
+        m_byteBufferDeque.add(byteBuffer);
+        m_ids = new ArrayDeque<>(1);
+        m_ids.push(id);
+    }
+
+    @Deprecated
     public SimpleByteBufferCursor(ByteBuffer[] byteBufferArray) {
         m_byteBufferDeque = Arrays.stream(byteBufferArray).collect(Collectors.toCollection(ArrayDeque::new));
     }
@@ -49,8 +58,9 @@ public class SimpleByteBufferCursor extends ByteBufferCursor {
         m_byteBufferDeque = new ArrayDeque<>(byteBufferArray);
     }
 
-    public SimpleByteBufferCursor(ArrayDeque<ByteBuffer> byteBufferArrayDeque) {
+    public SimpleByteBufferCursor(ArrayDeque<ByteBuffer> byteBufferArrayDeque, ArrayDeque<Long> ids) {
         m_byteBufferDeque = byteBufferArrayDeque;
+        m_ids = ids;
     }
 
     @Override
@@ -59,14 +69,22 @@ public class SimpleByteBufferCursor extends ByteBufferCursor {
     }
 
     @Override
-    public int getByteBufferID() {
-        return m_index;
+    public long getByteBufferID() {
+        return m_current_id;
+    }
+
+    void __incrementID() {
+        if (m_ids != null && !m_ids.isEmpty()) {
+            m_current_id = m_ids.pop();
+        } else {
+            m_current_id++;
+        }
     }
 
     @Override
     public ByteBuffer next() {
         if (!m_byteBufferDeque.isEmpty()) {
-            m_index++;
+            __incrementID();
             return m_byteBufferDeque.pop();
         }
 

@@ -325,7 +325,7 @@ class Bufferer {
         public boolean hasNext() { return m_mp.getPointCount() > m_index; }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }
@@ -398,10 +398,12 @@ class Bufferer {
         }
 
         @Override
-        public boolean hasNext() { return m_current_path_index < ((MultiPathImpl)m_polyline._getImpl()).getPathCount(); }
+        public boolean hasNext() {
+            return m_polyline != null && m_current_path_index < ((MultiPathImpl)m_polyline._getImpl()).getPathCount();
+        }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }
@@ -443,10 +445,12 @@ class Bufferer {
         }
 
         @Override
-        public boolean hasNext() { return m_geometry != null && m_index < ((MultiPath)m_geometry).getPathCount(); }
+        public boolean hasNext() {
+            return m_geometry != null && m_index < ((MultiPath)m_geometry).getPathCount();
+        }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }
@@ -489,10 +493,12 @@ class Bufferer {
         }
 
         @Override
-        public boolean hasNext() {return m_index < ((Polygon)m_bufferer.m_geometry).getPathCount();}
+        public boolean hasNext() {
+            return m_index < ((Polygon)m_bufferer.m_geometry).getPathCount();
+        }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return 0;
         }
     }

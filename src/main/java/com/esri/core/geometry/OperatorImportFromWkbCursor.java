@@ -6,10 +6,8 @@ public class OperatorImportFromWkbCursor extends GeometryCursor {
 
     ByteBufferCursor m_inputWkbBuffers;
     int m_importFlags;
-    int m_index;
 
     public OperatorImportFromWkbCursor(int importFlags, ByteBufferCursor wkbBuffers) {
-        m_index = -1;
         if (wkbBuffers == null)
             throw new GeometryException("invalid argument");
 
@@ -22,16 +20,18 @@ public class OperatorImportFromWkbCursor extends GeometryCursor {
 
     @Override
     public Geometry next() {
-        ByteBuffer wkbBuffer = m_inputWkbBuffers.next();
-        if (wkbBuffer != null) {
-            m_index = m_inputWkbBuffers.getByteBufferID();
-            return OperatorImportFromWkbLocal.local().execute(m_importFlags, Geometry.Type.Unknown, wkbBuffer, null);
+        if (hasNext()) {
+            return OperatorImportFromWkbLocal.local().execute(
+                    m_importFlags,
+                    Geometry.Type.Unknown,
+                    m_inputWkbBuffers.next(),
+                    null);
         }
         return null;
     }
 
     @Override
-    public int getGeometryID() {
-        return m_index;
+    public long getGeometryID() {
+        return m_inputWkbBuffers.getByteBufferID();
     }
 }

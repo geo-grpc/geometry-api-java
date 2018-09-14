@@ -30,11 +30,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 final class OperatorUnionCursor extends GeometryCursor {
-
-    private GeometryCursor m_inputGeoms;
     private ProgressTracker m_progress_tracker;
     private SpatialReferenceImpl m_spatial_reference;
-    private int m_index = -1;
     private boolean m_b_done = false;
     private boolean[] m_had_geometry = new boolean[4];
     private int[] m_dim_geom_counts = new int[4];
@@ -81,9 +78,9 @@ final class OperatorUnionCursor extends GeometryCursor {
 
     ArrayList<TreeMap<Integer, Bin_type>> m_union_bins = new ArrayList<TreeMap<Integer, Bin_type>>();//for each dimension there is a list of bins sorted by level
 
-    OperatorUnionCursor(GeometryCursor inputGeoms1, SpatialReference sr,
+    OperatorUnionCursor(GeometryCursor inputGeoms, SpatialReference sr,
                         ProgressTracker progress_tracker) {
-        m_inputGeoms = inputGeoms1;
+        m_inputGeoms = inputGeoms;
         m_spatial_reference = (SpatialReferenceImpl) (sr);
         m_progress_tracker = progress_tracker;
     }
@@ -139,22 +136,12 @@ final class OperatorUnionCursor extends GeometryCursor {
                     break;
             }
 
-            m_index++;
             return get_result_geometry(m_current_dim);
         } else {
-            m_index = 0;
             assert (m_max_dimension >= 0);
             m_current_dim = m_max_dimension;
             return get_result_geometry(m_max_dimension);
         }
-    }
-
-    @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
-    @Override
-    public int getGeometryID() {
-        return m_index;
     }
 
     private boolean step_() {

@@ -27,29 +27,23 @@ class OperatorConvexHullCursor extends GeometryCursor {
     private ProgressTracker m_progress_tracker;
     private boolean m_b_merge;
     private boolean m_b_done;
-    private GeometryCursor m_inputGeometryCursor;
-    private int m_index;
     ConvexHull m_hull = new ConvexHull();
 
     OperatorConvexHullCursor(boolean b_merge, GeometryCursor geoms, ProgressTracker progress_tracker) {
-        m_index = -1;
         if (geoms == null)
             throw new IllegalArgumentException();
 
         m_b_merge = b_merge;
         m_b_done = false;
-        m_inputGeometryCursor = geoms;
+        m_inputGeoms = geoms;
         m_progress_tracker = progress_tracker;
     }
-
-    @Override
-    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
 
     @Override
     public Geometry next() {
         if (m_b_merge) {
             if (!m_b_done) {
-                Geometry result = calculateConvexHullMerging_(m_inputGeometryCursor, m_progress_tracker);
+                Geometry result = calculateConvexHullMerging_(m_inputGeoms, m_progress_tracker);
                 m_b_done = true;
                 return result;
             }
@@ -58,10 +52,8 @@ class OperatorConvexHullCursor extends GeometryCursor {
         }
 
         if (!m_b_done) {
-            Geometry geometry = m_inputGeometryCursor.next();
-            if (geometry != null) {
-                m_index = m_inputGeometryCursor.getGeometryID();
-                return calculateConvexHull_(geometry, m_progress_tracker);
+            if (hasNext()) {
+                return calculateConvexHull_(m_inputGeoms.next(), m_progress_tracker);
             }
 
             m_b_done = true;
@@ -70,16 +62,10 @@ class OperatorConvexHullCursor extends GeometryCursor {
         return null;
     }
 
-    @Override
-    public int getGeometryID() {
-        return m_index;
-    }
-
     private Geometry calculateConvexHullMerging_(GeometryCursor geoms, ProgressTracker progress_tracker) {
-        Geometry geometry;
-
-        while ((geometry = geoms.next()) != null)
-            m_hull.addGeometry(geometry);
+        while (geoms.hasNext()) {
+            m_hull.addGeometry(geoms.next());
+        }
 
         return m_hull.getBoundingGeometry();
     }
@@ -96,7 +82,7 @@ class OperatorConvexHullCursor extends GeometryCursor {
             throw new GeometryException("Invalid call for non merging convex hull.");
         }
 
-        Geometry geometry = m_inputGeometryCursor.next();
+        Geometry geometry = m_inputGeoms.next();
         if (geometry != null) {
             m_hull.addGeometry(geometry);
             return true;

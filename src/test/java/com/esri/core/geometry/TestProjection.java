@@ -292,11 +292,11 @@ public class TestProjection extends TestCase {
         boolean isSimple = simplify.isSimpleAsFeature(result, spatialReferenceWGS, true, nonSimpleResult, null);
         assertTrue(isSimple);
 
-        simpleStringCursor = new SimpleStringCursor(wktGeom);
+        simpleStringCursor = new SimpleStringCursor(wktGeom, 99);
         wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
         Polygon expected = (Polygon) wktCursor.next();
         assertTrue(GeometryEngine.isSimple(expected, spatialReferenceWGS));
-
+        assertEquals(wktCursor.getGeometryID(), 99);
         assertEquals(expected.calculateArea2D(), result.calculateArea2D(), 1e-10);
     }
 

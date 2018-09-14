@@ -373,7 +373,7 @@ public class OGCConcreteGeometryCollection extends OGCGeometryCollection {
         }
 
         @Override
-        public int getGeometryID() {
+        public long getGeometryID() {
             return m_index;
         }
 

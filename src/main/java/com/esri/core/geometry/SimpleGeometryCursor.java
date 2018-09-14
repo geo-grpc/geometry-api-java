@@ -32,9 +32,11 @@ import java.util.stream.Collectors;
  */
 public class SimpleGeometryCursor extends GeometryCursor {
 
-    int m_index = -1;
-    MapGeometryCursor m_mapGeometryCursor = null;
-    ArrayDeque<Geometry> m_geometryDeque = null;
+    private long m_index = -1;
+    private MapGeometryCursor m_mapGeometryCursor = null;
+    private ArrayDeque<Geometry> m_geometryDeque = null;
+
+    private long m_current_id = -1;
 
     public SimpleGeometryCursor(Geometry geom) {
         m_geometryDeque = new ArrayDeque<>(1);
@@ -64,23 +66,26 @@ public class SimpleGeometryCursor extends GeometryCursor {
     }
 
     @Override
-    public int getGeometryID() {
-        if (m_mapGeometryCursor != null)
-            return m_mapGeometryCursor.getGeometryID();
-
-        return m_index;
+    public long getGeometryID() {
+        return m_current_id;
     }
 
     @Override
     public Geometry next() {
+        m_index++;
+        Geometry geometry = null;
         if (m_geometryDeque != null && !m_geometryDeque.isEmpty()) {
-            m_index++;
-            return m_geometryDeque.pop();
+            geometry = m_geometryDeque.pop();
+
+            // TODO get id off of geometry if exists
+            m_current_id = m_index;
         } else if (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext()) {
-            m_index++;
-            return m_mapGeometryCursor.next().m_geometry;
+            geometry = m_mapGeometryCursor.next().m_geometry;
+
+            // TODO get id off of geometry if exists
+            m_current_id = m_mapGeometryCursor.getGeometryID();
         }
 
-        return null;
+        return geometry;
     }
 }

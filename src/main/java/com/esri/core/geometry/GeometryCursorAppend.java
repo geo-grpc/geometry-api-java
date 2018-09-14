@@ -49,7 +49,7 @@ public class GeometryCursorAppend extends GeometryCursor {
     }
 
     @Override
-    public int getGeometryID() {
+    public long getGeometryID() {
         return m_cur.getGeometryID();
     }
 }

@@ -35,10 +35,8 @@ public class OperatorImportFromESRIShapeCursor extends GeometryCursor {
     ByteBufferCursor m_inputShapeBuffers;
     int m_importFlags;
     int m_type;
-    int m_index;
 
     public OperatorImportFromESRIShapeCursor(int importFlags, int type, ByteBufferCursor shapeBuffers) {
-        m_index = -1;
         if (shapeBuffers == null)
             throw new GeometryException("invalid argument");
 
@@ -54,15 +52,14 @@ public class OperatorImportFromESRIShapeCursor extends GeometryCursor {
     public Geometry next() {
         ByteBuffer shapeBuffer = m_inputShapeBuffers.next();
         if (shapeBuffer != null) {
-            m_index = m_inputShapeBuffers.getByteBufferID();
             return importFromESRIShape(shapeBuffer);
         }
         return null;
     }
 
     @Override
-    public int getGeometryID() {
-        return m_index;
+    public long getGeometryID() {
+        return m_inputShapeBuffers.getByteBufferID();
     }
 
     private Geometry importFromESRIShape(ByteBuffer shapeBuffer) {

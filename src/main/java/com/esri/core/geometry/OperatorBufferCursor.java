@@ -26,7 +26,6 @@ package com.esri.core.geometry;
 
 class OperatorBufferCursor extends GeometryCursor {
     Bufferer m_bufferer = new Bufferer();
-    private GeometryCursor m_inputGeoms;
     private SpatialReferenceImpl m_Spatial_reference;
     private ProgressTracker m_progress_tracker;
     private double[] m_distances;
@@ -34,7 +33,6 @@ class OperatorBufferCursor extends GeometryCursor {
     private boolean m_bUnion;
     double m_max_deviation;
     int m_max_vertices_in_full_circle;
-    private int m_index;
     private int m_dindex;
 
     OperatorBufferCursor(GeometryCursor inputGeoms,
@@ -44,7 +42,6 @@ class OperatorBufferCursor extends GeometryCursor {
                          int max_vertices,
                          boolean b_union,
                          ProgressTracker progress_tracker) {
-        m_index = -1;
         m_inputGeoms = inputGeoms;
         m_max_deviation = max_deviation;
         m_max_vertices_in_full_circle = max_vertices;
@@ -64,27 +61,16 @@ class OperatorBufferCursor extends GeometryCursor {
                     m_Spatial_reference, m_distances, m_max_deviation, m_max_vertices_in_full_circle, false, m_progress_tracker);
             return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(bufferCursor, m_Spatial_reference, m_progress_tracker).next();
         } else {
-            Geometry geom;
-            while ((geom = m_inputGeoms.next()) != null) {
-                m_index = m_inputGeoms.getGeometryID();
+            if (hasNext()) {
                 if (m_dindex + 1 < m_distances.length)
                     m_dindex++;
 
-                return buffer(geom, m_distances[m_dindex]);
+                return buffer(m_inputGeoms.next(), m_distances[m_dindex]);
             }
             return null;
         }
     }
 
-    @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
-    @Override
-    public int getGeometryID() {
-        return m_index;
-    }
-
-    // virtual bool IsRecycling() OVERRIDE { return false; }
     Geometry buffer(Geometry geom, double distance) {
         return m_bufferer.buffer(geom, distance, m_Spatial_reference, m_max_deviation, m_max_vertices_in_full_circle, m_progress_tracker);
     }

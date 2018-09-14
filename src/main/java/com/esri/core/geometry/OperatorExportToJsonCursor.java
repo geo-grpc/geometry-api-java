@@ -32,10 +32,8 @@ public class OperatorExportToJsonCursor extends StringCursor {
 
     GeometryCursor m_inputGeometryCursor;
     SpatialReference m_spatialReference;
-    int m_index;
 
     public OperatorExportToJsonCursor(SpatialReference spatialReference, GeometryCursor geometryCursor) {
-        m_index = -1;
         if (geometryCursor == null) {
             throw new IllegalArgumentException();
         }
@@ -48,15 +46,14 @@ public class OperatorExportToJsonCursor extends StringCursor {
     public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
 
     @Override
-    public int getID() {
-        return m_index;
+    public long getID() {
+        return m_inputGeometryCursor.getGeometryID();
     }
 
     @Override
     public String next() {
         Geometry geometry;
         if ((geometry = m_inputGeometryCursor.next()) != null) {
-            m_index = m_inputGeometryCursor.getGeometryID();
             return exportToString(geometry, m_spatialReference, null);
         }
         return null;

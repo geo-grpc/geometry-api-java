@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class OperatorEnclosingCircleCursor extends GeometryCursor {
-    GeometryCursor m_geometryCursor;
     SpatialReference m_spatialReference;
     ProgressTracker m_progressTracker;
 
     public OperatorEnclosingCircleCursor(GeometryCursor geoms, SpatialReference spatialReference, ProgressTracker progressTracker) {
-        m_geometryCursor = geoms;
+        m_inputGeoms = geoms;
         m_spatialReference = spatialReference;
         m_progressTracker = progressTracker;
     }
@@ -19,19 +18,9 @@ public class OperatorEnclosingCircleCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext())
-            return getCircle(m_geometryCursor.next());
+            return getCircle(m_inputGeoms.next());
 
         return null;
-    }
-
-    @Override
-    public int getGeometryID() {
-        return m_geometryCursor.getGeometryID();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return m_geometryCursor != null && m_geometryCursor.hasNext();
     }
 
     protected Geometry getCircle(Geometry geometry) {

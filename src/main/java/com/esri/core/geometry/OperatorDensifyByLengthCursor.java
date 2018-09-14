@@ -25,33 +25,18 @@
 package com.esri.core.geometry;
 
 class OperatorDensifyByLengthCursor extends GeometryCursor {
-
-    GeometryCursor m_inputGeoms;
-    // SpatialReferenceImpl m_spatialReference;
     double m_maxLength;
-    int m_index;
 
-    public OperatorDensifyByLengthCursor(GeometryCursor inputGeoms1,
+    public OperatorDensifyByLengthCursor(GeometryCursor inputGeoms,
                                          double maxLength, ProgressTracker progressTracker) {
-        m_index = -1;
-        m_inputGeoms = inputGeoms1;
+        m_inputGeoms = inputGeoms;
         m_maxLength = maxLength;
     }
 
     @Override
-    public int getGeometryID() {
-        return m_index;
-    }
-
-    @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
-    @Override
     public Geometry next() {
-        Geometry geom;
-        if ((geom = m_inputGeoms.next()) != null) {
-            m_index = m_inputGeoms.getGeometryID();
-            return densifyByLength(geom);
+        if (hasNext()) {
+            return densifyByLength(m_inputGeoms.next());
         }
         return null;
     }
@@ -157,7 +142,7 @@ class OperatorDensifyByLengthCursor extends GeometryCursor {
             }
         }
 
-        return (Geometry) densifiedPoly;
+        return densifiedPoly;
     }
 
 }

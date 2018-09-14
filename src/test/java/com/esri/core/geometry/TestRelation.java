@@ -71,11 +71,11 @@ public class TestRelation extends TestCase {
 
                 SimpleGeometryCursor simpleGeometryCursor1 = new SimpleGeometryCursor(poly1);
                 SimpleGeometryCursor simpleGeometryCursor2 = new SimpleGeometryCursor(new ArrayDeque<Geometry>(list2));
-                HashMap<Integer, Boolean> relate_map =
+                HashMap<Long, Boolean> relate_map =
                         operatorCrosses.execute(poly1, simpleGeometryCursor2, inputSR, null);
                 assertNotNull(relate_map);
-                assertTrue(!relate_map.get(0));
-                assertTrue(!relate_map.get(1));
+                assertTrue(!relate_map.get(0L));
+                assertTrue(!relate_map.get(1L));
 
 				/*simpleGeometryCursor2 = new SimpleGeometryCursor(list2);
                 SimpleGeometryCursor simpleGeometryCursor3 = new SimpleGeometryCursor(list3);

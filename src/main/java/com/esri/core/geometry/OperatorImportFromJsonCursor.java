@@ -32,7 +32,7 @@ public class OperatorImportFromJsonCursor extends MapGeometryCursor {
 
     int m_type;
 
-    int m_index;
+    long m_index;
 
     public OperatorImportFromJsonCursor(int type, JsonReaderCursor jsonParsers) {
         m_index = -1;
@@ -44,7 +44,7 @@ public class OperatorImportFromJsonCursor extends MapGeometryCursor {
     }
 
     @Override
-    public int getGeometryID() {
+    public long getGeometryID() {
         return m_index;
     }
 

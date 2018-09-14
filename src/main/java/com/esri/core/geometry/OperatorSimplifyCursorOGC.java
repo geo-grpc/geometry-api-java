@@ -24,49 +24,32 @@
 package com.esri.core.geometry;
 
 class OperatorSimplifyCursorOGC extends GeometryCursor {
-
-    GeometryCursor m_inputGeometryCursor;
     SpatialReference m_spatialReference;
     ProgressTracker m_progressTracker;
-
-    int m_index;
     boolean m_bForceSimplify;
 
     OperatorSimplifyCursorOGC(GeometryCursor geoms,
                               SpatialReference spatialRef, boolean bForceSimplify,
                               ProgressTracker progressTracker) {
-        m_progressTracker = progressTracker;
-        m_bForceSimplify = bForceSimplify;
-        m_index = -1;
         if (geoms == null)
             throw new IllegalArgumentException();
 
-        m_inputGeometryCursor = geoms;
+        m_progressTracker = progressTracker;
+        m_bForceSimplify = bForceSimplify;
+
+        m_inputGeoms = geoms;
 
         m_spatialReference = spatialRef;
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
-
-    @Override
     public Geometry next() {
-        Geometry geometry;
-        if ((geometry = m_inputGeometryCursor.next()) != null)// if (geometry =
-        // m_inputGeometryCursor->Next())
-        {
-            m_index = m_inputGeometryCursor.getGeometryID();
-            if ((m_progressTracker != null)
-                    && !(m_progressTracker.progress(-1, -1)))
+        if (hasNext()) {
+            if ((m_progressTracker != null) && !(m_progressTracker.progress(-1, -1)))
                 throw new RuntimeException("user_canceled");
-            return simplify(geometry);
+            return simplify(m_inputGeoms.next());
         }
         return null;
-    }
-
-    @Override
-    public int getGeometryID() {
-        return m_index;
     }
 
     Geometry simplify(Geometry geometry) {

@@ -186,10 +186,8 @@ public class TestBuffer extends TestCase {
     public void testBufferLine() {
         SpatialReference sr = SpatialReference.create(4326);
         Line inputGeom = new Line(12, 120, 20, 120);
-        OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal
-                .getInstance().getOperator(Operator.Type.Buffer);
-        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
-                .getInstance().getOperator(Operator.Type.Simplify);
+        OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
+        OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
         Geometry result = buffer.execute(inputGeom, sr, 40.0, null);
         assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
         Polygon poly = (Polygon) (result);

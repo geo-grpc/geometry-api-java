@@ -9,7 +9,6 @@ import java.util.stream.DoubleStream;
  */
 public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     ProgressTracker m_progressTracker;
-    GeometryCursor m_geoms;
     boolean m_bRemoveDegenerateParts;
     GeneralizeType m_generalizeType;
     double m_percentReduction;
@@ -22,7 +21,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                                           GeneralizeType generalizeType,
                                           SpatialReference spatialReference,
                                           ProgressTracker progressTracker) {
-        m_geoms = geoms;
+        m_inputGeoms = geoms;
         m_progressTracker = progressTracker;
         m_bRemoveDegenerateParts = bRemoveDegenerateParts;
         m_generalizeType = generalizeType;
@@ -38,7 +37,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
                                           GeneralizeType generalizeType,
                                           SpatialReference spatialReference,
                                           ProgressTracker progressTracker) {
-        m_geoms = geoms;
+        m_inputGeoms = geoms;
         m_progressTracker = progressTracker;
         m_bRemoveDegenerateParts = bRemoveDegenerateParts;
         m_generalizeType = generalizeType;
@@ -46,20 +45,13 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
 
         m_maxPointCount = maxPointCount;
     }
-    @Override
-    public boolean hasNext() { return m_geoms != null && m_geoms.hasNext(); }
 
     @Override
     public Geometry next() {
-        Geometry geom = m_geoms.next();
-        if (geom == null)
-            return null;
-        return GeneralizeArea(geom);
-    }
+        if (hasNext())
+            return GeneralizeArea(m_inputGeoms.next());
 
-    @Override
-    public int getGeometryID() {
-        return m_geoms.getGeometryID();
+        return null;
     }
 
     private Geometry GeneralizeArea(Geometry geom) {

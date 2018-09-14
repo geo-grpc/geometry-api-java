@@ -45,7 +45,7 @@ public abstract class MapGeometryCursor implements Iterator<MapGeometry> {
      * the input and output geometry classes. It is not always possible to
      * preserve an ID during an operation.
      */
-    public abstract int getGeometryID();
+    public abstract long getGeometryID();
 
     public abstract boolean hasNext();
 }

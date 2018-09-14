@@ -8,15 +8,12 @@ import java.util.Random;
  * Created by davidraleigh on 5/10/17.
  */
 public class OperatorRandomPointsCursor extends GeometryCursor {
-
-    private GeometryCursor m_inputGeoms;
     private double[] m_pointsPerSquareKm;
     private SpatialReferenceImpl m_spatialReference;
     private ProgressTracker m_progressTracker;
     private Random m_numberGenerator;
     private long m_seed;
 
-    private int m_index;
     private int m_PPSKmindex;
 
     public OperatorRandomPointsCursor(GeometryCursor inputGeoms,
@@ -24,7 +21,6 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
                                long seed,
                                SpatialReference sr,
                                ProgressTracker pr) {
-        m_index = -1;
         m_inputGeoms = inputGeoms;
         m_spatialReference = (SpatialReferenceImpl) sr;
         m_pointsPerSquareKm = pointsPerSquareKm;
@@ -36,29 +32,23 @@ public class OperatorRandomPointsCursor extends GeometryCursor {
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeoms != null && m_inputGeoms.hasNext(); }
-
-    @Override
     public Geometry next() {
-        Geometry geom;
-        while ((geom = m_inputGeoms.next()) != null) {
-            m_index = m_inputGeoms.getGeometryID();
+        if (hasNext()) {
             if (m_PPSKmindex + 1 < m_pointsPerSquareKm.length)
                 m_PPSKmindex++;
 
             m_numberGenerator.setSeed(m_seed);
             try {
-                return RandomPointMaker.generate(geom, m_pointsPerSquareKm[m_PPSKmindex], m_numberGenerator, m_spatialReference, m_progressTracker);
+                return RandomPointMaker.generate(
+                        m_inputGeoms.next(),
+                        m_pointsPerSquareKm[m_PPSKmindex],
+                        m_numberGenerator,
+                        m_spatialReference,
+                        m_progressTracker);
             } catch (PJException e) {
                 throw new GeometryException(e.getMessage());
             }
         }
         return null;
     }
-
-    @Override
-    public int getGeometryID() {
-        return 0;
-    }
-
 }
