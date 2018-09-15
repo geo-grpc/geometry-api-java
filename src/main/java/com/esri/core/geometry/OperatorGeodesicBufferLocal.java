@@ -36,13 +36,7 @@ class OperatorGeodesicBufferLocal extends OperatorGeodesicBuffer {
                                   boolean bReserved,
                                   boolean bUnion,
                                   ProgressTracker progressTracker) {
-
-        if (bUnion) {
-            OperatorGeodesicBufferCursor cursor = new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
-            return ((OperatorUnion) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Union)).execute(cursor, sr, progressTracker);
-        } else {
-            return new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
-        }
+        return new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
     }
 
     @Override

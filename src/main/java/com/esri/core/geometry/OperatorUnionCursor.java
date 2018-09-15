@@ -153,7 +153,6 @@ final class OperatorUnionCursor extends GeometryCursor {
             geom = m_inputGeoms.next();
             if (geom == null) {
                 m_b_done = true;
-                m_inputGeoms = null;
             }
         }
 

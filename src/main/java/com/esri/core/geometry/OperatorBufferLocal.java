@@ -62,11 +62,6 @@ class OperatorBufferLocal extends OperatorBuffer {
                                   int max_vertices_in_full_circle,
                                   boolean b_union,
                                   ProgressTracker progressTracker) {
-        if (b_union) {
-            OperatorBufferCursor cursor = new OperatorBufferCursor(inputGeometries, sr, distances, max_deviation, max_vertices_in_full_circle, false, progressTracker);
-            return OperatorUnion.local().execute(cursor, sr, progressTracker);// (int)Operator_union::Options::enum_disable_edge_dissolver
-        } else {
-            return new OperatorBufferCursor(inputGeometries, sr, distances, max_deviation, max_vertices_in_full_circle, false, progressTracker);
-        }
+        return new OperatorBufferCursor(inputGeometries, sr, distances, max_deviation, max_vertices_in_full_circle, b_union, progressTracker);
     }
 }

@@ -446,7 +446,7 @@ class Bufferer {
 
         @Override
         public boolean hasNext() {
-            return m_geometry != null && m_index < ((MultiPath)m_geometry).getPathCount();
+            return (m_geoms != null && m_geoms.hasNext()) || (m_geometry != null && m_index < ((MultiPath)m_geometry).getPathCount());
         }
 
         @Override

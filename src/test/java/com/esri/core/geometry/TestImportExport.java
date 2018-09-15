@@ -1949,7 +1949,7 @@ public class TestImportExport extends TestCase {
             assertTrue(geometry1.equals(geometry2));
         }
 
-        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(pointArrayDeque, ids);
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(pointArrayDeque.clone(), ids.clone());
         OperatorImportFromWktCursor operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
         int index = 0;
         while (operatorImportFromWktCursor.hasNext()) {
@@ -1962,6 +1962,21 @@ public class TestImportExport extends TestCase {
             assertEquals(point_orig.getX(), geom.getX(), 0.000001);
             assertEquals(point_orig.getY(), geom.getY(), 0.000001);
         }
+        assertTrue(index > 0);
+
+        simpleStringCursor = new SimpleStringCursor(pointArrayDeque.clone(), ids.clone());
+        operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        OperatorProjectCursor operatorProjectCursor = new OperatorProjectCursor(operatorImportFromWktCursor, new ProjectionTransformation(SpatialReference.create(3857), SpatialReference.create(4326)), null);
+        double[]stuff = new double[] {3000};
+        OperatorGeodesicBufferCursor operatorGeodesicBufferCursor = new OperatorGeodesicBufferCursor(operatorProjectCursor, SpatialReference.create(4326), stuff, 10, false, false, null);
+        index = 0;
+        while (operatorGeodesicBufferCursor.hasNext()) {
+            Geometry polygon = operatorGeodesicBufferCursor.next();
+            long geometryID = operatorGeodesicBufferCursor.getGeometryID();
+            assertEquals(geometryID, index + size);
+            index ++;
+        }
+        assertTrue(index > 0);
 
 
     }

@@ -27,6 +27,7 @@ package com.esri.core.geometry;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -184,6 +185,43 @@ public class TestUnion extends TestCase {
         boolean is_simple = OperatorSimplify.local().isSimpleAsFeature(shapelyGeom, null, true, nonSimpleResult, null);
         assertFalse(is_simple);
         assertTrue(OperatorSimplify.local().isSimpleAsFeature(eplGeom, null, true, nonSimpleResult, null));
+    }
+
+    @Test
+    public void testIDPass() {
+        int size = 1000;
+        List<String> points = new ArrayList<>(size);
+        List<Point> pointList = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            double x = randomWithRange(-20, 20);
+            double y = randomWithRange(-20, 20);
+            points.add(String.format("Point(%f %f)", x, y));
+            pointList.add(new Point(x, y));
+        }
+
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor(points);
+        OperatorImportFromWktCursor operatorImportFromWktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
+        double [] distances = new double[]{2.5};
+
+        GeometryCursor operatorBufferCursor  = OperatorBuffer.local().execute(operatorImportFromWktCursor,
+                null,
+                distances,
+                Double.NaN,
+                0,
+                true,
+                null);
+
+        OperatorExportToWkbCursor operatorExportToGeoJsonCursor = new OperatorExportToWkbCursor(0, operatorBufferCursor);
+
+        while (operatorExportToGeoJsonCursor.hasNext()) {
+            ByteBuffer wkb = operatorExportToGeoJsonCursor.next();
+            long id = operatorExportToGeoJsonCursor.getByteBufferID();
+        }
+    }
+
+    static double randomWithRange(double min, double max) {
+        double range = Math.abs(max - min);
+        return (Math.random() * range) + (min <= max ? min : max);
     }
 //    @Test
 //    @Ignore
