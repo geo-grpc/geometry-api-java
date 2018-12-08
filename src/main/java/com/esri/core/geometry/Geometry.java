@@ -617,7 +617,7 @@ public abstract class Geometry implements Serializable {
      */
     @Override
     public String toString() {
-        String snippet = OperatorExportToJson.local().execute(null, this);
+        String snippet = OperatorExportToWkt.local().execute(0, this, null);
         if (snippet.length() > 200) {
             return snippet.substring(0, 197) + "... (" + snippet.length() + " characters)";
         } else {

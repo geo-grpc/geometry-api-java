@@ -15,7 +15,7 @@ WORKDIR /opt/src/geometry-api-java
 RUN ./gradlew build install
 
 
-FROM us.gcr.io/echoparklabs/proj.4:${JRE_TAG}
+FROM echoparklabs/proj.4:${JRE_TAG}
 RUN apt-get update
 
 WORKDIR /opt/src/geometry-api-java/build/libs
