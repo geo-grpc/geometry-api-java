@@ -2,11 +2,10 @@ package com.esri.core.geometry;
 
 import junit.framework.TestCase;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
 import org.proj4.PJ;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 
 /**
@@ -94,8 +93,8 @@ public class TestProjection extends TestCase {
         MultiPoint originalMultiPoint = (MultiPoint) OperatorProject.local().execute(multiPointOut, projectionTransformation, null);
 
         for (int i = 0; i < multiPoint.getPointCount(); i++) {
-            assertEquals(multiPoint.getPoint(i).getX(), originalMultiPoint.getPoint(i).getX(), 1e-10);
-            assertEquals(multiPoint.getPoint(i).getY(), originalMultiPoint.getPoint(i).getY(), 1e-10);
+            assertEquals(multiPoint.getPoint(i).getX(), originalMultiPoint.getPoint(i).getX(), 1e-9);
+            assertEquals(multiPoint.getPoint(i).getY(), originalMultiPoint.getPoint(i).getY(), 1e-9);
         }
     }
 
@@ -119,10 +118,9 @@ public class TestProjection extends TestCase {
         assertEquals(polyline.getPointCount(), polylineOut.getPointCount());
         projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), SpatialReference.create(32632));
         Polyline originalPolyline = (Polyline) OperatorProject.local().execute(polylineOut, projectionTransformation, null);
-
         for (int i = 0; i < polyline.getPointCount(); i++) {
-            assertEquals(polyline.getPoint(i).getX(), originalPolyline.getPoint(i).getX(), 1e-10);
-            assertEquals(polyline.getPoint(i).getY(), originalPolyline.getPoint(i).getY(), 1e-10);
+            assertEquals(polyline.getPoint(i).getX(), originalPolyline.getPoint(i).getX(), 1e-9);
+            assertEquals(polyline.getPoint(i).getY(), originalPolyline.getPoint(i).getY(), 1e-9);
         }
     }
 
@@ -142,8 +140,8 @@ public class TestProjection extends TestCase {
         Polygon originalPolygon = (Polygon) OperatorProject.local().execute(polygonOut, projectionTransformation, null);
 
         for (int i = 0; i < polygon.getPointCount(); i++) {
-            assertEquals(polygon.getPoint(i).getX(), originalPolygon.getPoint(i).getX(), 1e-10);
-            assertEquals(polygon.getPoint(i).getY(), originalPolygon.getPoint(i).getY(), 1e-10);
+            assertEquals(polygon.getPoint(i).getX(), originalPolygon.getPoint(i).getX(), 1e-9);
+            assertEquals(polygon.getPoint(i).getY(), originalPolygon.getPoint(i).getY(), 1e-9);
         }
     }
 

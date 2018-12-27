@@ -24,53 +24,40 @@
 
 package com.esri.core.geometry;
 
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_BYTE_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_CHAR_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_CHAR_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_DOUBLE_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_DOUBLE_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_FLOAT_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_FLOAT_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_INT_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_INT_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_LONG_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_LONG_INDEX_SCALE;
-import static sun.misc.Unsafe.ARRAY_SHORT_BASE_OFFSET;
-import static sun.misc.Unsafe.ARRAY_SHORT_INDEX_SCALE;
+import jdk.internal.misc.Unsafe;
 
 public final class SizeOf {
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_FLOAT = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_FLOAT = 24;
 
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_DBL = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_DBL = 24;
 
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT8 = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT8 = 24;
 
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT16 = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT16 = 24;
 
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT32 = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT32 = 24;
 
-	public static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT64 = 24;
+	static final int SIZE_OF_ATTRIBUTE_STREAM_OF_INT64 = 24;
 
-	public static final int SIZE_OF_ENVELOPE = 32;
+	static final int SIZE_OF_ENVELOPE = 32;
 
-	public static final int SIZE_OF_ENVELOPE2D = 48;
+	static final int SIZE_OF_ENVELOPE2D = 48;
 
-	public static final int SIZE_OF_LINE = 56;
+	static final int SIZE_OF_LINE = 56;
 
-	public static final int SIZE_OF_MULTI_PATH = 24;
+	static final int SIZE_OF_MULTI_PATH = 24;
 
-	public static final int SIZE_OF_MULTI_PATH_IMPL = 112;
+	static final int SIZE_OF_MULTI_PATH_IMPL = 112;
 
-	public static final int SIZE_OF_MULTI_POINT = 24;
+	static final int SIZE_OF_MULTI_POINT = 24;
 
-	public static final int SIZE_OF_MULTI_POINT_IMPL = 56;
+	static final int SIZE_OF_MULTI_POINT_IMPL = 56;
 
-	public static final int SIZE_OF_POINT = 24;
+	static final int SIZE_OF_POINT = 24;
 
-	public static final int SIZE_OF_POLYGON = 24;
+	static final int SIZE_OF_POLYGON = 24;
 
-	public static final int SIZE_OF_POLYLINE = 24;
+	static final int SIZE_OF_POLYLINE = 24;
 
 	public static final int SIZE_OF_OGC_CONCRETE_GEOMETRY_COLLECTION = 24;
 
@@ -86,34 +73,34 @@ public final class SizeOf {
 
 	public static final int SIZE_OF_OGC_POLYGON = 24;
 	
-	public static final int SIZE_OF_MAPGEOMETRY = 24;
+	static final int SIZE_OF_MAPGEOMETRY = 24;
 
-	public static long sizeOfByteArray(int length) {
-		return ARRAY_BYTE_BASE_OFFSET + (((long) ARRAY_BYTE_INDEX_SCALE) * length);
+	static long sizeOfByteArray(int length) {
+		return Unsafe.ARRAY_BYTE_BASE_OFFSET + (((long) Unsafe.ARRAY_BYTE_INDEX_SCALE) * length);
 	}
 
-	public static long sizeOfShortArray(int length) {
-		return ARRAY_SHORT_BASE_OFFSET + (((long) ARRAY_SHORT_INDEX_SCALE) * length);
+	static long sizeOfShortArray(int length) {
+		return Unsafe.ARRAY_SHORT_BASE_OFFSET + (((long) Unsafe.ARRAY_SHORT_INDEX_SCALE) * length);
 	}
 
 	public static long sizeOfCharArray(int length) {
-		return ARRAY_CHAR_BASE_OFFSET + (((long) ARRAY_CHAR_INDEX_SCALE) * length);
+		return Unsafe.ARRAY_CHAR_BASE_OFFSET + (((long) Unsafe.ARRAY_CHAR_INDEX_SCALE) * length);
 	}
 
-	public static long sizeOfIntArray(int length) {
-		return ARRAY_INT_BASE_OFFSET + (((long) ARRAY_INT_INDEX_SCALE) * length);
+	static long sizeOfIntArray(int length) {
+		return Unsafe.ARRAY_INT_BASE_OFFSET + (((long) Unsafe.ARRAY_INT_INDEX_SCALE) * length);
 	}
 
-	public static long sizeOfLongArray(int length) {
-		return ARRAY_LONG_BASE_OFFSET + (((long) ARRAY_LONG_INDEX_SCALE) * length);
+	static long sizeOfLongArray(int length) {
+		return Unsafe.ARRAY_LONG_BASE_OFFSET + (((long) Unsafe.ARRAY_LONG_INDEX_SCALE) * length);
 	}
 
-	public static long sizeOfFloatArray(int length) {
-		return ARRAY_FLOAT_BASE_OFFSET + (((long) ARRAY_FLOAT_INDEX_SCALE) * length);
+	static long sizeOfFloatArray(int length) {
+		return Unsafe.ARRAY_FLOAT_BASE_OFFSET + (((long) Unsafe.ARRAY_FLOAT_INDEX_SCALE) * length);
 	}
 
-	public static long sizeOfDoubleArray(int length) {
-		return ARRAY_DOUBLE_BASE_OFFSET + (((long) ARRAY_DOUBLE_INDEX_SCALE) * length);
+	static long sizeOfDoubleArray(int length) {
+		return Unsafe.ARRAY_DOUBLE_BASE_OFFSET + (((long) Unsafe.ARRAY_DOUBLE_INDEX_SCALE) * length);
 	}
 
 	private SizeOf() {
