@@ -2,8 +2,10 @@ package com.esri.core.geometry;
 
 import junit.framework.TestCase;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import org.junit.rules.ExpectedException;
 import org.proj4.PJ;
 
 import java.util.Arrays;
@@ -496,6 +498,26 @@ public class TestProjection extends TestCase {
         while (reProjectCursor.hasNext()) {
             Geometry geometry = reProjectCursor.next();
             assertTrue(geometry.isEmpty());
+        }
+    }
+
+    @Test
+    public void testProjectionTrans() {
+        Point point = new Point(-180, -90);
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(point);
+
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(null, SpatialReference.create(3035));
+        OperatorProjectCursor projectCursor = new OperatorProjectCursor(simpleGeometryCursor, projectionTransformation, null);
+        OperatorProjectCursor reProjectCursor = new OperatorProjectCursor(projectCursor, projectionTransformation.getReverse(), null);
+
+
+        while (reProjectCursor.hasNext()) {
+            try {
+                Geometry geometry = reProjectCursor.next();
+                assertTrue(geometry.isEmpty());
+            } catch (GeometryException exception) {
+                assertEquals("From and To Spatial references required to Project Geometry", exception.getMessage());
+            }
         }
     }
 }

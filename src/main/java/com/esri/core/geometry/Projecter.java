@@ -74,6 +74,10 @@ class Projecter {
         if (geometry.isEmpty()) {
             return geometry;
         }
+
+        if (projectionTransformation.m_fromSpatialReference == null || projectionTransformation.m_toSpatialReference == null) {
+            throw new GeometryException("From and To Spatial references required to Project Geometry");
+        }
         // TODO check that all project methods no longer use 'new Geometry'
         // TODO maybe push copy down to each geometry type? Envelope shouldn't create copy, right?
         // TODO is clipping creating a new cloned geometry? Should there should be a check so that there aren't too many unnecessary clones
