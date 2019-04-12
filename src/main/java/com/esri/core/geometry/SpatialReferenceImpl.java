@@ -35,7 +35,7 @@ class SpatialReferenceImpl extends SpatialReference {
     public final static int c_SULIMIT32 = 2147483645;
     public final static long c_SULIMIT64 = 9007199254740990L;
     //	https://regex101.com/r/F0FAUw/1
-    public final static Pattern m_pattern = Pattern.compile("^([\\w\\W]+AUTHORITY[\\s]*\\[[\\s]*\"EPSG\"[\\s]*,[\\s]*[\"]*([\\d]+)[\"]*[\\s]*][\\s]*][\\s]*)$");
+    public final static Pattern m_pattern = Pattern.compile("^([\\w\\W]+AUTHORITY[\\s]*\\[[\\s]*\"EPSG\"[\\s]*,[\\s]*[\"]*([\\d]+)[\"]*[\\s]*][\\s]*][\\s\\]]*)$");
     public final static Pattern m_proj4wkid = Pattern.compile("^\\+init=epsg:([\\d]+)");
 
 

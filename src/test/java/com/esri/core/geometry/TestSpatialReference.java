@@ -203,5 +203,18 @@ public class TestSpatialReference extends TestCase {
         spatialReference = SpatialReference.createFromProj4("+proj=longlat +datum=WGS84 +no_defs ");
         assertEquals(SpatialReference.CoordinateSystemType.GEOGRAPHIC, spatialReference.getCoordinateSystemType());
     }
+
+    @Test
+    public void testProj9001() {
+        String tet5 = "PROJCS[\"NUTM30\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.2572221010042,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-3],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]]";
+        String epsg = "+init=epsg:4326";
+        SpatialReference spatialReference = SpatialReference.createFromProj4(epsg);
+        assertEquals(4326, spatialReference.getID());
+        assertEquals(SpatialReference.CoordinateSystemType.GEOGRAPHIC, spatialReference.getCoordinateSystemType());
+
+        SpatialReference spatialReference1 = SpatialReference.create(tet5);
+        assertEquals(9001, spatialReference1.getID());
+        assertEquals("+init=epsg:9001", spatialReference1.getProj4());
+    }
 }
 
