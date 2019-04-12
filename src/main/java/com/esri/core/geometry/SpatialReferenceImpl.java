@@ -308,8 +308,17 @@ class SpatialReferenceImpl extends SpatialReference {
         if (m_userWkid != sr.m_userWkid)
             return false;
 
+
         if (m_userWkid == 0) {
-            if (!m_userWkt.equals(sr.m_userWkt))// m_userWkt cannot be null here!
+            if (m_userWkt != null && sr.m_userWkt != null && m_userWkt.equals(sr.m_userWkt)) {
+                return true;
+            }
+
+            if (m_proj4 != null && sr.m_proj4 != null && m_proj4.equals(sr.m_proj4)) {
+                return true;
+            }
+
+            if ((m_proj4 != null || m_userWkt != null) && (sr.m_proj4 != null || sr.m_userWkt != null))
                 return false;
         }
 

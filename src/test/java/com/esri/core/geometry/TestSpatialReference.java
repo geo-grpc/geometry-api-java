@@ -35,10 +35,11 @@ public class TestSpatialReference extends TestCase {
     public void testEquals() {
         String wktext1 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]";
         String wktext2 = "PROJCS[\"WGS_1984_Web_Mercator_Auxiliary_Sphere\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mercator_Auxiliary_Sphere\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",0.0],PARAMETER[\"Auxiliary_Sphere_Type\",0.0],UNIT[\"Meter\",1.0]]";
-
+        String proj4 = "+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ";
         SpatialReference a1 = SpatialReference.create(wktext1);
         SpatialReference b = SpatialReference.create(wktext2);
         SpatialReference a2 = SpatialReference.create(wktext1);
+        SpatialReference c = SpatialReference.createFromProj4(proj4);
 
         assertTrue(a1.equals(a1));
         assertTrue(b.equals(b));
@@ -47,6 +48,9 @@ public class TestSpatialReference extends TestCase {
 
         assertFalse(a1.equals(b));
         assertFalse(b.equals(a1));
+
+        assertFalse(c.equals(a1));
+        assertFalse(c.equals(b));
     }
 
     @Test
@@ -215,6 +219,13 @@ public class TestSpatialReference extends TestCase {
         SpatialReference spatialReference1 = SpatialReference.create(tet5);
         assertEquals(9001, spatialReference1.getID());
         assertEquals("+init=epsg:9001", spatialReference1.getProj4());
+    }
+
+    @Test
+    public void testProjEquality() {
+        SpatialReference spatialReference = SpatialReference.createFromProj4("+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ");
+        SpatialReference spatialReference2 = SpatialReference.createFromProj4("+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ");
+        assertEquals(spatialReference, spatialReference2);
     }
 }
 
