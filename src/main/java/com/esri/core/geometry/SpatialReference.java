@@ -104,6 +104,16 @@ public abstract class SpatialReference implements Serializable {
         return SpatialReference.create(epsg_code + bump);
     }
 
+    public static SpatialReference createEqualArea(double lon_0, double lat_0) {
+        // create projection transformation that goes from input to input's equal area azimuthal projection
+        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        String proj4 = String.format(
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                lat_0,
+                lon_0);
+        return SpatialReference.createFromProj4(proj4);
+    }
+
 
     public static SpatialReference createEqualArea(Geometry geometry, SpatialReference spatialReference) {
         Envelope2D inputEnvelope2D = new Envelope2D();
@@ -131,13 +141,7 @@ public abstract class SpatialReference implements Serializable {
         double longitude = ptCenter.x;
         double latitude = ptCenter.y;
 
-        // create projection transformation that goes from input to input's equal area azimuthal projection
-        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
-        String proj4 = String.format(
-                "+proj=laea +lat_0=%f +lon_0=%f +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-                latitude,
-                longitude);
-        return SpatialReference.createFromProj4(proj4);
+        return createEqualArea(longitude, latitude);
     }
 
     /**
