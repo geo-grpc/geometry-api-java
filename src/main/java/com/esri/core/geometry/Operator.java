@@ -33,28 +33,53 @@ public abstract class Operator {
      * The operator type enum.
      */
     public enum Type {
+//        TODO, if you change the order of this you will ruin the geometry service
         Project,
-
-        ExportToJson, ImportFromJson,
-        ExportToESRIShape, ImportFromESRIShape,
-
-        Union, Difference,
-
+        ExportToJson,
+        ImportFromJson,
+        ExportToESRIShape,
+        ImportFromESRIShape,
+        Union,
+        Difference,
         Proximity2D,
-
-        Relate, Equals, Disjoint, Intersects, Within, Contains, Crosses, Touches, Overlaps,
-
-        Buffer, Distance, Intersection, Clip, Cut, DensifyByLength,
-        DensifyByAngle, LabelPoint,
-
-        GeodesicBuffer, GeodeticDensifyByLength, ShapePreservingDensify, GeodeticLength, GeodeticArea,
-
-        Simplify, SimplifyOGC, Offset, Generalize, GeneralizeByArea,
-
-        ExportToWkb, ImportFromWkb, ExportToWkt, ImportFromWkt, ImportFromGeoJson, ExportToGeoJson, SymmetricDifference, ConvexHull, Boundary,
-
-        RandomPoints, EnclosingCircle
-
+        Relate,
+        Equals,
+        Disjoint,
+        Intersects,
+        Within,
+        Contains,
+        Crosses,
+        Touches,
+        Overlaps,
+        Buffer,
+        Distance,
+        Intersection,
+        Clip,
+        Cut,
+        DensifyByLength,
+        DensifyByAngle,
+        LabelPoint,
+        GeodesicBuffer,
+        GeodeticDensifyByLength,
+        ShapePreservingDensify,
+        GeodeticLength,
+        GeodeticArea,
+        Simplify,
+        SimplifyOGC,
+        Offset,
+        Generalize,
+        GeneralizeByArea,
+        ExportToWkb,
+        ImportFromWkb,
+        ExportToWkt,
+        ImportFromWkt,
+        ImportFromGeoJson,
+        ExportToGeoJson,
+        SymmetricDifference,
+        ConvexHull,
+        Boundary,
+        RandomPoints,
+        EnclosingCircle
     }
 
     public abstract Type getType();

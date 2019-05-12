@@ -53,34 +53,6 @@ public class ProjectionTransformation {
     }
 
     public static ProjectionTransformation getEqualArea(Geometry geometry, SpatialReference spatialReference) {
-        // TODO implement projection
-        if (spatialReference.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC)
-            throw new GeometryException("Not implemented for Projected geometries");
-
-        // TODO change proj4 string below to include other GEOGRAPHIC
-        if (spatialReference.getID() != 4326) {
-            throw new GeometryException("Not implemented for any GEOGRAPHIC except WGS84");
-        }
-
-        Envelope2D inputEnvelope2D = new Envelope2D();
-        geometry.queryEnvelope2D(inputEnvelope2D);
-
-        // From GEOGRAPHIC Grab point
-        double a = spatialReference.getMajorAxis();
-        double e2 = spatialReference.getEccentricitySquared();
-
-        Point2D ptCenter = new Point2D();
-        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
-        double longitude = ptCenter.x;
-        double latitude = ptCenter.y;
-
-        // create projection transformation that goes from input to input's equal area azimuthal projection
-        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
-        String proj4 = String.format(
-                "+proj=laea +lat_0=%f +lon_0=%f +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-                latitude,
-                longitude);
-        SpatialReference spatialReferenceAzi = SpatialReference.createFromProj4(proj4);
-        return new ProjectionTransformation(spatialReference, spatialReferenceAzi);
+        return new ProjectionTransformation(spatialReference, SpatialReference.createEqualArea(geometry, spatialReference));
     }
 }

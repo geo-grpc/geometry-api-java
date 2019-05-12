@@ -103,6 +103,43 @@ public abstract class SpatialReference implements Serializable {
 
         return SpatialReference.create(epsg_code + bump);
     }
+
+
+    public static SpatialReference createEqualArea(Geometry geometry, SpatialReference spatialReference) {
+        Envelope2D inputEnvelope2D = new Envelope2D();
+
+        if (spatialReference == null) {
+            throw new GeometryException("Requires spatial reference");
+        }
+
+        if (spatialReference.getID() != 4326) {
+            OperatorProject operatorProject = (OperatorProject) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Project);
+            // TODO this should be grabbing the GCS wkid from the input spatialreference instead of assuming 4326
+            ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, SpatialReference.create(4326));
+            Geometry projectedGeom = operatorProject.execute(geometry, projectionTransformation, null);
+            projectedGeom.queryEnvelope2D(inputEnvelope2D);
+        } else {
+            geometry.queryEnvelope2D(inputEnvelope2D);
+        }
+
+        // From GEOGRAPHIC Grab point
+        double a = spatialReference.getMajorAxis();
+        double e2 = spatialReference.getEccentricitySquared();
+
+        Point2D ptCenter = new Point2D();
+        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
+        double longitude = ptCenter.x;
+        double latitude = ptCenter.y;
+
+        // create projection transformation that goes from input to input's equal area azimuthal projection
+        // +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        String proj4 = String.format(
+                "+proj=laea +lat_0=%f +lon_0=%f +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+                latitude,
+                longitude);
+        return SpatialReference.createFromProj4(proj4);
+    }
+
     /**
      * Creates an instance of the spatial reference based on the provided well
      * known text representation for the horizontal coordinate system.

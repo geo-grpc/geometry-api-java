@@ -10,6 +10,9 @@ import org.proj4.PJ;
 
 import java.util.Arrays;
 
+import static com.esri.core.geometry.Operator.Type.ExportToJson;
+import static com.esri.core.geometry.Operator.Type.Project;
+
 /**
  * Created by davidraleigh on 11/3/16.
  */
@@ -519,5 +522,33 @@ public class TestProjection extends TestCase {
                 assertEquals("From and To Spatial references required to Project Geometry", exception.getMessage());
             }
         }
+    }
+
+    @Test
+    public void testIdNumber() {
+        assertEquals(0, Project.ordinal());
+        assertEquals(1, ExportToJson.ordinal());
+    }
+
+    @Test
+    public void testAziEA() {
+        MultiPoint multiPoint = new MultiPoint();
+        multiPoint.add(0,0);
+        multiPoint.add(1,1);
+        multiPoint.add(-1,-1);
+        SpatialReference utmZone = SpatialReference.createUTM(multiPoint);
+        SpatialReference spatialReferenceWGS84 = SpatialReference.create(4326);
+        ProjectionTransformation projectionTransformationUTM = new ProjectionTransformation(spatialReferenceWGS84, utmZone);
+        Geometry utmPoint = GeometryEngine.project(multiPoint, spatialReferenceWGS84, utmZone);
+        Geometry utmPoint2 = OperatorProject.local().execute(multiPoint, projectionTransformationUTM, null);
+        ProjectionTransformation projectionTransformationAziUTM = ProjectionTransformation.getEqualArea(utmPoint, utmZone);
+        ProjectionTransformation projectionTransformationAziWGS84 = ProjectionTransformation.getEqualArea(multiPoint, spatialReferenceWGS84);
+        Geometry aziPoint1 = OperatorProject.local().execute(utmPoint, projectionTransformationAziUTM, null);
+        Geometry aziPoint2 = OperatorProject.local().execute(multiPoint, projectionTransformationAziWGS84, null);
+        assertEquals(((MultiPoint)aziPoint1).getPoint(0).getX(), ((MultiPoint)aziPoint2).getPoint(0).getX());
+        Geometry utmPoint1 = OperatorProject.local().execute(aziPoint1, projectionTransformationAziUTM.getReverse(), null);
+        Geometry wgs84Point1 = OperatorProject.local().execute(aziPoint2, projectionTransformationAziWGS84.getReverse(), null);
+        Geometry wgs84Point2 = OperatorProject.local().execute(utmPoint1, projectionTransformationUTM.getReverse(), null);
+        assertEquals(((MultiPoint)wgs84Point1).getPoint(2).getY(), ((MultiPoint)wgs84Point2).getPoint(2).getY(), 0.0000000000001);
     }
 }

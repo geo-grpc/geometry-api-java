@@ -63,11 +63,11 @@ class GeodesicDensifier {
     private Geometry densifySegment(Segment geom) {
         double length = geodesicDistanceOnWGS84(geom);
         if (length <= m_maxLength)
-            return (Geometry) geom;
+            return geom;
 
         Polyline polyline = new Polyline(geom.getDescription());
         polyline.addSegment(geom, true);
-        return densifyMultiPath((MultiPath) polyline);
+        return densifyMultiPath(polyline);
     }
 
     private Geometry densifyEnvelope(Envelope geom) {
@@ -81,9 +81,9 @@ class GeodesicDensifier {
         double height = geodesicDistanceOnWGS84(env2D.getUpperLeft(), env2D.getLowerLeft());// height on right is same as left. meridians are geodesics
 
         if (wTop <= m_maxLength && wBottom <= m_maxLength && height <= m_maxLength)
-            return (Geometry) polygon;
+            return polygon;
 
-        return densifyMultiPath((MultiPath) polygon);
+        return densifyMultiPath(polygon);
     }
 
     private Geometry densifyMultiPath(MultiPath geom) {
@@ -167,6 +167,6 @@ class GeodesicDensifier {
             }
         }
 
-        return (Geometry) densifiedPoly;
+        return densifiedPoly;
     }
 }
