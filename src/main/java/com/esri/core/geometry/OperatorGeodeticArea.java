@@ -27,7 +27,7 @@ package com.esri.core.geometry;
 /**
  * A base class for the ExportToESRIShape Operator.
  */
-abstract class OperatorGeodeticArea extends Operator {
+public abstract class OperatorGeodeticArea extends Operator {
 
     @Override
     public Type getType() {
