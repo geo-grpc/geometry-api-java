@@ -757,6 +757,42 @@ public class TestGeodetic extends TestCase {
 
     }
 
+    @Test
+    public void testProjectedGeodetic() {
+        /*
+                // POINT (4322181.519435114 3212199.338618969) proj4: "+proj=laea +lat_0=31.593750 +lon_0=-94.718750 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+        SpatialReferenceData spatialReferenceData = SpatialReferenceData.newBuilder().setProj4("+proj=laea +lat_0=31.593750 +lon_0=-94.718750 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs").build();
+        GeometryData geometryData = GeometryData.newBuilder().setWkt("POINT (4322181.519435114 3212199.338618969)").setSr(spatialReferenceData).build();
+        GeometryRequest geometryRequest = GeometryRequest
+                .newBuilder()
+                .setGeometry(geometryData)
+                .setOperator(OperatorType.GEODESIC_BUFFER)
+                .setBufferParams(GeometryRequest.BufferParams.newBuilder().setDistance(200).build())
+                .setResultEncoding(Encoding.WKT)
+                .build();
+
+        GeometryServiceGrpc.GeometryServiceBlockingStub stub = GeometryServiceGrpc.newBlockingStub(inProcessChannel);
+        GeometryResponse geometryResponse = stub.geometryOperationUnary(geometryRequest);
+
+        GeometryRequest geometryRequest1 = GeometryRequest
+                .newBuilder()
+                .setLeftGeometry(geometryResponse.getGeometry())
+                .setRightGeometry(geometryData)
+                .setOperator(OperatorType.INTERSECTS)
+                .build();
+
+        GeometryResponse geometryResponse1 = stub.geometryOperationUnary(geometryRequest1);
+        assertTrue(geometryResponse1.getSpatialRelationship());
+         */
+        Geometry point = GeometryEngine.geometryFromWkt("POINT (4322181.519435114 3212199.338618969)", 0, Geometry.Type.Unknown);
+        SpatialReference spatialReference = SpatialReference.createFromProj4("+proj=laea +lat_0=31.593750 +lon_0=-94.718750 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+        OperatorGeodesicBuffer operatorGeodesicBuffer = (OperatorGeodesicBuffer)OperatorFactoryLocal.getInstance().getOperator(Operator.Type.GeodesicBuffer);
+        Geometry buffered = operatorGeodesicBuffer.execute(point, spatialReference, GeodeticCurveType.Geodesic, 400, Double.NaN, false, null);
+
+        assertFalse(GeometryEngine.disjoint(buffered, point, spatialReference));
+    }
+
+
     public void testLengthAccurateCR191313() {
         /*
 		 * // random_test(); OperatorFactoryLocal engine =
@@ -776,6 +812,8 @@ public class TestGeodetic extends TestCase {
 		 * assertTrue(Math.abs(length - 2738362.3249366437) < 2e-9 * length);
 		 */
     }
+
+
 
 
 }
