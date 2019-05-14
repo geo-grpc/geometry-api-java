@@ -36,16 +36,19 @@ class OperatorGeodesicBufferLocal extends OperatorGeodesicBuffer {
                                   boolean bReserved,
                                   boolean bUnion,
                                   ProgressTracker progressTracker) {
+        SpatialReference gcs = SpatialReference.create(4326);
         if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
             // TODO assigning to WGS 84, but should grab GCS from projection
-            ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, SpatialReference.create(4326));
+            ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, gcs);
             inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
+        } else {
+            gcs = sr;
         }
 
-        inputGeometries = new OperatorGeodesicBufferCursor(inputGeometries, sr, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
+        inputGeometries = new OperatorGeodesicBufferCursor(inputGeometries, gcs, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
 
         if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
-            ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), sr);
+            ProjectionTransformation projectionTransformation = new ProjectionTransformation(gcs, sr);
             inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
         }
 
