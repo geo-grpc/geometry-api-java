@@ -813,6 +813,99 @@ public class TestGeodetic extends TestCase {
 		 */
     }
 
+    public void testGeodeticLength() {
+        Polyline polyline = new Polyline();
+        polyline.startPath(0,0);
+        polyline.lineTo(1, 0);
+        double length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length);
+
+        polyline = new Polyline();
+        polyline.startPath(0,0);
+        polyline.lineTo(-1, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length);
+
+        polyline = new Polyline();
+        polyline.startPath(179,0);
+        polyline.lineTo(-180, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(-179,0);
+        polyline.lineTo(-180, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(179,0);
+        polyline.lineTo(180, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(180,0);
+        polyline.lineTo(179, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(180,0);
+        polyline.lineTo(177, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(3 * 111319.4907932264, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(0,90);
+        polyline.lineTo(0, 0);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(1,0);
+        polyline.lineTo(1, 90);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000, length, 14);
+
+        polyline = new Polyline();
+        polyline.startPath(1,90);
+        polyline.lineTo(1, 0);
+        polyline.lineTo(0, 0);
+        polyline.lineTo(0,90);
+        length = OperatorGeodeticLength.local().execute(polyline, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000 * 2 + 111319.4907932264, length, 14);
+
+        Polygon polygon = new Polygon();
+        polygon.startPath(1,90);
+        polygon.lineTo(1, 0);
+        polygon.lineTo(0, 0);
+        polygon.lineTo(0,90);
+        length = OperatorGeodeticLength.local().execute(polygon, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000 * 2 + 111319.4907932264, length, 14);
+
+
+        polygon = new Polygon();
+        polygon.startPath(10,90);
+        polygon.lineTo(10, 0);
+        polygon.lineTo(0, 0);
+        polygon.lineTo(0,90);
+        polygon.closeAllPaths();
+        length = OperatorGeodeticLength.local().execute(polygon, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(2.11171263665557E7, length, 14);
+
+        polygon = new Polygon();
+        polygon.startPath(10,90);
+        polygon.lineTo(10, 0);
+        polygon.lineTo(0, 0);
+        polygon.lineTo(0,90);
+        polygon.startPath(8, 3);
+        polygon.lineTo(2, 3);
+        polygon.lineTo(5, 80);
+        length = OperatorGeodeticLength.local().execute(polygon, SpatialReference.create(4326), GeodeticCurveType.Geodesic, null);
+        assertEquals(3.889408543061711E7, length, 14);
+
+    }
 
 
 

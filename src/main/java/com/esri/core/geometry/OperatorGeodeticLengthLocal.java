@@ -27,8 +27,42 @@ package com.esri.core.geometry;
 //This is a stub
 class OperatorGeodeticLengthLocal extends OperatorGeodeticLength {
     @Override
-    public double execute(Geometry geom, SpatialReference sr,
-                          int geodeticCurveType, ProgressTracker progressTracker) {
-        throw new GeometryException("not implemented");
+    public double execute(Geometry geom,
+                          SpatialReference sr,
+                          int geodeticCurveType,
+                          ProgressTracker progressTracker) {
+        if (geodeticCurveType != GeodeticCurveType.Geodesic) {
+            throw new GeometryException("only Geodesic implemented");
+        }
+        if (geom.getType() == Geometry.Type.MultiPoint || geom.getType() == Geometry.Type.Point) {
+            return 0;
+        }
+
+        SegmentIteratorImpl segIter;
+        double a, e2;
+        if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
+            SpatialReference wgs84 = SpatialReference.create(4326);
+            ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, wgs84);
+            MultiPathImpl projected = (MultiPathImpl)OperatorProject.local().execute(geom, projectionTransformation, progressTracker);
+            segIter = projected.querySegmentIterator();
+            a = wgs84.getMajorAxis();
+            e2 = wgs84.getEccentricitySquared();
+        } else {
+            segIter = ((MultiPathImpl)geom._getImpl()).querySegmentIterator();
+            a = sr.getMajorAxis();
+            e2 = sr.getEccentricitySquared();
+        }
+
+        MathUtils.KahanSummator len = new MathUtils.KahanSummator(0);
+
+        while (segIter.nextPath()) {
+            while (segIter.hasNextSegment()) {
+                Segment segment = segIter.nextSegment();
+                double dist = GeoDist.geodesicDistance(a, e2, segment.getStartXY(), segment.getEndXY(), null, null);
+                len.add(dist);
+            }
+        }
+
+        return len.getResult();
     }
 }

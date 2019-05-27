@@ -551,4 +551,21 @@ public class TestProjection extends TestCase {
         Geometry wgs84Point2 = OperatorProject.local().execute(utmPoint1, projectionTransformationUTM.getReverse(), null);
         assertEquals(((MultiPoint)wgs84Point1).getPoint(2).getY(), ((MultiPoint)wgs84Point2).getPoint(2).getY(), 0.0000000000001);
     }
+
+    @Test
+    public void testAziRoundTrip() {
+        String wkt= "POLYGON ((39.99430071558862 19.99640653733888, 39.99430071558862 20.00359325081125, 40.00569928441138 20.00359325081125, 40.00569928441138 19.99640653733888, 39.99430071558862 19.99640653733888))";
+        Geometry geometry = GeometryEngine.geometryFromWkt(wkt, 0, Geometry.Type.Unknown);
+        SpatialReference spatialReference4326 = SpatialReference.create(4326);
+        SpatialReference spatialReferenceAzi = SpatialReference.createEqualArea(40, 20);
+
+        // TODO this loses data
+        Geometry roundTrip = GeometryEngine.project(GeometryEngine.project(geometry, spatialReference4326, spatialReferenceAzi), spatialReferenceAzi, spatialReference4326);
+        // TODO lost data if it were assertTrue(GeometryEngine.equals(geometry, roundTrip, spatialReference4326)); it would faile
+
+        Geometry buffered = GeometryEngine.buffer(geometry, spatialReference4326, spatialReference4326.getTolerance() * 3);
+        assertTrue(GeometryEngine.contains(buffered, roundTrip, spatialReference4326));
+        Geometry difference = GeometryEngine.difference(geometry, roundTrip, spatialReference4326);
+        assertEquals(difference.calculateArea2D(), 0.0);
+    }
 }

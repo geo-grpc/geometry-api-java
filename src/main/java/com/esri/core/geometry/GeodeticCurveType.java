@@ -26,7 +26,7 @@ package com.esri.core.geometry;
 /**
  * Values for use in Geodetic length and area calculations
  */
-interface GeodeticCurveType {
+public interface GeodeticCurveType {
     /**
      * Shortest distance between two points on an ellipsoide
      */

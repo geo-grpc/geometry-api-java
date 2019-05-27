@@ -209,6 +209,33 @@ final class GeoDist {
         return answer.val;
     }
 
+    public static Point2D getEnvCenter(Geometry geometry, SpatialReference spatialReference) {
+        Envelope2D inputEnvelope2D = new Envelope2D();
+
+        if (spatialReference == null) {
+            throw new GeometryException("Requires spatial reference");
+        }
+
+        if (spatialReference.getID() != 4326) {
+            OperatorProject operatorProject = (OperatorProject) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Project);
+            // TODO this should be grabbing the GCS wkid from the input spatialreference instead of assuming 4326
+            ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, SpatialReference.create(4326));
+            Geometry projectedGeom = operatorProject.execute(geometry, projectionTransformation, null);
+            projectedGeom.queryEnvelope2D(inputEnvelope2D);
+        } else {
+            geometry.queryEnvelope2D(inputEnvelope2D);
+        }
+
+        // From GEOGRAPHIC Grab point
+        double a = spatialReference.getMajorAxis();
+        double e2 = spatialReference.getEccentricitySquared();
+
+        Point2D ptCenter = new Point2D();
+        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
+
+        return ptCenter;
+    }
+
     public static void getEnvCenter(double a,
                                     double e2,
                                     Envelope2D env2D,

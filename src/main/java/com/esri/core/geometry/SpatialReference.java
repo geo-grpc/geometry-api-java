@@ -29,11 +29,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.Math;
-import com.esri.core.geometry.SpatialReference;
-import com.esri.core.geometry.SpatialReferenceSerializer;
-import com.esri.core.geometry.VertexDescription;
-import com.fasterxml.jackson.core.JsonParser;
-import org.proj4.PJ;
 
 /**
  * A class that represents the spatial reference for the geometry.
@@ -114,30 +109,8 @@ public abstract class SpatialReference implements Serializable {
         return SpatialReference.createFromProj4(proj4);
     }
 
-
     public static SpatialReference createEqualArea(Geometry geometry, SpatialReference spatialReference) {
-        Envelope2D inputEnvelope2D = new Envelope2D();
-
-        if (spatialReference == null) {
-            throw new GeometryException("Requires spatial reference");
-        }
-
-        if (spatialReference.getID() != 4326) {
-            OperatorProject operatorProject = (OperatorProject) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Project);
-            // TODO this should be grabbing the GCS wkid from the input spatialreference instead of assuming 4326
-            ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, SpatialReference.create(4326));
-            Geometry projectedGeom = operatorProject.execute(geometry, projectionTransformation, null);
-            projectedGeom.queryEnvelope2D(inputEnvelope2D);
-        } else {
-            geometry.queryEnvelope2D(inputEnvelope2D);
-        }
-
-        // From GEOGRAPHIC Grab point
-        double a = spatialReference.getMajorAxis();
-        double e2 = spatialReference.getEccentricitySquared();
-
-        Point2D ptCenter = new Point2D();
-        GeoDist.getEnvCenter(a, e2, inputEnvelope2D, ptCenter);
+        Point2D ptCenter = GeoDist.getEnvCenter(geometry, spatialReference);
         double longitude = ptCenter.x;
         double latitude = ptCenter.y;
 

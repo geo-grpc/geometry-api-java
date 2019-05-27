@@ -24,12 +24,10 @@
 
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.Operator.Type;
-
 /**
  * Geodetic length calculation.
  */
-abstract class OperatorGeodeticLength extends Operator {
+public abstract class OperatorGeodeticLength extends Operator {
 
     @Override
     public Type getType() {
