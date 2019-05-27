@@ -43,8 +43,8 @@ class OperatorGeodeticLengthLocal extends OperatorGeodeticLength {
         if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
             SpatialReference wgs84 = SpatialReference.create(4326);
             ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, wgs84);
-            MultiPathImpl projected = (MultiPathImpl)OperatorProject.local().execute(geom, projectionTransformation, progressTracker);
-            segIter = projected.querySegmentIterator();
+            Geometry projected = OperatorProject.local().execute(geom, projectionTransformation, progressTracker);
+            segIter = ((MultiPathImpl)projected._getImpl()).querySegmentIterator();
             a = wgs84.getMajorAxis();
             e2 = wgs84.getEccentricitySquared();
         } else {
