@@ -79,7 +79,8 @@ public abstract class Operator {
         ConvexHull,
         Boundary,
         RandomPoints,
-        EnclosingCircle
+        EnclosingCircle,
+        GeodeticInverse
     }
 
     public abstract Type getType();

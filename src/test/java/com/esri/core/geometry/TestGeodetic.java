@@ -908,5 +908,43 @@ public class TestGeodetic extends TestCase {
     }
 
 
+    public void testInverse() {
+        SpatialReference sr = SpatialReference.create(4326);
+        Point point1 = new Point(0,0);
+        Point point2 = new Point(-1, 0);
+        InverseResult inverseResult = OperatorGeodeticInverse.local().execute(point1, point2, sr, sr, GeodeticCurveType.Geodesic, null);
 
+        assertEquals(111319.4907932264, inverseResult.getDistance_m());
+        assertEquals(-Math.PI / 2, inverseResult.getAz12_rad());
+        assertEquals(Math.PI / 2, inverseResult.getAz21_rad());
+
+        point1 = new Point(179,0);
+        point2 = new Point(-180, 0);
+        inverseResult = OperatorGeodeticInverse.local().execute(point1, point2, sr, sr, GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, inverseResult.getDistance_m(), 14);
+        assertEquals(Math.PI / 2, inverseResult.getAz12_rad());
+        assertEquals(-Math.PI / 2, inverseResult.getAz21_rad());
+
+        point2 = new Point(179,0);
+        point1 = new Point(-180, 0);
+        inverseResult = OperatorGeodeticInverse.local().execute(point1, point2, sr, sr, GeodeticCurveType.Geodesic, null);
+        assertEquals(111319.4907932264, inverseResult.getDistance_m(), 14);
+        assertEquals(-Math.PI / 2, inverseResult.getAz12_rad());
+        assertEquals(Math.PI / 2, inverseResult.getAz21_rad());
+
+
+        point1 = new Point(0,90);
+        point2 = new Point(0, 0);
+        inverseResult = OperatorGeodeticInverse.local().execute(point1, point2, sr, sr, GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000, inverseResult.getDistance_m(), 14);
+        assertEquals(Math.PI, inverseResult.getAz12_rad());
+        assertEquals(0, inverseResult.getAz21_rad(), 14);
+
+        point1 = new Point(1,0);
+        point2 = new Point(1, 90);
+        inverseResult = OperatorGeodeticInverse.local().execute(point1, point2, sr, sr, GeodeticCurveType.Geodesic, null);
+        assertEquals(10001.96572931 * 1000, inverseResult.getDistance_m(), 14);
+        assertEquals(0, inverseResult.getAz12_rad(), 14);
+        assertEquals(Math.PI, inverseResult.getAz21_rad(), 14);
+    }
 }

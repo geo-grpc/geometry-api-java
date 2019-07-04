@@ -24,8 +24,6 @@
 
 package com.esri.core.geometry;
 
-import com.esri.core.geometry.PeDouble;
-
 final class GeoDist {
     private static final double PE_PI = 3.14159265358979323846264;
     private static final double PE_PI2 = 1.57079632679489661923132;
@@ -304,6 +302,27 @@ final class GeoDist {
                 azFromTo,
                 azToFrom);
         return answer.val;
+    }
+
+    // TODO replace geodesic_distance_ngs with this and get rid of PeDouble
+    static public InverseResult geodesicInverse(double a,
+                                                double e2,
+                                                Point2D fromPoint,
+                                                Point2D toPoint) {
+        PeDouble az12 = new PeDouble();
+        PeDouble az21 = new PeDouble();
+        PeDouble distance = new PeDouble();
+        GeoDist.geodesic_distance_ngs(
+                a,
+                e2,
+                fromPoint.x * DEG_TO_RAD,
+                fromPoint.y * DEG_TO_RAD,
+                toPoint.x * DEG_TO_RAD,
+                toPoint.y * DEG_TO_RAD,
+                distance,
+                az12,
+                az21);
+        return new InverseResult(az12.val, az21.val, distance.val);
     }
 
     static public void geodesic_forward(double a,
