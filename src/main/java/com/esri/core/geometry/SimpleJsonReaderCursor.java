@@ -28,24 +28,32 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class SimpleJsonReaderCursor extends JsonReaderCursor {
-    ArrayDeque<JsonReader> m_jsonDeque;
-    int m_index;
+    private ArrayDeque<JsonReader> m_jsonDeque;
+    private int m_index= -1;
+    private String currentFeatureID = "";
+    private SimpleStateEnum simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
 
     public SimpleJsonReaderCursor(JsonReader jsonString) {
         m_jsonDeque = new ArrayDeque<>(1);
         m_jsonDeque.add(jsonString);
-        m_index = -1;
     }
 
     public SimpleJsonReaderCursor(JsonReader[] jsonStringArray) {
         m_jsonDeque = Arrays.stream(jsonStringArray).collect(Collectors.toCollection(ArrayDeque::new));
-        m_index = -1;
     }
 
     @Override
     public int getID() {
         return m_index;
     }
+
+    @Override
+    public SimpleStateEnum getSimpleState() {
+        return simpleState;
+    }
+
+    @Override
+    public String getFeatureID() { return currentFeatureID ; }
 
     @Override
     public boolean hasNext() {

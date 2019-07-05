@@ -36,42 +36,51 @@ class OperatorCutCursor extends GeometryCursor {
     Polyline m_cutter;
     double m_tolerance;
     ProgressTracker m_progressTracker;
+    SpatialReference m_spatialReference;
     int m_cutIndex;
     ArrayList<MultiPath> m_cuts = null;
     boolean m_bFirstCall = false;
 
-    OperatorCutCursor(boolean bConsiderTouch, Geometry cuttee, Polyline cutter,
-                      SpatialReference spatialReference, ProgressTracker progressTracker) {
-        if (cuttee == null || cutter == null)
-            throw new GeometryException("invalid argument");
+    OperatorCutCursor(boolean bConsiderTouch,
+                      GeometryCursor cutteeCursor,
+                      Polyline cutter,
+                      SpatialReference spatialReference,
+                      ProgressTracker progressTracker) {
 
         m_bConsiderTouch = bConsiderTouch;
-        m_cuttee = cuttee;
+        m_inputGeoms = cutteeCursor;
         m_cutter = cutter;
-        Envelope2D e = InternalUtils.getMergedExtent(cuttee, cutter);
-        m_tolerance = InternalUtils.calculateToleranceFromGeometry(spatialReference, e, true);
+        m_spatialReference = spatialReference;
         m_cutIndex = -1;
         m_progressTracker = progressTracker;
         m_bFirstCall = true;
     }
 
-    // TODO maybe return inputs geometry id?
-    @Override
-    public long getGeometryID() {
-        return 0;
-    }
-
     @Override
     public boolean hasNext() {
+        return m_inputGeoms != null && (m_inputGeoms.hasNext() || (m_bFirstCall || m_cutIndex + 1 < m_cuts.size()));
+    }
+
+    private boolean hasNextRes() {
         return m_bFirstCall || m_cutIndex + 1 < m_cuts.size();
     }
 
     @Override
     public Geometry next() {
-        m_bFirstCall = false;
-        generateCuts_();
-        if (++m_cutIndex < m_cuts.size()) {
-            return m_cuts.get(m_cutIndex);
+        if (m_bFirstCall || (m_inputGeoms != null && m_inputGeoms.hasNext() && !(m_cutIndex + 1 < m_cuts.size()))) {
+            m_cuttee = m_inputGeoms.next();
+            Envelope2D e = InternalUtils.getMergedExtent(m_cuttee, m_cutter);
+            m_tolerance = InternalUtils.calculateToleranceFromGeometry(m_spatialReference, e, true);
+            m_bFirstCall = true;
+            m_cutIndex = -1;
+        }
+
+        if (hasNextRes()) {
+            m_bFirstCall = false;
+            generateCuts_();
+            if (++m_cutIndex < m_cuts.size()) {
+                return m_cuts.get(m_cutIndex);
+            }
         }
 
         return null;

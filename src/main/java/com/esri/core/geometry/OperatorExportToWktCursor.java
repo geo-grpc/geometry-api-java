@@ -1,8 +1,9 @@
 package com.esri.core.geometry;
 
 public class OperatorExportToWktCursor extends StringCursor {
-    GeometryCursor m_geometryCursor;
-    int m_export_flags;
+    private GeometryCursor m_geometryCursor;
+    private int m_export_flags;
+    private SimpleStateEnum simpleStateEnum = SimpleStateEnum.SIMPLE_UNKNOWN;
 
     public OperatorExportToWktCursor(int exportFlags, GeometryCursor geometryCursor, ProgressTracker progressTracker) {
         if (geometryCursor == null)
@@ -14,8 +15,10 @@ public class OperatorExportToWktCursor extends StringCursor {
 
     @Override
     public String next() {
-        Geometry geometry = m_geometryCursor.next();
-        if (geometry != null) {
+        Geometry geometry;
+        if (hasNext()) {
+            geometry = m_geometryCursor.next();
+            simpleStateEnum = geometry.getSimpleState();
             StringBuilder stringBuilder = new StringBuilder();
             OperatorExportToWktLocal.exportToWkt(m_export_flags, geometry, stringBuilder);
             return stringBuilder.toString();
@@ -30,4 +33,12 @@ public class OperatorExportToWktCursor extends StringCursor {
     public long getID() {
         return m_geometryCursor.getGeometryID();
     }
+
+    @Override
+    public SimpleStateEnum getSimpleState() {
+        return simpleStateEnum;
+    }
+
+    @Override
+    public String getFeatureID() { return m_geometryCursor.getFeatureID(); }
 }

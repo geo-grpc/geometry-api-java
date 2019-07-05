@@ -4,24 +4,29 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class OperatorExportToWkbCursor extends ByteBufferCursor {
-    GeometryCursor m_inputGeometryCursor;
-    int m_exportFlags;
+    private GeometryCursor m_geometryCursor;
+    private int m_exportFlags;
+    private SimpleStateEnum simpleStateEnum = SimpleStateEnum.SIMPLE_UNKNOWN;
 
     public OperatorExportToWkbCursor(int exportFlags, GeometryCursor geometryCursor) {
         if (geometryCursor == null)
             throw new GeometryException("invalid argument");
 
         m_exportFlags = exportFlags;
-        m_inputGeometryCursor = geometryCursor;
+        m_geometryCursor = geometryCursor;
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+    public boolean hasNext() {
+        return m_geometryCursor != null && m_geometryCursor.hasNext();
+    }
 
     @Override
     public ByteBuffer next() {
-        Geometry geometry = m_inputGeometryCursor.next();
-        if (geometry != null) {
+        Geometry geometry;
+        if (hasNext()) {
+            geometry = m_geometryCursor.next();
+            simpleStateEnum = geometry.getSimpleState();
             int size = OperatorExportToWkbLocal.exportToWKB(m_exportFlags, geometry, null);
             ByteBuffer wkbBuffer = ByteBuffer.allocate(size).order(ByteOrder.nativeOrder());
             OperatorExportToWkbLocal.exportToWKB(m_exportFlags, geometry, wkbBuffer);
@@ -32,8 +37,16 @@ public class OperatorExportToWkbCursor extends ByteBufferCursor {
 
     @Override
     public long getByteBufferID() {
-        return m_inputGeometryCursor.getGeometryID();
+        return m_geometryCursor.getGeometryID();
     }
 
+    @Override
+    public SimpleStateEnum getSimpleState() {
+        return simpleStateEnum;
+    }
 
+    @Override
+    public String getFeatureID() {
+        return m_geometryCursor.getFeatureID();
+    }
 }

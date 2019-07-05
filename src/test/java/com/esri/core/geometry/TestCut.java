@@ -27,6 +27,8 @@ package com.esri.core.geometry;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.util.ArrayDeque;
+
 public class TestCut extends TestCase {
     @Override
     protected void setUp() throws Exception {
@@ -56,14 +58,52 @@ public class TestCut extends TestCase {
         OperatorCut opCut = (OperatorCut) engine.getOperator(Operator.Type.Cut);
 
         Polyline polyline1 = makePolyline1();
+        Polyline polyline11 = makePolyline1();
         Polyline cutter1 = makePolylineCutter1();
 
-        GeometryCursor cursor = opCut.execute(true, polyline1, cutter1,
+        ArrayDeque<Geometry> polylines = new ArrayDeque<>();
+        polylines.push(polyline1);
+        polylines.push(polyline11);
+
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(polylines);
+        GeometryCursor cursor = opCut.execute(true, simpleGeometryCursor, cutter1,
                 spatialReference, null);
         Polyline cut;
         int pathCount;
         int segmentCount;
         double length;
+
+        cut = (Polyline) cursor.next();
+        pathCount = cut.getPathCount();
+        segmentCount = cut.getSegmentCount();
+        length = cut.calculateLength2D();
+        assertTrue(pathCount == 4);
+        assertTrue(segmentCount == 4);
+        assertTrue(length == 6);
+
+        cut = (Polyline) cursor.next();
+        pathCount = cut.getPathCount();
+        segmentCount = cut.getSegmentCount();
+        length = cut.calculateLength2D();
+        assertTrue(pathCount == 6);
+        assertTrue(segmentCount == 8);
+        assertTrue(length == 12);
+
+        cut = (Polyline) cursor.next();
+        pathCount = cut.getPathCount();
+        segmentCount = cut.getSegmentCount();
+        length = cut.calculateLength2D();
+        assertTrue(pathCount == 1);
+        assertTrue(segmentCount == 1);
+        assertTrue(length == 1);
+
+        cut = (Polyline) cursor.next();
+        pathCount = cut.getPathCount();
+        segmentCount = cut.getSegmentCount();
+        length = cut.calculateLength2D();
+        assertTrue(pathCount == 1);
+        assertTrue(segmentCount == 1);
+        assertTrue(length == 1);
 
         cut = (Polyline) cursor.next();
         pathCount = cut.getPathCount();

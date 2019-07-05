@@ -30,35 +30,44 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
-    GeometryCursor m_inputGeometryCursor;
-    int m_exportFlags;
-    long m_index;
-    ByteBuffer m_shapeBuffer;
+    private GeometryCursor m_geometryCursor;
+    private int m_exportFlags;
+    private ByteBuffer m_shapeBuffer;
+    private SimpleStateEnum simpleStateEnum = SimpleStateEnum.SIMPLE_UNKNOWN;
 
     public OperatorExportToESRIShapeCursor(int exportFlags, GeometryCursor geometryCursor) {
-        m_index = -1;
         if (geometryCursor == null)
             throw new GeometryException("invalid argument");
 
         m_exportFlags = exportFlags;
-        m_inputGeometryCursor = geometryCursor;
+        m_geometryCursor = geometryCursor;
         m_shapeBuffer = null;
     }
 
     @Override
     public long getByteBufferID() {
-        return m_index;
+        return m_geometryCursor.getGeometryID();
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+    public SimpleStateEnum getSimpleState() {
+        return simpleStateEnum;
+    }
+
+    @Override
+    public String getFeatureID() {
+        return m_geometryCursor.getFeatureID();
+    }
+
+    @Override
+    public boolean hasNext() { return m_geometryCursor != null && m_geometryCursor.hasNext(); }
 
     @Override
     public ByteBuffer next() {
-        Geometry geometry = m_inputGeometryCursor.next();
-        if (geometry != null) {
-            m_index = m_inputGeometryCursor.getGeometryID();
-
+        Geometry geometry;
+        if (hasNext()) {
+            geometry = m_geometryCursor.next();
+            simpleStateEnum = geometry.getSimpleState();
             int size = exportToESRIShape(m_exportFlags, geometry, null);
             if (m_shapeBuffer == null || size > m_shapeBuffer.capacity())
                 m_shapeBuffer = ByteBuffer.allocate(size).order(

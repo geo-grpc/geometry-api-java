@@ -907,7 +907,6 @@ public class TestGeodetic extends TestCase {
 
     }
 
-
     public void testInverse() {
         SpatialReference sr = SpatialReference.create(4326);
         Point point1 = new Point(0,0);

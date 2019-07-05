@@ -80,7 +80,14 @@ class OperatorCutLocal extends OperatorCut {
     public GeometryCursor execute(boolean bConsiderTouch, Geometry cuttee,
                                   Polyline cutter, SpatialReference spatialReference,
                                   ProgressTracker progressTracker) {
-        return new OperatorCutCursor(bConsiderTouch, cuttee, cutter,
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(cuttee);
+        return new OperatorCutCursor(bConsiderTouch, simpleGeometryCursor, cutter,
+                spatialReference, progressTracker);
+    }
+
+    @Override
+    public GeometryCursor execute(boolean bConsiderTouch, GeometryCursor cuttees, Polyline cutter, SpatialReference spatialReference, ProgressTracker progressTracker) {
+        return new OperatorCutCursor(bConsiderTouch, cuttees, cutter,
                 spatialReference, progressTracker);
     }
 }

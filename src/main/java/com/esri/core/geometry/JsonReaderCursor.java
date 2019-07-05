@@ -63,5 +63,9 @@ abstract class JsonReaderCursor implements Iterator<JsonReader> {
      */
     public abstract int getID();
 
+    public abstract SimpleStateEnum getSimpleState();
+
+    public abstract String getFeatureID();
+
     public abstract boolean hasNext();
 }

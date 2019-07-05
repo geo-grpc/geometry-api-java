@@ -52,7 +52,15 @@ public abstract class OperatorCut extends Operator {
      * bounded to the left and right of the cutter.
      */
     public abstract GeometryCursor execute(boolean bConsiderTouch,
-                                           Geometry cuttee, Polyline cutter, SpatialReference spatialReference,
+                                           Geometry cuttee,
+                                           Polyline cutter,
+                                           SpatialReference spatialReference,
+                                           ProgressTracker progressTracker);
+
+    public abstract GeometryCursor execute(boolean bConsiderTouch,
+                                           GeometryCursor cuttees,
+                                           Polyline cutter,
+                                           SpatialReference spatialReference,
                                            ProgressTracker progressTracker);
 
     public static OperatorCut local() {

@@ -49,6 +49,14 @@ public class OperatorImportFromJsonCursor extends MapGeometryCursor {
     }
 
     @Override
+    public SimpleStateEnum getSimpleState() {
+        return m_inputJsonParsers.getSimpleState();
+    }
+
+    @Override
+    public String getFeatureID() { return m_inputJsonParsers.getFeatureID(); }
+
+    @Override
     public boolean hasNext() {
         return m_inputJsonParsers.hasNext();
     }

@@ -25,35 +25,46 @@ package com.esri.core.geometry;
 
 import com.esri.core.geometry.VertexDescription.Semantics;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class OperatorExportToJsonCursor extends StringCursor {
 
-    GeometryCursor m_inputGeometryCursor;
-    SpatialReference m_spatialReference;
+    private GeometryCursor m_geometryCursor;
+    private SpatialReference m_spatialReference;
+    private SimpleStateEnum simpleStateEnum = SimpleStateEnum.SIMPLE_UNKNOWN;
+
 
     public OperatorExportToJsonCursor(SpatialReference spatialReference, GeometryCursor geometryCursor) {
         if (geometryCursor == null) {
             throw new IllegalArgumentException();
         }
 
-        m_inputGeometryCursor = geometryCursor;
+        m_geometryCursor = geometryCursor;
         m_spatialReference = spatialReference;
     }
 
     @Override
-    public boolean hasNext() { return m_inputGeometryCursor != null && m_inputGeometryCursor.hasNext(); }
+    public boolean hasNext() { return m_geometryCursor != null && m_geometryCursor.hasNext(); }
 
     @Override
     public long getID() {
-        return m_inputGeometryCursor.getGeometryID();
+        return m_geometryCursor.getGeometryID();
+    }
+
+    @Override
+    public SimpleStateEnum getSimpleState() { return simpleStateEnum; }
+
+    @Override
+    public String getFeatureID() {
+        return m_geometryCursor.getFeatureID();
     }
 
     @Override
     public String next() {
         Geometry geometry;
-        if ((geometry = m_inputGeometryCursor.next()) != null) {
+        if (hasNext()) {
+            geometry = m_geometryCursor.next();
+            simpleStateEnum = geometry.getSimpleState();
             return exportToString(geometry, m_spatialReference, null);
         }
         return null;

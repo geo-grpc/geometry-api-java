@@ -47,5 +47,9 @@ public abstract class MapGeometryCursor implements Iterator<MapGeometry> {
      */
     public abstract long getGeometryID();
 
+    public abstract SimpleStateEnum getSimpleState();
+
+    public abstract String getFeatureID();
+
     public abstract boolean hasNext();
 }

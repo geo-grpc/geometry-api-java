@@ -652,4 +652,17 @@ public abstract class Geometry implements Serializable {
         throw new GeometryException("missing type");
     }
 
+    protected SimpleStateEnum getSimpleState() {
+        if (getType() != Type.Polygon && getType() != Type.Polyline && getType() != Type.MultiPoint) {
+            return SimpleStateEnum.STRONG_SIMPLE;
+        } else {
+            if (((MultiVertexGeometryImpl)this._getImpl())._hasDirtyFlag(MultiVertexGeometryImpl.DirtyFlags.IsStrongSimple)) {
+                return SimpleStateEnum.STRONG_SIMPLE;
+            } else if (((MultiVertexGeometryImpl)this._getImpl())._hasDirtyFlag(MultiVertexGeometryImpl.DirtyFlags.IsWeakSimple)) {
+                return SimpleStateEnum.WEAK_SIMPLE;
+            }
+            return SimpleStateEnum.SIMPLE_UNKNOWN;
+        }
+    }
+
 }

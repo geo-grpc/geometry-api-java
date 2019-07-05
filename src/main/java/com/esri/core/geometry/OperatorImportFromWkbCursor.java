@@ -1,11 +1,8 @@
 package com.esri.core.geometry;
 
-import java.nio.ByteBuffer;
-
 public class OperatorImportFromWkbCursor extends GeometryCursor {
-
-    ByteBufferCursor m_inputWkbBuffers;
-    int m_importFlags;
+    private ByteBufferCursor m_inputWkbBuffers;
+    private int m_importFlags;
 
     public OperatorImportFromWkbCursor(int importFlags, ByteBufferCursor wkbBuffers) {
         if (wkbBuffers == null)
@@ -34,4 +31,10 @@ public class OperatorImportFromWkbCursor extends GeometryCursor {
     public long getGeometryID() {
         return m_inputWkbBuffers.getByteBufferID();
     }
+
+    @Override
+    public SimpleStateEnum getSimpleState() { return m_inputWkbBuffers.getSimpleState(); }
+
+    @Override
+    public String getFeatureID() { return m_inputWkbBuffers.getFeatureID(); }
 }

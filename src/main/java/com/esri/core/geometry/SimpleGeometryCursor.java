@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 public class SimpleGeometryCursor extends GeometryCursor {
 
     private long m_index = -1;
+    private String m_currentFeatureId = "";
+    private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
     private MapGeometryCursor m_mapGeometryCursor = null;
     private ArrayDeque<Geometry> m_geometryDeque = null;
 
@@ -71,6 +73,12 @@ public class SimpleGeometryCursor extends GeometryCursor {
     }
 
     @Override
+    public SimpleStateEnum getSimpleState() { return m_simpleState; }
+
+    @Override
+    public String getFeatureID() { return m_currentFeatureId; }
+
+    @Override
     public Geometry next() {
         m_index++;
         Geometry geometry = null;
@@ -79,11 +87,13 @@ public class SimpleGeometryCursor extends GeometryCursor {
 
             // TODO get id off of geometry if exists
             m_current_id = m_index;
+            m_simpleState = geometry.getSimpleState();
         } else if (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext()) {
             geometry = m_mapGeometryCursor.next().m_geometry;
 
             // TODO get id off of geometry if exists
             m_current_id = m_mapGeometryCursor.getGeometryID();
+            m_simpleState = m_mapGeometryCursor.getSimpleState();
         }
 
         return geometry;

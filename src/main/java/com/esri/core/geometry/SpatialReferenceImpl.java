@@ -318,8 +318,9 @@ class SpatialReferenceImpl extends SpatialReference {
                 return true;
             }
 
-            if ((m_proj4 != null || m_userWkt != null) && (sr.m_proj4 != null || sr.m_userWkt != null))
+            if ((m_proj4 != null || m_userWkt != null) && (sr.m_proj4 != null || sr.m_userWkt != null)) {
                 return false;
+            }
         }
 
         return true;

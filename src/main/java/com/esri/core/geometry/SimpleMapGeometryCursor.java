@@ -32,25 +32,33 @@ import java.util.stream.Collectors;
  * an array of MapGeometry classes
  */
 class SimpleMapGeometryCursor extends MapGeometryCursor {
-    MapGeometry m_geom;
-    ArrayDeque<MapGeometry> m_geomDeque;
-    long m_index;
+    private ArrayDeque<MapGeometry> m_geomDeque;
+    private long m_index = -1;
+    private String m_currentFeatureID = "";
+    private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
+
 
     public SimpleMapGeometryCursor(MapGeometry geom) {
         m_geomDeque = new ArrayDeque<>(1);
-        m_geom = geom;
-        m_index = -1;
     }
 
     public SimpleMapGeometryCursor(MapGeometry[] geoms) {
         m_geomDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
-        m_index = -1;
     }
 
     @Override
     public long getGeometryID() {
         return m_index;
     }
+
+    @Override
+    public SimpleStateEnum getSimpleState() {
+        return m_simpleState;
+    }
+
+    @Override
+    public String getFeatureID() { return m_currentFeatureID; }
+
 
     @Override
     public boolean hasNext() {
@@ -61,7 +69,9 @@ class SimpleMapGeometryCursor extends MapGeometryCursor {
     public MapGeometry next() {
         if (hasNext()) {
             m_index++;
-            return m_geomDeque.pop();
+            MapGeometry mapGeometry = m_geomDeque.pop();
+            m_simpleState = mapGeometry.m_geometry.getSimpleState();
+            return mapGeometry;
         }
 
         return null;

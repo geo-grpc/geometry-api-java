@@ -33,6 +33,7 @@ public abstract class GeometryCursor implements Iterator<Geometry> {
     // TODO add extent
     // TODO add spatial reference
     GeometryCursor m_inputGeoms = null;
+
     /**
      * Moves the cursor to the next Geometry. Returns null when reached the end.
      * The behavior of the cursor is undefined after the method returns null.
@@ -48,6 +49,11 @@ public abstract class GeometryCursor implements Iterator<Geometry> {
     public long getGeometryID() {
         return m_inputGeoms.getGeometryID();
     }
+
+
+    public SimpleStateEnum getSimpleState() { return m_inputGeoms.getSimpleState(); }
+
+    public String getFeatureID() { return m_inputGeoms.getFeatureID(); }
 
     /**
      * Executes a unit of work on the cursor.

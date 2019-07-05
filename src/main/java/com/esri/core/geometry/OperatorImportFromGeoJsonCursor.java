@@ -30,6 +30,12 @@ public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
     }
 
     @Override
+    public SimpleStateEnum getSimpleState() { return m_jsonStringCursor.getSimpleState(); }
+
+    @Override
+    public String getFeatureID() { return m_jsonStringCursor.getFeatureID(); }
+
+    @Override
     public long getGeometryID() {
         return m_jsonStringCursor.getID();
     }

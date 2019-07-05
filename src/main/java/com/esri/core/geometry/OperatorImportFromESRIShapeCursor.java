@@ -58,6 +58,14 @@ public class OperatorImportFromESRIShapeCursor extends GeometryCursor {
     }
 
     @Override
+    public SimpleStateEnum getSimpleState() {
+        return m_inputShapeBuffers.getSimpleState();
+    }
+
+    @Override
+    public String getFeatureID() { return m_inputShapeBuffers.getFeatureID(); }
+
+    @Override
     public long getGeometryID() {
         return m_inputShapeBuffers.getByteBufferID();
     }
