@@ -44,12 +44,15 @@ public final class ListeningGeometryCursor extends GeometryCursor {
     }
 
     @Override
-    public boolean hasNext() { return !m_geomList.isEmpty(); }
+    public boolean hasNext() { return m_geomList != null && !m_geomList.isEmpty(); }
 
     @Override
     public long getGeometryID() {
         return m_index;
     }
+
+    @Override
+    public String getFeatureID() { return ""; }
 
     @Override
     public Geometry next() {
