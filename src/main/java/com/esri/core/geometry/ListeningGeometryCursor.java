@@ -23,8 +23,8 @@
  */
 package com.esri.core.geometry;
 
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A GeometryCursor implementation that allows pushing geometries into it.
@@ -34,8 +34,11 @@ import java.util.LinkedList;
  * but are coming in a stream.
  */
 public final class ListeningGeometryCursor extends GeometryCursor {
-    LinkedList<Geometry> m_geomList = (LinkedList<Geometry>) Collections.synchronizedList(new LinkedList<Geometry>());
-    long m_index = -1;
+    // required for use with grpc streaming
+    // https://github.com/grpc/grpc-java/blob/06e9b8814787b5cdec10a60e0d9a2228feb8554d/examples/src/main/java/io/grpc/examples/routeguide/RouteGuideServer.java#L246
+    private Queue<Geometry> m_geomList = new ConcurrentLinkedQueue<Geometry>();
+
+    private long m_index = -1;
 
     public ListeningGeometryCursor() {
     }
@@ -52,7 +55,7 @@ public final class ListeningGeometryCursor extends GeometryCursor {
     public Geometry next() {
         if (m_geomList != null && !m_geomList.isEmpty()) {
             m_index++;
-            return m_geomList.pollFirst();
+            return m_geomList.poll();
         }
 
         m_geomList = null;//prevent the class from being used again
