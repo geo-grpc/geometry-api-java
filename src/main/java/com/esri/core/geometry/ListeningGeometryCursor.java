@@ -23,6 +23,7 @@
  */
 package com.esri.core.geometry;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -33,8 +34,7 @@ import java.util.LinkedList;
  * but are coming in a stream.
  */
 public final class ListeningGeometryCursor extends GeometryCursor {
-
-    LinkedList<Geometry> m_geomList = new LinkedList<Geometry>();
+    LinkedList<Geometry> m_geomList = (LinkedList<Geometry>) Collections.synchronizedList(new LinkedList<Geometry>());
     long m_index = -1;
 
     public ListeningGeometryCursor() {

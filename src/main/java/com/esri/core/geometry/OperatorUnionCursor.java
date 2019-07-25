@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-final class OperatorUnionCursor extends GeometryCursor {
+public final class OperatorUnionCursor extends GeometryCursor {
     private ProgressTracker m_progress_tracker;
     private SpatialReferenceImpl m_spatial_reference;
     private boolean m_b_done = false;
