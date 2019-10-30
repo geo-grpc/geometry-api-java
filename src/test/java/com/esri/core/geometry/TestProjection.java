@@ -177,7 +177,7 @@ public class TestProjection extends TestCase {
     @Test
     public void testEPSGCodes() {
         String wktGeom = "MULTIPOLYGON (((6311583.246999994 1871386.1630000025, 6311570 1871325, 6311749.093999997 1871285.9699999988, 6311768.118000001 1871345.9619999975, 6311583.246999994 1871386.1630000025)))";
-        SpatialReference spatialReference = SpatialReference.create(102646);
+        SpatialReference spatialReference = SpatialReference.create(2230);
         SpatialReference spatialReferenceWgs84 = SpatialReference.create(4326);
         ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReference, spatialReferenceWgs84);
         SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
@@ -280,9 +280,9 @@ public class TestProjection extends TestCase {
     @Test
     public void testAlbers() {
         String wktGeom = "MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 45 20, 30 5, 10 10, 10 30, 20 35), (30 20, 20 25, 20 15, 30 20)))";
-        int wkid = 102003;
 
-        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReferenceWGS, SpatialReference.create(wkid));
+        SpatialReference sr = SpatialReference.create(2163);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(spatialReferenceWGS, sr);
 
         SimpleStringCursor simpleStringCursor = new SimpleStringCursor(wktGeom);
         OperatorImportFromWktCursor wktCursor = new OperatorImportFromWktCursor(0, simpleStringCursor);
