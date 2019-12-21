@@ -80,7 +80,9 @@ public abstract class Operator {
         Boundary,
         RandomPoints,
         EnclosingCircle,
-        GeodeticInverse
+        GeodeticInverse,
+        ImportFromS2,
+        ExportToS2
     }
 
     public abstract Type getType();
