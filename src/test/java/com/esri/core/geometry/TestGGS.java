@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 
-public class TestS2 extends TestCase {
+public class TestGGS extends TestCase {
     @Test
     public void testBasic() {
         S2LatLng llRad = S2LatLng.fromRadians(S2.M_PI_4, S2.M_PI_2);
@@ -45,6 +45,6 @@ public class TestS2 extends TestCase {
         S2Cell s2Cell = new S2Cell(s2LatLng);
         long id = s2Cell.id().id();
         Envelope envelope = (Envelope)OperatorImportFromS2.local().execute(id, 0, null);
-        assertEquals(envelope.getCenter().getX(), 20);
+        assertEquals(envelope.getCenter().getX(), 14.99999999, .00001);
     }
 }
