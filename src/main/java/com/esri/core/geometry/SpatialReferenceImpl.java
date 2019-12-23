@@ -254,7 +254,7 @@ class SpatialReferenceImpl extends SpatialReference {
 
         SpatialReferenceImpl spatRef = new SpatialReferenceImpl();
         spatRef.m_userWkid = wkid;
-        spatRef.m_proj4 = "+init=epsg:" + Integer.toString(wkid);
+        spatRef.m_proj4 = "+init=epsg:" + wkid;
 
         return spatRef;
     }

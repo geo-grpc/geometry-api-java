@@ -79,24 +79,32 @@ public abstract class SpatialReference implements Serializable {
      */
     public static SpatialReference createUTM(double longitude, double latitude) {
         // epsg code for N1 32601
-        int epsg_code = 32601;
+        int epsg_code = 32600 + getUTMZone(longitude);
         if (latitude < 0) {
             // epsg code for S1 32701
             epsg_code += 100;
         }
 
+        return SpatialReference.create(epsg_code);
+    }
+
+    public static int getUTMZone(double longitude) {
         double diff = longitude + 180.0;
 
-        // TODO ugly
-        if (diff == 0.0) {
-            return SpatialReference.create(epsg_code);
+        // fold into 360
+        if (diff >= 360) {
+            diff -= 360 * (int)(diff / 360);
+        }
+
+        // utm zone ends at each 6 degrees
+        if (diff % 6 == 0) {
+            return (int)(diff / 6) + 1;
         }
 
         // 6 degrees of separation between zones, started with zone one, so subtract 1
         Double interval_count = Math.ceil(diff / 6);
-        int bump = interval_count.intValue() - 1;
 
-        return SpatialReference.create(epsg_code + bump);
+        return interval_count.intValue();
     }
 
     public static SpatialReference createEqualArea(double lon_0, double lat_0) {
