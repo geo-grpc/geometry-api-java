@@ -1,13 +1,9 @@
 package com.esri.core.geometry;
 
-import com.google.common.geometry.S1Angle;
-import com.google.common.geometry.S2;
-import com.google.common.geometry.S2LatLng;
+import com.google.common.geometry.*;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import com.google.common.geometry.S2CellId;
-//import com.google.common.geometry.S2LatLng;
 
 public class TestS2 extends TestCase {
     @Test
@@ -41,5 +37,14 @@ public class TestS2 extends TestCase {
         assertTrue((S2LatLng.fromDegrees(10, 20).sub(S2LatLng.fromDegrees(20, 30))).approxEquals(
                 S2LatLng.fromDegrees(-10, -10)));
         assertTrue((S2LatLng.fromDegrees(10, 20).mul(0.5)).approxEquals(S2LatLng.fromDegrees(5, 10)));
+    }
+
+    @Test
+    public void testLatLngRect() {
+        S2LatLng s2LatLng = S2LatLng.fromDegrees(10, 20);
+        S2Cell s2Cell = new S2Cell(s2LatLng);
+        long id = s2Cell.id().id();
+        Envelope envelope = (Envelope)OperatorImportFromS2.local().execute(id, 0, null);
+        assertEquals(envelope.getCenter().getX(), 20);
     }
 }

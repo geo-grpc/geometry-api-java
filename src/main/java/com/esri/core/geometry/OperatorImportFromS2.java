@@ -8,11 +8,9 @@ public abstract class OperatorImportFromS2 extends Operator {
         return Type.ImportFromS2;
     }
 
-    public abstract GeometryCursor execute(ArrayDeque<Integer> s2ids, ProgressTracker progressTracker);
+    public abstract GeometryCursor execute(ArrayDeque<Long> s2ids, double maxDeviation, ProgressTracker progressTracker);
 
-    public abstract Geometry execute(
-            int s2id,
-            ProgressTracker progressTracker);
+    public abstract Geometry execute(long s2id, double maxDeviation, ProgressTracker progressTracker);
 
     public static OperatorImportFromS2 local() {
         return (OperatorImportFromS2) OperatorFactoryLocal.getInstance().getOperator(Type.ImportFromS2);
