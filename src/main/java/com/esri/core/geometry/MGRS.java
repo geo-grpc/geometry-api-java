@@ -2,6 +2,15 @@ package com.esri.core.geometry;
 
 public class MGRS {
 
+    public enum Zoom {
+        Level1M(1), Level10M(10), Level100M(100), Level1K(1000), Level10K(10000), Level100K(100000), LevelGridZone(6);
+
+        int m_level;
+        Zoom(int level) {
+            m_level = level;
+        }
+    }
+
     /**
      * The 6° wide UTM zones, numbered 1–60, are intersected by latitude bands that are normally 8° high,
      * lettered C–X (omitting I and O). South of 80°S, UPS South (Universal Polar Stereographic) is used instead
@@ -66,5 +75,54 @@ public class MGRS {
         }
 
         return COL_100KM[colIndex] + rowLetter;
+    }
+
+    public static String gridSquare(Point utmPoint, Zoom zoomLevelMeters) {
+        // get complete easting and northing
+        String easting = String.valueOf((int)Math.floor(utmPoint.getX()));
+        String northing = String.valueOf((int)Math.floor(utmPoint.getY()));
+
+        // Level1M
+        int index = 0;
+
+        switch (zoomLevelMeters) {
+            case Level10M:
+                index = 1;
+                break;
+            case Level100M:
+                index = 2;
+                break;
+            case Level1K:
+                index = 3;
+                break;
+            case Level10K:
+                index = 4;
+                break;
+        }
+
+        easting = easting.substring(easting.length() - 5, easting.length() - index);
+        northing = northing.substring(northing.length() - 5, northing.length() - index);
+        return easting + " " + northing;
+    }
+
+    public static String gridSquare(double lon, double lat, Zoom zoomLevelMeters) {
+        // project coordinate to UTM
+        SpatialReference spatialReference = SpatialReference.createUTM(lon, lat);
+        ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), spatialReference);
+        Point utmPoint = (Point)OperatorProject.local().execute(new Point(lon, lat), projectionTransformation, null);
+
+        return gridSquare(utmPoint, zoomLevelMeters);
+    }
+
+    public static String getMGRSPosition(double lon, double lat, Zoom zoomLevelMeters) {
+        switch (zoomLevelMeters) {
+            case LevelGridZone:
+                return gridZoneCode(lon, lat);
+            case Level100K:
+                return gridZoneCode(lon, lat) + " " + gridSquareId(lon, lat);
+            default:
+                return gridZoneCode(lon, lat) + " " + gridSquareId(lon, lat) + " " + gridSquare(lon, lat, zoomLevelMeters);
+
+        }
     }
 }

@@ -25,4 +25,26 @@ public class TestGGS extends TestCase {
         assertEquals("UA", MGRS.gridSquareId(-112.61440, 50.00820));
         assertEquals("12U", MGRS.gridZoneCode(-112.61440, 50.00820));
     }
+
+    @Test
+    public void testSquares() {
+        //12U UA 84323 40791
+        assertEquals("84323 40791", MGRS.gridSquare(-112.61440, 50.00820, MGRS.Zoom.Level1M));
+        assertEquals("8432 4079", MGRS.gridSquare(-112.61440, 50.00820, MGRS.Zoom.Level10M));
+        assertEquals("843 407", MGRS.gridSquare(-112.61440, 50.00820, MGRS.Zoom.Level100M));
+        assertEquals("84 40", MGRS.gridSquare(-112.61440, 50.00820, MGRS.Zoom.Level1K));
+        assertEquals("8 4", MGRS.gridSquare(-112.61440, 50.00820, MGRS.Zoom.Level10K));
+    }
+
+    @Test
+    public void testMGRSposition() {
+        //12U UA 84323 40791
+        assertEquals("12U UA 84323 40791", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level1M));
+        assertEquals("12U UA 8432 4079", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level10M));
+        assertEquals("12U UA 843 407", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level100M));
+        assertEquals("12U UA 84 40", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level1K));
+        assertEquals("12U UA 8 4", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level10K));
+        assertEquals("12U UA", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.Level100K));
+        assertEquals("12U", MGRS.getMGRSPosition(-112.61440, 50.00820, MGRS.Zoom.LevelGridZone));
+    }
 }
