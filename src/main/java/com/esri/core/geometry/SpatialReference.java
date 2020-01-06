@@ -78,9 +78,12 @@ public abstract class SpatialReference implements Serializable {
      * @return
      */
     public static SpatialReference createUTM(double longitude, double latitude) {
-        // epsg code for N1 32601
-        int epsg_code = 32600 + getUTMZone(longitude);
-        if (latitude < 0) {
+        return createUTM(getUTMZone(longitude), latitude < 0);
+    }
+
+    public static SpatialReference createUTM(int utmZone, boolean south) {
+        int epsg_code = 32600 + utmZone;
+        if (south) {
             // epsg code for S1 32701
             epsg_code += 100;
         }
