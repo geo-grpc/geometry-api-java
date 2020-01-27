@@ -50,7 +50,7 @@ public class OperatorOffsetCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext())
-            return Offset(m_inputGeoms.next());
+            return postProject(Offset(preProjectNext()));
 
         return null;
     }

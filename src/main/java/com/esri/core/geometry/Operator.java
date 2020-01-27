@@ -80,7 +80,8 @@ public abstract class Operator {
         Boundary,
         RandomPoints,
         EnclosingCircle,
-        GeodeticInverse
+        GeodeticInverse,
+        ImportFromMGRS
     }
 
     public abstract Type getType();

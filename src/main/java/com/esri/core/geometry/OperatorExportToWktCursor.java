@@ -17,7 +17,7 @@ public class OperatorExportToWktCursor extends StringCursor {
     public String next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = m_geometryCursor.next();
+            geometry = preProjectNext(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             StringBuilder stringBuilder = new StringBuilder();
             OperatorExportToWktLocal.exportToWkt(m_export_flags, geometry, stringBuilder);

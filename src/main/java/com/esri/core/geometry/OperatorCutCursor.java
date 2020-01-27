@@ -26,7 +26,6 @@
 package com.esri.core.geometry;
 
 import com.esri.core.geometry.OperatorCutLocal.Side;
-import com.esri.core.geometry.VertexDescription.Semantics;
 
 import java.util.ArrayList;
 
@@ -68,7 +67,7 @@ class OperatorCutCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (m_bFirstCall || (m_inputGeoms != null && m_inputGeoms.hasNext() && !(m_cutIndex + 1 < m_cuts.size()))) {
-            m_cuttee = m_inputGeoms.next();
+            m_cuttee = preProjectNext();
             Envelope2D e = InternalUtils.getMergedExtent(m_cuttee, m_cutter);
             m_tolerance = InternalUtils.calculateToleranceFromGeometry(m_spatialReference, e, true);
             m_bFirstCall = true;
@@ -79,7 +78,7 @@ class OperatorCutCursor extends GeometryCursor {
             m_bFirstCall = false;
             generateCuts_();
             if (++m_cutIndex < m_cuts.size()) {
-                return m_cuts.get(m_cutIndex);
+                return postProject(m_cuts.get(m_cutIndex));
             }
         }
 

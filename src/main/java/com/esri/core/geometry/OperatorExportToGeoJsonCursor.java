@@ -50,6 +50,7 @@ import com.esri.core.geometry.VertexDescription.Semantics;
 public class OperatorExportToGeoJsonCursor extends StringCursor {
     private GeometryCursor m_geometryCursor;
     private SpatialReference m_spatialReference;
+    private static SpatialReference m_wgs84 = SpatialReference.create(4326);
     private int m_export_flags;
     private SimpleStateEnum simpleStateEnum = SimpleStateEnum.SIMPLE_UNKNOWN;
 
@@ -61,6 +62,8 @@ public class OperatorExportToGeoJsonCursor extends StringCursor {
         m_export_flags = export_flags;
         m_spatialReference = spatialReference;
         m_geometryCursor = geometryCursor;
+        setInputSR(spatialReference);
+        setOperateSR(m_wgs84);
     }
 
     @Override
@@ -85,7 +88,7 @@ public class OperatorExportToGeoJsonCursor extends StringCursor {
     public String next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = m_geometryCursor.next();
+            geometry = preProjectNext(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             return exportToGeoJson(m_export_flags, geometry, m_spatialReference);
         }

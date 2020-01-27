@@ -266,9 +266,9 @@ public class TestGeomToGeoJson extends TestCase {
         SimpleStringCursor simpleStringCursor = new SimpleStringCursor(result);
 
         OperatorImportFromGeoJsonCursor importFromGeoJsonCursor = new OperatorImportFromGeoJsonCursor(GeoJsonImportFlags.geoJsonImportSkipCRS, simpleStringCursor, null);
-        MapGeometry mapGeometry = importFromGeoJsonCursor.next();
+        Geometry mapGeometry = importFromGeoJsonCursor.next();
 
-        assertTrue(p.equals(mapGeometry.m_geometry));
+        assertTrue(p.equals(mapGeometry));
     }
 
 

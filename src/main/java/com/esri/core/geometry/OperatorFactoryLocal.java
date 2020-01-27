@@ -105,6 +105,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
         st_supportedOperators.put(Type.RandomPoints, new OperatorRandomPointsLocal());
         st_supportedOperators.put(Type.EnclosingCircle, new OperatorEnclosingCircleLocal());
         st_supportedOperators.put(Type.GeodeticInverse, new OperatorGeodeticInverseLocal());
+        st_supportedOperators.put(Type.ImportFromMGRS, new OperatorImportFromMGRSLocal());
 
         // LabelPoint, - not ported
 

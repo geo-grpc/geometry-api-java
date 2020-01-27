@@ -16,6 +16,7 @@ public class OperatorGeodeticDensifyCursor extends GeometryCursor {
                                          ProgressTracker progressTracker) {
         m_inputGeoms = inputGeoms1;
         m_maxLength = maxLength;
+        // TODO requires proper projection handing.
         m_spatialReference = (SpatialReferenceImpl) spatialReference;
         m_startPoint = new Point();
         m_endPoint = new Point();

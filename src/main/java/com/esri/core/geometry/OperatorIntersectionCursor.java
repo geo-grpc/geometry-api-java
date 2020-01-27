@@ -45,6 +45,7 @@ public class OperatorIntersectionCursor extends GeometryCursor {
         m_bEmpty = geomIntersector == null;
         m_inputGeoms = inputGeoms;
         m_spatial_reference = sr;
+        // TODO handle projections
         m_geomIntersector = geomIntersector.next();
         m_geomIntersectorType = m_geomIntersector.getType().value();
         m_currentGeomType = Geometry.Type.Unknown.value();

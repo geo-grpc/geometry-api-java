@@ -49,7 +49,7 @@ public class OperatorGeneralizeByAreaCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext())
-            return GeneralizeArea(m_inputGeoms.next());
+            return postProject(GeneralizeArea(preProjectNext()));
 
         return null;
     }

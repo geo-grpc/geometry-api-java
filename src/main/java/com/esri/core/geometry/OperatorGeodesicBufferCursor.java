@@ -22,6 +22,7 @@ public class OperatorGeodesicBufferCursor extends GeometryCursor {
                                  boolean b_union,
                                  ProgressTracker progressTracker) {
         m_inputGeoms = inputGeoms;
+        // TODO, requires proper projection handling.
         m_spatialReference = (SpatialReferenceImpl) sr;
         m_distances = distances;
         m_maxDeviation = maxDeviation;

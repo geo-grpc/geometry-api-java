@@ -28,11 +28,37 @@ import java.util.Iterator;
 /**
  * An abstract Geometry Cursor class.
  */
-public abstract class GeometryCursor implements Iterator<Geometry> {
+public abstract class GeometryCursor extends PrePostProjection implements Iterator<Geometry>{
     // TODO add count
     // TODO add extent
     // TODO add spatial reference
     GeometryCursor m_inputGeoms = null;
+    private PrePostProjection m_projectionHelper = new PrePostProjection();
+
+    public void setInputSR(SpatialReference inputSR) {
+        if (inputSR != null)
+            this.m_projectionHelper.setInputSR(inputSR);
+    }
+
+    public void setResultSR(SpatialReference resultSR, boolean setWithoutProject) {
+        this.m_projectionHelper.setResultSR(resultSR, setWithoutProject);
+    }
+
+    public void setOperateSR(SpatialReference operateSR) {
+        this.m_projectionHelper.setOperateSR(operateSR);
+    }
+
+    public SpatialReference getSR() {
+        return this.m_projectionHelper.getSR();
+    }
+
+    public Geometry preProjectNext() {
+        return this.m_projectionHelper.preProjectNext(m_inputGeoms);
+    }
+
+    public Geometry postProject(Geometry geometry) {
+        return this.m_projectionHelper.postProject(geometry);
+    }
 
     /**
      * Moves the cursor to the next Geometry. Returns null when reached the end.

@@ -45,6 +45,17 @@ public class SimpleGeometryCursor extends GeometryCursor {
         m_geometryDeque.add(geom);
     }
 
+    public SimpleGeometryCursor(Geometry geom,
+                                String featureId,
+                                long featureIndex,
+                                SimpleStateEnum simpleStateEnum) {
+        m_geometryDeque = new ArrayDeque<>(1);
+        m_geometryDeque.add(geom);
+        m_current_id = featureIndex;
+        m_currentFeatureId = featureId;
+        m_simpleState = simpleStateEnum;
+    }
+
     public SimpleGeometryCursor(Geometry[] geoms) {
         m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
     }

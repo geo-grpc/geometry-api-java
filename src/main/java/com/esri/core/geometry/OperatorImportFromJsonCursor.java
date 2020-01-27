@@ -27,7 +27,7 @@ package com.esri.core.geometry;
 import com.esri.core.geometry.MultiVertexGeometryImpl.DirtyFlags;
 import com.esri.core.geometry.VertexDescription.Semantics;
 
-public class OperatorImportFromJsonCursor extends MapGeometryCursor {
+public class OperatorImportFromJsonCursor extends GeometryCursor {
     JsonReaderCursor m_inputJsonParsers;
 
     int m_type;
@@ -62,11 +62,14 @@ public class OperatorImportFromJsonCursor extends MapGeometryCursor {
     }
 
     @Override
-    public MapGeometry next() {
+    public Geometry next() {
         JsonReader jsonParser;
         if ((jsonParser = m_inputJsonParsers.next()) != null) {
             m_index = m_inputJsonParsers.getID();
-            return importFromJsonParser(m_type, jsonParser);
+            MapGeometry mp = importFromJsonParser(m_type, jsonParser);
+            this.setOperateSR(mp.sr);
+            this.setResultSR(getSR(), false);
+            return postProject(mp.getGeometry());
         }
         return null;
     }

@@ -30,12 +30,14 @@ class OperatorDifferenceCursor extends GeometryCursor {
     Geometry m_geomSubtractor;
     boolean m_bEmpty;
 
+    // TODO this could have inputs of different spatial references.
     OperatorDifferenceCursor(GeometryCursor inputGeoms,
                              GeometryCursor geomSubtractor, SpatialReference sr,
                              ProgressTracker progress_tracker) {
         m_bEmpty = (geomSubtractor == null);
         m_inputGeoms = inputGeoms;
         m_Spatial_reference = sr;
+        // TODO handle null exception
         m_geomSubtractor = geomSubtractor.next();
         m_progress_tracker = progress_tracker;
     }
@@ -46,11 +48,11 @@ class OperatorDifferenceCursor extends GeometryCursor {
             return null;
 
         if (hasNext()) {
-            return OperatorDifferenceLocal.difference(
-                    m_inputGeoms.next(),
+            return postProject(OperatorDifferenceLocal.difference(
+                    preProjectNext(),
                     m_geomSubtractor,
                     m_Spatial_reference,
-                    m_progress_tracker);
+                    m_progress_tracker));
         }
         return null;
     }

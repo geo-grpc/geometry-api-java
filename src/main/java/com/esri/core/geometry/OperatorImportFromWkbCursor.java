@@ -18,11 +18,11 @@ public class OperatorImportFromWkbCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext()) {
-            return OperatorImportFromWkbLocal.local().execute(
+            return postProject(OperatorImportFromWkbLocal.local().execute(
                     m_importFlags,
                     Geometry.Type.Unknown,
                     m_inputWkbBuffers.next(),
-                    null);
+                    null));
         }
         return null;
     }

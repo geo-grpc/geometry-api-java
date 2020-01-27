@@ -38,7 +38,7 @@ public abstract class OperatorImportFromJson extends Operator {
      *
      * @return Returns a MapGeometryCursor.
      */
-    abstract MapGeometryCursor execute(Geometry.Type type,
+    abstract GeometryCursor execute(Geometry.Type type,
                                        JsonReaderCursor jsonReaderCursor);
 
     /**

@@ -136,11 +136,11 @@ public final class OperatorUnionCursor extends GeometryCursor {
                     break;
             }
 
-            return get_result_geometry(m_current_dim);
+            return postProject(get_result_geometry(m_current_dim));
         } else {
             assert (m_max_dimension >= 0);
             m_current_dim = m_max_dimension;
-            return get_result_geometry(m_max_dimension);
+            return postProject(get_result_geometry(m_max_dimension));
         }
     }
 
@@ -150,7 +150,7 @@ public final class OperatorUnionCursor extends GeometryCursor {
 
         Geometry geom = null;
         if (m_inputGeoms != null) {
-            geom = m_inputGeoms.next();
+            geom = preProjectNext();
             if (geom == null) {
                 m_b_done = true;
             }

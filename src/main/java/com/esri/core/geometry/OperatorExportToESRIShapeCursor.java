@@ -66,7 +66,7 @@ public class OperatorExportToESRIShapeCursor extends ByteBufferCursor {
     public ByteBuffer next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = m_geometryCursor.next();
+            geometry = preProjectNext(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             int size = exportToESRIShape(m_exportFlags, geometry, null);
             if (m_shapeBuffer == null || size > m_shapeBuffer.capacity())

@@ -1,6 +1,6 @@
 package com.esri.core.geometry;
 
-public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
+public class OperatorImportFromGeoJsonCursor extends GeometryCursor {
     StringCursor m_jsonStringCursor;
     int m_import_flags;
     int m_count;
@@ -20,11 +20,14 @@ public class OperatorImportFromGeoJsonCursor extends MapGeometryCursor {
     }
 
     @Override
-    public MapGeometry next() {
+    public Geometry next() {
         String nextString;
         if ((nextString = m_jsonStringCursor.next()) != null) {
             JsonReader jsonReader = JsonParserReader.createFromString(nextString);
-            return OperatorImportFromGeoJsonLocal.OperatorImportFromGeoJsonHelper.importFromGeoJson(m_import_flags, Geometry.Type.Unknown, jsonReader, null, false);
+            MapGeometry mapGeometry = OperatorImportFromGeoJsonLocal.OperatorImportFromGeoJsonHelper.importFromGeoJson(m_import_flags, Geometry.Type.Unknown, jsonReader, null, false);
+            this.setOperateSR(mapGeometry.sr);
+            this.setResultSR(getSR(), false);
+            return postProject(mapGeometry.getGeometry());
         }
         return null;
     }

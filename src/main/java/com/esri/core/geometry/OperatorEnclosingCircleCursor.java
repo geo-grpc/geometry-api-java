@@ -1,10 +1,5 @@
 package com.esri.core.geometry;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 public class OperatorEnclosingCircleCursor extends GeometryCursor {
     SpatialReference m_spatialReference;
     ProgressTracker m_progressTracker;
@@ -18,7 +13,7 @@ public class OperatorEnclosingCircleCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext())
-            return getCircle(m_inputGeoms.next());
+            return postProject(getCircle(preProjectNext()));
 
         return null;
     }

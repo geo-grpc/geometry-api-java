@@ -38,11 +38,11 @@ final class OperatorGeneralizeCursor extends GeometryCursor {
 
     @Override
     public Geometry next() {
-        // TODO Auto-generated method stub
-        Geometry geom = m_inputGeoms.next();
-        if (geom == null)
-            return null;
-        return Generalize(geom);
+        if (hasNext()) {
+            return postProject(Generalize(preProjectNext()));
+        }
+
+        return null;
     }
 
     private Geometry Generalize(Geometry geom) {

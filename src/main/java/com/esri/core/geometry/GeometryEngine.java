@@ -24,7 +24,6 @@
 
 package com.esri.core.geometry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -55,8 +54,7 @@ public class GeometryEngine {
      * spatial reference.
      */
     public static MapGeometry jsonToGeometry(JsonParser json) {
-        MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, new JsonParserReader(json));
-        return geom;
+        return OperatorImportFromJson.local().execute(Geometry.Type.Unknown, new JsonParserReader(json));
     }
 
 	/**
@@ -72,8 +70,7 @@ public class GeometryEngine {
 	 *         spatial reference.
 	 */
 	public static MapGeometry jsonToGeometry(JsonReader json) {
-		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
-		return geom;
+		return OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
 	}
 	
 	/**
@@ -89,8 +86,7 @@ public class GeometryEngine {
 	 *         spatial reference.
 	 */
 	public static MapGeometry jsonToGeometry(String json) {
-		MapGeometry geom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
-		return geom;
+		return OperatorImportFromJson.local().execute(Geometry.Type.Unknown, json);
 	}
 	
 	/**

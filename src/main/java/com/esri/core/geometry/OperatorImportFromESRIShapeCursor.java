@@ -52,7 +52,7 @@ public class OperatorImportFromESRIShapeCursor extends GeometryCursor {
     public Geometry next() {
         ByteBuffer shapeBuffer = m_inputShapeBuffers.next();
         if (shapeBuffer != null) {
-            return importFromESRIShape(shapeBuffer);
+            return postProject(importFromESRIShape(shapeBuffer));
         }
         return null;
     }

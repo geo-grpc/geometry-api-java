@@ -28,7 +28,7 @@ public class MGRS {
      * @param lat
      * @return
      */
-    public static String gridZoneCode(double lon, double lat) {
+    public static String getZoneCode(double lon, double lat) {
         if (lon < -180 || lon > 180 || lat < -80 || lat > 84) {
             throw new IndexOutOfBoundsException("lat's must be from -80 to 84 and lons from 180 to -180");
         }
@@ -68,7 +68,7 @@ public class MGRS {
     final static double GRID_SIZE = 100000;
     final static double SOUTH_START = 10000000;
 
-    public static String gridSquareId(double lon, double lat) {
+    public static String getSquareIdCode(double lon, double lat) {
         SpatialReference spatialReference = SpatialReference.createUTM(lon, lat);
         ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), spatialReference);
         Point pt = (Point)OperatorProject.local().execute(new Point(lon, lat), projectionTransformation, null);
@@ -97,7 +97,7 @@ public class MGRS {
         return COL_100KM.get(colIndex) + rowLetter;
     }
 
-    public static String gridSquare(Point utmPoint, Zoom zoomLevelMeters) {
+    public static String getSquareZoomCode(Point utmPoint, Zoom zoomLevelMeters) {
         String easting = String.format("%06d", (int)Math.floor(utmPoint.getX()));
         String northing = String.format("%06d", (int)Math.floor(utmPoint.getY()));
 
@@ -123,34 +123,34 @@ public class MGRS {
         return easting + " " + northing;
     }
 
-    public static String gridSquare(double lon, double lat, Zoom zoomLevelMeters) {
+    public static String getSquareZoomCode(double lon, double lat, Zoom zoomLevelMeters) {
         // project coordinate to UTM
         SpatialReference spatialReference = SpatialReference.createUTM(lon, lat);
         ProjectionTransformation projectionTransformation = new ProjectionTransformation(SpatialReference.create(4326), spatialReference);
         Point utmPoint = (Point)OperatorProject.local().execute(new Point(lon, lat), projectionTransformation, null);
 
-        return gridSquare(utmPoint, zoomLevelMeters);
+        return getSquareZoomCode(utmPoint, zoomLevelMeters);
     }
 
-    public static String getMGRSPosition(double lon, double lat, Zoom zoomLevelMeters) {
+    public static String getMGRSCode(double lon, double lat, Zoom zoomLevelMeters) {
         switch (zoomLevelMeters) {
             case LevelGridZone:
-                return gridZoneCode(lon, lat);
+                return getZoneCode(lon, lat);
             case Level100K:
-                return gridZoneCode(lon, lat) + " " + gridSquareId(lon, lat);
+                return getZoneCode(lon, lat) + " " + getSquareIdCode(lon, lat);
             default:
-                return gridZoneCode(lon, lat) + " " + gridSquareId(lon, lat) + " " + gridSquare(lon, lat, zoomLevelMeters);
+                return getZoneCode(lon, lat) + " " + getSquareIdCode(lon, lat) + " " + getSquareZoomCode(lon, lat, zoomLevelMeters);
         }
     }
 
-    public static int getUTMZone(String mgrsZone) {
+    public static int parseUTMZone(String mgrsZone) {
         return Integer.parseInt(mgrsZone.substring(0, mgrsZone.length() - 1));
     }
 
-    public static Envelope getZoneEnvelope(String mgrsZone) {
+    public static Envelope parseZoneEnvelope(String mgrsZone) {
         String latBandCode = mgrsZone.substring(mgrsZone.length() - 1);
         int latIndex = LAT_BANDS_S_TO_N.indexOf(latBandCode);
-        int utmZone = getUTMZone(mgrsZone);
+        int utmZone = parseUTMZone(mgrsZone);
         double xmax = -180 + utmZone * 6;
         double xmin = xmax - 6;
 
@@ -210,7 +210,7 @@ public class MGRS {
             return getGridYNorth(rowId, bUtmZoneEven, utmZoneEnvelope.getYMin());
     }
 
-    public static Envelope getSquareIdEnvelope(String mgrsSquareId, int utmZone, Envelope zoneEnvelope, ProjectionTransformation transformationTo4326) {
+    public static Envelope parseSquareIdEnvelope(String mgrsSquareId, int utmZone, Envelope zoneEnvelope, ProjectionTransformation transformationTo4326) {
         boolean bSouth = zoneEnvelope.getCenter().getY() < 0;
 
         Envelope queryEnvelope = new Envelope();
@@ -229,7 +229,7 @@ public class MGRS {
         return new Envelope(xMin, yMin, xMin + GRID_SIZE, yMin + GRID_SIZE);
     }
 
-    public static Envelope getGridSquare(Envelope gridEnvelopeUTM, String xLocation, String yLocation, ProjectionTransformation transformationTo4326) {
+    public static Envelope parseSquareZoom(Envelope gridEnvelopeUTM, String xLocation, String yLocation, ProjectionTransformation transformationTo4326) {
         double xShift = Math.pow(10, 5 - xLocation.length());
         double yShift = Math.pow(10, 5 - yLocation.length());
         double numericalLocationX = Double.parseDouble(xLocation) * xShift;
@@ -247,14 +247,14 @@ public class MGRS {
         return utmEnvelope;
     }
 
-    public static Polygon getMGRSPolygon(String mgrsCode, boolean bWGS84Result) {
+    public static Polygon parseMGRS(String mgrsCode, boolean bWGS84Result) {
         Polygon result = new Polygon();
         String[] mgrsParts = mgrsCode.split("[ ]+");
         if (mgrsParts.length == 0)
             return result;
 
-        Envelope zoneEnvelope = getZoneEnvelope(mgrsParts[0]);
-        int utmZone = getUTMZone(mgrsParts[0]);
+        Envelope zoneEnvelope = parseZoneEnvelope(mgrsParts[0]);
+        int utmZone = parseUTMZone(mgrsParts[0]);
         SpatialReference utmSpatialReference = SpatialReference.createUTM(utmZone, zoneEnvelope.getCenter().getY() < 0);
         ProjectionTransformation transformationTo4326 = new ProjectionTransformation(utmSpatialReference, SpatialReference.create(4326));
 
@@ -265,7 +265,7 @@ public class MGRS {
             return (Polygon)OperatorProject.local().execute(zoneEnvelope, transformationTo4326.getReverse(), null);
         }
 
-        Envelope utmGridEnvelope = getSquareIdEnvelope(mgrsParts[1], utmZone, zoneEnvelope, transformationTo4326);
+        Envelope utmGridEnvelope = parseSquareIdEnvelope(mgrsParts[1], utmZone, zoneEnvelope, transformationTo4326);
         if (mgrsParts.length == 2 && !bWGS84Result) {
             result.addEnvelope(utmGridEnvelope, false);
             return result;
@@ -273,7 +273,7 @@ public class MGRS {
             return (Polygon)OperatorProject.local().execute(utmGridEnvelope, transformationTo4326, null);
         }
 
-        Envelope utmGridSquare = getGridSquare(utmGridEnvelope, mgrsParts[2], mgrsParts[3], transformationTo4326);
+        Envelope utmGridSquare = parseSquareZoom(utmGridEnvelope, mgrsParts[2], mgrsParts[3], transformationTo4326);
         if (!bWGS84Result) {
             result.addEnvelope(utmGridSquare, false);
             return result;
@@ -284,8 +284,8 @@ public class MGRS {
 
     public static SpatialReference getMGRSSpatialReference(String mgrsCode) {
         String[] mgrsParts = mgrsCode.split("[ ]+");
-        Envelope zoneEnvelope = getZoneEnvelope(mgrsParts[0]);
-        int utmZone = getUTMZone(mgrsParts[0]);
+        Envelope zoneEnvelope = parseZoneEnvelope(mgrsParts[0]);
+        int utmZone = parseUTMZone(mgrsParts[0]);
         return SpatialReference.createUTM(utmZone, zoneEnvelope.getCenter().getY() < 0);
     }
 }

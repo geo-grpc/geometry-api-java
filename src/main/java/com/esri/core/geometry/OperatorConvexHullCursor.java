@@ -43,7 +43,7 @@ class OperatorConvexHullCursor extends GeometryCursor {
     public Geometry next() {
         if (m_b_merge) {
             if (!m_b_done) {
-                Geometry result = calculateConvexHullMerging_(m_inputGeoms, m_progress_tracker);
+                Geometry result = calculateConvexHullMerging_(m_progress_tracker);
                 m_b_done = true;
                 return result;
             }
@@ -53,7 +53,7 @@ class OperatorConvexHullCursor extends GeometryCursor {
 
         if (!m_b_done) {
             if (hasNext()) {
-                return calculateConvexHull_(m_inputGeoms.next(), m_progress_tracker);
+                return postProject(calculateConvexHull_(preProjectNext(), m_progress_tracker));
             }
 
             m_b_done = true;
@@ -62,12 +62,12 @@ class OperatorConvexHullCursor extends GeometryCursor {
         return null;
     }
 
-    private Geometry calculateConvexHullMerging_(GeometryCursor geoms, ProgressTracker progress_tracker) {
-        while (geoms.hasNext()) {
-            m_hull.addGeometry(geoms.next());
+    private Geometry calculateConvexHullMerging_(ProgressTracker progress_tracker) {
+        while (m_inputGeoms.hasNext()) {
+            m_hull.addGeometry(preProjectNext());
         }
 
-        return m_hull.getBoundingGeometry();
+        return postProject(m_hull.getBoundingGeometry());
     }
 
     @Override

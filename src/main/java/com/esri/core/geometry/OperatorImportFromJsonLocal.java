@@ -23,10 +23,11 @@
  */
 package com.esri.core.geometry;
 
+
 class OperatorImportFromJsonLocal extends OperatorImportFromJson {
 
     @Override
-    public MapGeometryCursor execute(Geometry.Type type,
+    public GeometryCursor execute(Geometry.Type type,
                                      JsonReaderCursor jsonParserCursor) {
         return new OperatorImportFromJsonCursor(type.value(), jsonParserCursor);
     }
