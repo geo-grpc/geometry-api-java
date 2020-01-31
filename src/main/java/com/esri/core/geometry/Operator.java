@@ -81,7 +81,8 @@ public abstract class Operator {
         RandomPoints,
         EnclosingCircle,
         GeodeticInverse,
-        ImportFromMGRS
+        ImportFromMGRS,
+        ExportToMGRS
     }
 
     public abstract Type getType();

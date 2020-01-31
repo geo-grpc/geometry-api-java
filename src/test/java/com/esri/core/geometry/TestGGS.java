@@ -283,6 +283,52 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
         assertTrue(OperatorIntersects.local().execute(result, pt, SpatialReference.create(4326), null));
     }
 
+    public void testImportFromMGRS() {
+        SimpleStringCursor simpleStringCursor = new SimpleStringCursor("15J", 8);
+        OperatorImportFromMGRSCursor operatorImportFromMGRSCursor = new OperatorImportFromMGRSCursor(simpleStringCursor);
+        Geometry geometry = operatorImportFromMGRSCursor.next();
+        SpatialReference sr = operatorImportFromMGRSCursor.getSR();
+        assertNotNull(sr);
+        assertEquals(sr.getID(), 32715);
+        assertNotNull(geometry);
+
+        simpleStringCursor = new SimpleStringCursor("15J", 8);
+        operatorImportFromMGRSCursor = new OperatorImportFromMGRSCursor(simpleStringCursor);
+        operatorImportFromMGRSCursor.setResultSR(SpatialReference.create(4326), false);
+        Geometry geometry2 = operatorImportFromMGRSCursor.next();
+        SpatialReference sr2 = operatorImportFromMGRSCursor.getSR();
+        assertFalse(geometry.equals(geometry2));
+        assertEquals(sr2.getID(), 4326);
+    }
+
+    public void testExportToMGRS() {
+        SpatialReference sr = SpatialReference.create(32715);
+        Geometry geometry = GeometryEngine.geometryFromWkt("MULTIPOLYGON (((216576.77347494266 6455630.090461375, 783423.226525055 6455630.090461375, 805227.1893161184 7342521.290554579, 194772.810683879 7342521.290554579, 216576.77347494266 6455630.090461375)))", 0, Geometry.Type.Unknown);
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(geometry);
+        simpleGeometryCursor.setInputSR(sr);
+        OperatorExportToMGRSCursor operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
+        String value = operatorExportToMGRSCursor.next();
+        assertEquals(value, "15J");
+
+        simpleGeometryCursor = new SimpleGeometryCursor(geometry);
+        operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
+        operatorExportToMGRSCursor.setInputSR(sr);
+        value = operatorExportToMGRSCursor.next();
+        assertEquals(value, "15J");
+
+        simpleGeometryCursor = new SimpleGeometryCursor(geometry);
+        simpleGeometryCursor.setResultSR(sr, true);
+        operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
+        value = operatorExportToMGRSCursor.next();
+        assertEquals(value, "15J");
+
+        simpleGeometryCursor = new SimpleGeometryCursor(geometry);
+        simpleGeometryCursor.setOperateSR(sr);
+        operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
+        value = operatorExportToMGRSCursor.next();
+        assertEquals(value, "15J");
+    }
+
     public void testBasics() {
         Envelope envelope = new Envelope();
         Point point = new Point(-174,0);

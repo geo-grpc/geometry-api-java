@@ -16,8 +16,8 @@ public class OperatorImportFromMGRSCursor extends GeometryCursor {
             String mgrsCode = m_mgrsStringCursor.next();
             Geometry geometry = OperatorImportFromMGRS.local().execute(Geometry.Type.Unknown, mgrsCode, null);
             SpatialReference outputSR = MGRS.getMGRSSpatialReference(mgrsCode);
-            setResultSR(outputSR, true);
-            postProject(geometry);
+            setOperateSR(outputSR);
+            return postProject(geometry);
         }
         return null;
     }

@@ -27,6 +27,9 @@ public class PrePostProjection {
     }
 
     public SpatialReference getSR() {
+        if (finalSR == null) {
+            return resultSR != null ? resultSR : (operateSR != null ? operateSR : inputSR);
+        }
         return finalSR;
     }
 
@@ -41,15 +44,14 @@ public class PrePostProjection {
         }
         finalSR = operateSR;
 
-
         // TODO need a projection transformation cache
         return OperatorProject.local().execute(geometryCursor.next(), new ProjectionTransformation(inputSR, operateSR), null);
     }
 
     Geometry postProject(Geometry geometry) {
-        if (resultSR == null ||
-                (operateSR == null && inputSR == null) ||
-                (resultSR.equals(operateSR)) || (operateSR == null && resultSR.equals(inputSR))) {
+        SpatialReference fromSR = operateSR != null ? operateSR : inputSR;
+        if (resultSR == null || resultSR.equals(finalSR)) {
+            finalSR = fromSR;
             return geometry;
         }
 
@@ -59,13 +61,6 @@ public class PrePostProjection {
         }
 
         // TODO need a projection transformation cache
-        ProjectionTransformation projectionTransformation;
-        if (operateSR != null) {
-            projectionTransformation = new ProjectionTransformation(operateSR, resultSR);
-        } else {
-            projectionTransformation = new ProjectionTransformation(inputSR, resultSR);
-        }
-
-        return OperatorProject.local().execute(geometry, projectionTransformation, null);
+        return OperatorProject.local().execute(geometry, new ProjectionTransformation(fromSR, resultSR), null);
     }
 }
