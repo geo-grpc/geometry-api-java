@@ -150,7 +150,7 @@ public final class OperatorUnionCursor extends GeometryCursor {
 
         Geometry geom = null;
         if (m_inputGeoms != null) {
-            geom = preProjectNext();
+            geom = preProject();
             if (geom == null) {
                 m_b_done = true;
             }

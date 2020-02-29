@@ -49,7 +49,7 @@ class OperatorDifferenceCursor extends GeometryCursor {
 
         if (hasNext()) {
             return postProject(OperatorDifferenceLocal.difference(
-                    preProjectNext(),
+                    preProject(),
                     m_geomSubtractor,
                     m_Spatial_reference,
                     m_progress_tracker));

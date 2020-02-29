@@ -63,7 +63,7 @@ public class OperatorExportToJsonCursor extends StringCursor {
     public String next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = preProjectNext(m_geometryCursor);
+            geometry = preProject(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             return exportToString(geometry, m_spatialReference, null);
         }

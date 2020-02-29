@@ -47,7 +47,7 @@ class OperatorSimplifyCursorOGC extends GeometryCursor {
         if (hasNext()) {
             if ((m_progressTracker != null) && !(m_progressTracker.progress(-1, -1)))
                 throw new RuntimeException("user_canceled");
-            return postProject(simplify(preProjectNext()));
+            return postProject(simplify(preProject()));
         }
         return null;
     }

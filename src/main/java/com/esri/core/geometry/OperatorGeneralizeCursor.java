@@ -39,7 +39,7 @@ final class OperatorGeneralizeCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext()) {
-            return postProject(Generalize(preProjectNext()));
+            return postProject(Generalize(preProject()));
         }
 
         return null;

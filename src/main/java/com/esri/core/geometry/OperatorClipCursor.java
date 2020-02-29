@@ -42,7 +42,7 @@ class OperatorClipCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext()) {
-            return postProject(Clipper.clip(preProjectNext(), m_envelope, m_tolerance, 0.0));
+            return postProject(Clipper.clip(preProject(), m_envelope, m_tolerance, 0.0));
         }
         return null;
     }

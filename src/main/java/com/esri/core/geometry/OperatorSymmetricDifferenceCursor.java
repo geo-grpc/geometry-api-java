@@ -46,7 +46,7 @@ public class OperatorSymmetricDifferenceCursor extends GeometryCursor {
 
         if (hasNext()) {
             return postProject(OperatorSymmetricDifferenceLocal.symmetricDifference(
-                    preProjectNext(),
+                    preProject(),
                     m_rightGeom,
                     m_spatial_reference,
                     m_progress_tracker));

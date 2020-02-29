@@ -63,6 +63,7 @@ public class OperatorExportToGeoJsonCursor extends StringCursor {
         m_spatialReference = spatialReference;
         m_geometryCursor = geometryCursor;
         setInputSR(spatialReference);
+        // geojson must be wgs84
         setOperateSR(m_wgs84);
     }
 
@@ -88,7 +89,7 @@ public class OperatorExportToGeoJsonCursor extends StringCursor {
     public String next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = preProjectNext(m_geometryCursor);
+            geometry = preProject(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             return exportToGeoJson(m_export_flags, geometry, m_spatialReference);
         }

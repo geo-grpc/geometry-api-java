@@ -195,6 +195,7 @@ class GeodesicBufferer {
 
         @Override
         public Geometry next() {
+            // TODO allocate once.
             Point point = new Point();
             while (true) {
                 if (m_index == m_mp.getPointCount())

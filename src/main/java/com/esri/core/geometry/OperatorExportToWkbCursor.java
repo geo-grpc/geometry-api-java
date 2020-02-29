@@ -25,7 +25,7 @@ public class OperatorExportToWkbCursor extends ByteBufferCursor {
     public ByteBuffer next() {
         Geometry geometry;
         if (hasNext()) {
-            geometry = preProjectNext(m_geometryCursor);
+            geometry = preProject(m_geometryCursor);
             simpleStateEnum = geometry.getSimpleState();
             int size = OperatorExportToWkbLocal.exportToWKB(m_exportFlags, geometry, null);
             ByteBuffer wkbBuffer = ByteBuffer.allocate(size).order(ByteOrder.nativeOrder());

@@ -68,7 +68,7 @@ public class OperatorImportFromJsonCursor extends GeometryCursor {
             m_index = m_inputJsonParsers.getID();
             MapGeometry mp = importFromJsonParser(m_type, jsonParser);
             this.setOperateSR(mp.sr);
-            this.setResultSR(getSR(), false);
+            this.setResultSR(getSR());
             return postProject(mp.getGeometry());
         }
         return null;

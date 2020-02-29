@@ -36,7 +36,7 @@ class OperatorDensifyByLengthCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext()) {
-            return postProject(densifyByLength(preProjectNext()));
+            return postProject(densifyByLength(preProject()));
         }
         return null;
     }

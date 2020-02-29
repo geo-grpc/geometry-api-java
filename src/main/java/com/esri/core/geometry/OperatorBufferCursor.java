@@ -65,7 +65,7 @@ class OperatorBufferCursor extends GeometryCursor {
                 if (m_dindex + 1 < m_distances.length)
                     m_dindex++;
 
-                return postProject(buffer(preProjectNext(), m_distances[m_dindex]));
+                return postProject(buffer(preProject(), m_distances[m_dindex]));
             }
             return null;
         }

@@ -25,8 +25,10 @@ public class OperatorImportFromGeoJsonCursor extends GeometryCursor {
         if ((nextString = m_jsonStringCursor.next()) != null) {
             JsonReader jsonReader = JsonParserReader.createFromString(nextString);
             MapGeometry mapGeometry = OperatorImportFromGeoJsonLocal.OperatorImportFromGeoJsonHelper.importFromGeoJson(m_import_flags, Geometry.Type.Unknown, jsonReader, null, false);
+            // TODO, is it more clear if we set this to be setInputSR even though there is not preProject step?
+            // TODO, throw exception if not WGS84
             this.setOperateSR(mapGeometry.sr);
-            this.setResultSR(getSR(), false);
+            this.setResultSR(getSR());
             return postProject(mapGeometry.getGeometry());
         }
         return null;

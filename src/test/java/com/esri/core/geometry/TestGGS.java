@@ -3,6 +3,7 @@ package com.esri.core.geometry;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -294,7 +295,7 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
 
         simpleStringCursor = new SimpleStringCursor("15J", 8);
         operatorImportFromMGRSCursor = new OperatorImportFromMGRSCursor(simpleStringCursor);
-        operatorImportFromMGRSCursor.setResultSR(SpatialReference.create(4326), false);
+        operatorImportFromMGRSCursor.setResultSR(SpatialReference.create(4326));
         Geometry geometry2 = operatorImportFromMGRSCursor.next();
         SpatialReference sr2 = operatorImportFromMGRSCursor.getSR();
         assertFalse(geometry.equals(geometry2));
@@ -317,7 +318,7 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
         assertEquals(value, "15J");
 
         simpleGeometryCursor = new SimpleGeometryCursor(geometry);
-        simpleGeometryCursor.setResultSR(sr, true);
+        simpleGeometryCursor.setResultSR(sr);
         operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
         value = operatorExportToMGRSCursor.next();
         assertEquals(value, "15J");
@@ -327,6 +328,19 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
         operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.LevelGridZone, null);
         value = operatorExportToMGRSCursor.next();
         assertEquals(value, "15J");
+    }
+
+    public void testEnvelopes() {
+        SpatialReference sr = SpatialReference.create(32715);
+        Geometry geometry = GeometryEngine.geometryFromWkt("MULTIPOLYGON (((216576.77347494266 6455630.090461375, 783423.226525055 6455630.090461375, 805227.1893161184 7342521.290554579, 194772.810683879 7342521.290554579, 216576.77347494266 6455630.090461375)))", 0, Geometry.Type.Unknown);
+        SimpleGeometryCursor simpleGeometryCursor = new SimpleGeometryCursor(geometry);
+        simpleGeometryCursor.setInputSR(sr);
+        OperatorExportToMGRSCursor operatorExportToMGRSCursor = new OperatorExportToMGRSCursor(simpleGeometryCursor, MGRS.Zoom.Level100K, null);
+        while (operatorExportToMGRSCursor.hasNext()) {
+            String mgrsCode = (String)operatorExportToMGRSCursor.next();
+            Polygon polygon = MGRS.parseMGRS(mgrsCode, false);
+            assertTrue(polygon.toString(), OperatorIntersects.local().execute(geometry, polygon, null, null));
+        }
     }
 
     public void testBasics() {
@@ -400,4 +414,6 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
         result.queryEnvelope(envelope);
         assertEquals(166021.5, envelope.getCenterX(), .00001);
     }
+
+
 }

@@ -13,7 +13,7 @@ public class OperatorEnclosingCircleCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (hasNext())
-            return postProject(getCircle(preProjectNext()));
+            return postProject(getCircle(preProject()));
 
         return null;
     }

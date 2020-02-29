@@ -67,7 +67,7 @@ class OperatorCutCursor extends GeometryCursor {
     @Override
     public Geometry next() {
         if (m_bFirstCall || (m_inputGeoms != null && m_inputGeoms.hasNext() && !(m_cutIndex + 1 < m_cuts.size()))) {
-            m_cuttee = preProjectNext();
+            m_cuttee = preProject();
             Envelope2D e = InternalUtils.getMergedExtent(m_cuttee, m_cutter);
             m_tolerance = InternalUtils.calculateToleranceFromGeometry(m_spatialReference, e, true);
             m_bFirstCall = true;
