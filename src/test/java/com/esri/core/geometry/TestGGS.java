@@ -414,6 +414,4 @@ envelope: Envelope: [-96.13180313970017, -30.716083310981194, -95.06959008486949
         result.queryEnvelope(envelope);
         assertEquals(166021.5, envelope.getCenterX(), .00001);
     }
-
-
 }
