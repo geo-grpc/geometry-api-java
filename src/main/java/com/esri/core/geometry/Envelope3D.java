@@ -30,9 +30,9 @@ import java.io.Serializable;
 /**
  * A class that represents axis parallel 3D rectangle.
  */
-public final class Envelope3D implements Serializable {
+public final class Envelope3D implements Serializable{
 	private static final long serialVersionUID = 1L;
-
+	
 	public double xmin;
 
 	public double ymin;
@@ -46,7 +46,7 @@ public final class Envelope3D implements Serializable {
 	public double zmax;
 
 	public static Envelope3D construct(double _xmin, double _ymin,
-	                                   double _zmin, double _xmax, double _ymax, double _zmax) {
+			double _zmin, double _xmax, double _ymax, double _zmax) {
 		Envelope3D env = new Envelope3D(_xmin, _ymin, _zmin, _xmax, _ymax, _zmax);
 		return env;
 	}
@@ -63,7 +63,7 @@ public final class Envelope3D implements Serializable {
 		setCoords(other);
 	}
 
-
+	
 	public void setInfinite() {
 		xmin = NumberUtils.negativeInf();
 		xmax = NumberUtils.positiveInf();
@@ -99,7 +99,7 @@ public final class Envelope3D implements Serializable {
 	}
 
 	public void setCoords(double _xmin, double _ymin, double _zmin,
-	                      double _xmax, double _ymax, double _zmax) {
+			double _xmax, double _ymax, double _zmax) {
 		xmin = _xmin;
 		ymin = _ymin;
 		zmin = _zmin;
@@ -119,7 +119,7 @@ public final class Envelope3D implements Serializable {
 	}
 
 	public void setCoords(Point3D center, double width, double height,
-	                      double depth) {
+			double depth) {
 		xmin = center.x - width * 0.5;
 		xmax = xmin + width;
 		ymin = center.y - height * 0.5;
@@ -218,7 +218,7 @@ public final class Envelope3D implements Serializable {
 	public void merge(Point3D pt) {
 		merge(pt.x, pt.y, pt.z);
 	}
-
+	
 	public void merge(Envelope3D other) {
 		if (other.isEmpty())
 			return;
@@ -228,7 +228,7 @@ public final class Envelope3D implements Serializable {
 	}
 
 	public void merge(double x1, double y1, double z1, double x2, double y2,
-	                  double z2) {
+			double z2) {
 		merge(x1, y1, z1);
 		merge(x2, y2, z2);
 	}
@@ -253,8 +253,8 @@ public final class Envelope3D implements Serializable {
 	 */
 	public boolean isIntersecting(Envelope3D other) {
 		return !isEmpty() && !other.isEmpty() && ((xmin <= other.xmin) ? xmax >= other.xmin : other.xmax >= xmin) && // check that x projections overlap
-				((ymin <= other.ymin) ? ymax >= other.ymin : other.ymax >= ymin) && // check that y projections overlap
-				((zmin <= other.zmin) ? zmax >= other.zmin : other.zmax >= zmin); // check that z projections overlap
+			((ymin <= other.ymin) ? ymax >= other.ymin : other.ymax >= ymin) && // check that y projections overlap
+			((zmin <= other.zmin) ? zmax >= other.zmin : other.zmax >= zmin); // check that z projections overlap
 	}
 
 	/**
@@ -320,8 +320,24 @@ public final class Envelope3D implements Serializable {
 		return true;
 	}
 
+	
+	@Override
+	public int hashCode() {
+		if (isEmpty()) {
+			return NumberUtils.hash(NumberUtils.TheNaN);
+		}
+		
+		int hash = NumberUtils.hash(xmin);
+		hash = NumberUtils.hash(hash, xmax);
+		hash = NumberUtils.hash(hash, ymin);
+		hash = NumberUtils.hash(hash, ymax);
+		hash = NumberUtils.hash(hash, zmin);
+		hash = NumberUtils.hash(hash, zmax);
+		return hash;
+	}
+
 	public void construct(Envelope1D xinterval, Envelope1D yinterval,
-	                      Envelope1D zinterval) {
+			Envelope1D zinterval) {
 		if (xinterval.isEmpty() || yinterval.isEmpty()) {
 			setEmpty();
 			return;

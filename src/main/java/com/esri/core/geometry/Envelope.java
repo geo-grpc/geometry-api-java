@@ -44,10 +44,13 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Creates an envelope by defining its center, width, and height.
-	 *
-	 * @param center The center point of the envelope.
-	 * @param width  The width of the envelope.
-	 * @param height The height of the envelope.
+	 * 
+	 * @param center
+	 *            The center point of the envelope.
+	 * @param width
+	 *            The width of the envelope.
+	 * @param height
+	 *            The height of the envelope.
 	 */
 	public Envelope(Point center, double width, double height) {
 		m_description = VertexDescriptionDesignerImpl.getDefaultDescriptor2D();
@@ -67,16 +70,20 @@ public class Envelope extends Geometry implements Serializable {
 	public Envelope(VertexDescription vd) {
 		if (vd == null)
 			throw new IllegalArgumentException();
+		
 		m_description = vd;
 		m_envelope.setEmpty();
+		_ensureAttributes();
 	}
 
 	public Envelope(VertexDescription vd, Envelope2D env2D) {
 		if (vd == null)
 			throw new IllegalArgumentException();
+		
 		m_description = vd;
 		m_envelope.setCoords(env2D);
 		m_envelope.normalize();
+		_ensureAttributes();
 	}
 
 	/**
@@ -90,7 +97,7 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Constructs an envelope that covers the given point. The coordinates of
 	 * the point are used to set the extent of the envelope.
-	 *
+	 * 
 	 * @param point The point that the envelope covers.
 	 */
 	public Envelope(Point point) {
@@ -104,11 +111,15 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Constructs an envelope with the specified X and Y extents.
-	 *
-	 * @param xmin The minimum x-coordinate of the envelope.
-	 * @param ymin The minimum y-coordinate of the envelope.
-	 * @param xmax The maximum x-coordinate of the envelope.
-	 * @param ymax The maximum y-coordinate of the envelope.
+	 * 
+	 * @param xmin
+	 *            The minimum x-coordinate of the envelope.
+	 * @param ymin
+	 *            The minimum y-coordinate of the envelope.
+	 * @param xmax
+	 *            The maximum x-coordinate of the envelope.
+	 * @param ymax
+	 *            The maximum y-coordinate of the envelope.
 	 */
 	public Envelope(double xmin, double ymin, double xmax, double ymax) {
 		m_description = VertexDescriptionDesignerImpl.getDefaultDescriptor2D();
@@ -117,11 +128,15 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Sets the 2-dimensional extents of the envelope.
-	 *
-	 * @param xmin The minimum x-coordinate of the envelope.
-	 * @param ymin The minimum y-coordinate of the envelope.
-	 * @param xmax The maximum x-coordinate of the envelope.
-	 * @param ymax The maximum y-coordinate of the envelope.
+	 * 
+	 * @param xmin
+	 *            The minimum x-coordinate of the envelope.
+	 * @param ymin
+	 *            The minimum y-coordinate of the envelope.
+	 * @param xmax
+	 *            The maximum x-coordinate of the envelope.
+	 * @param ymax
+	 *            The maximum y-coordinate of the envelope.
 	 */
 	public void setCoords(double xmin, double ymin, double xmax, double ymax) {
 		_touch();
@@ -132,8 +147,9 @@ public class Envelope extends Geometry implements Serializable {
 	 * Sets the envelope from the array of points. The result envelope is a
 	 * bounding box of all the points in the array. If the array has zero
 	 * length, the envelope will be empty.
-	 *
-	 * @param points The point array.
+	 * 
+	 * @param points
+	 *            The point array.
 	 */
 	void setCoords(Point[] points) {
 		_touch();
@@ -161,7 +177,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Indicates whether this envelope contains any points.
-	 *
+	 * 
 	 * @return boolean Returns true if the envelope is empty.
 	 */
 	@Override
@@ -171,7 +187,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * The width of the envelope.
-	 *
+	 * 
 	 * @return The width of the envelope.
 	 */
 
@@ -181,7 +197,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * The height of the envelope.
-	 *
+	 * 
 	 * @return The height of the envelope.
 	 */
 	public double getHeight() {
@@ -190,7 +206,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * The x-coordinate of the center of the envelope.
-	 *
+	 * 
 	 * @return The x-coordinate of the center of the envelope.
 	 */
 	public double getCenterX() {
@@ -199,7 +215,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * The y-coordinate of center of the envelope.
-	 *
+	 * 
 	 * @return The y-coordinate of center of the envelope.
 	 */
 	public double getCenterY() {
@@ -208,7 +224,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * The x and y-coordinates of the center of the envelope.
-	 *
+	 * 
 	 * @return A point whose x and y-coordinates are that of the center of the envelope.
 	 */
 	public Point2D getCenterXY() {
@@ -242,10 +258,11 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Merges this envelope with the extent of the given envelope. If this
-	 * envelope is empty, the coordinates of the given envelope
+	 * envelope is empty, the coordinates of the given envelope 
 	 * are assigned. If the given envelope is empty, this envelope is unchanged.
-	 *
-	 * @param other The envelope to merge.
+	 * 
+	 * @param other
+	 *            The envelope to merge.
 	 */
 	public void merge(Envelope other) {
 		_touch();
@@ -273,8 +290,9 @@ public class Envelope extends Geometry implements Serializable {
 	 * increased to include the point. If the envelope is empty, the coordinates
 	 * of the point to merge are assigned. If the point is empty, the original
 	 * envelope is unchanged.
-	 *
-	 * @param point The point to be merged.
+	 * 
+	 * @param point
+	 *            The point to be merged.
 	 */
 	public void merge(Point point) {
 		_touch();
@@ -317,8 +335,8 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	void _setFromPoint(Point centerPoint) {
-		m_envelope.setCoords(centerPoint.m_attributes[0],
-				centerPoint.m_attributes[1]);
+		mergeVertexDescription(centerPoint.getDescription());
+		m_envelope.setCoords(centerPoint.getX(), centerPoint.getY());
 		VertexDescription pointVD = centerPoint.m_description;
 		for (int iattrib = 1, nattrib = pointVD.getAttributeCount(); iattrib < nattrib; iattrib++) {
 			int semantics = pointVD._getSemanticsImpl(iattrib);
@@ -336,15 +354,17 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	public void setInterval(int semantics, int ordinate, double vmin,
-	                        double vmax) {
+			double vmax) {
 		setInterval(semantics, ordinate, new Envelope1D(vmin, vmax));
 	}
 
 	/**
 	 * Re-aspects this envelope to fit within the specified width and height.
-	 *
-	 * @param arWidth  The width within which to fit the envelope.
-	 * @param arHeight The height within which to fit the envelope.
+	 * 
+	 * @param arWidth
+	 *            The width within which to fit the envelope.
+	 * @param arHeight
+	 *            The height within which to fit the envelope.
 	 */
 	public void reaspect(double arWidth, double arHeight) {
 		_touch();
@@ -355,9 +375,11 @@ public class Envelope extends Geometry implements Serializable {
 	 * Changes the dimensions of the envelope while preserving the center. New width
 	 * is Width + 2 * dx, new height is Height + 2 * dy. If the result envelope
 	 * width or height becomes negative, the envelope is set to be empty.
-	 *
-	 * @param dx The inflation along the x-axis.
-	 * @param dy The inflation along the y-axis.
+	 * 
+	 * @param dx
+	 *            The inflation along the x-axis.
+	 * @param dy
+	 *            The inflation along the y-axis.
 	 */
 	public void inflate(double dx, double dy) {
 		_touch();
@@ -378,9 +400,9 @@ public class Envelope extends Geometry implements Serializable {
 			queryEnvelope3D(env);
 			if (env.isEmptyZ())
 				env.setEmpty(); // Z components is empty, the
-				// AffineTransformation3D makes the whole
-				// envelope empty. Consider
-				// throwing an assert instead.
+								// AffineTransformation3D makes the whole
+								// envelope empty. Consider
+			// throwing an assert instead.
 			else
 				transform.transform(env);
 		}
@@ -396,7 +418,8 @@ public class Envelope extends Geometry implements Serializable {
 		envDst.m_description = m_description;
 		envDst.m_envelope.setCoords(m_envelope);
 		envDst.m_attributes = null;
-		if (m_attributes != null) {
+		if (m_attributes != null)
+		{
 			envDst._ensureAttributes();
 			System.arraycopy(m_attributes, 0, envDst.m_attributes, 0,
 					(m_description.getTotalComponentCount() - 2) * 2);
@@ -429,7 +452,8 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_ENVELOPE + m_envelope.estimateMemorySize() + estimateMemorySize(m_attributes);
 	}
 
@@ -492,71 +516,73 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Sets the point's coordinates to the coordinates of the envelope at the
 	 * given corner.
-	 *
-	 * @param index The index of the envelope's corners from 0 to 3.
-	 *              <p>
-	 *              0 = lower left corner
-	 *              <p>
-	 *              1 = top-left corner
-	 *              <p>
-	 *              2 = top right corner
-	 *              <p>
-	 *              3 = bottom right corner
-	 * @param ptDst The point whose coordinates are used to set the envelope's
-	 *              coordinate at a specified corner.
+	 * 
+	 * @param index
+	 *            The index of the envelope's corners from 0 to 3.
+	 *            <p>
+	 *            0 = lower left corner
+	 *            <p>
+	 *            1 = top-left corner
+	 *            <p>
+	 *            2 = top right corner
+	 *            <p>
+	 *            3 = bottom right corner
+	 * @param ptDst
+	 *            The point whose coordinates are used to set the envelope's
+	 *            coordinate at a specified corner.
 	 */
 	public void queryCornerByVal(int index, Point ptDst) {
 		ptDst.assignVertexDescription(m_description);
 		int nattrib = getDescription().getAttributeCount() - 1;
 		switch (index) {
-			case 0: {
-				for (int i = 0; i < nattrib; i++) {
-					int semantics = m_description.getSemantics(i);
-					int ncomp = VertexDescription.getComponentCount(semantics);
-					for (int iord = 0; iord < ncomp; iord++)
-						ptDst.setAttribute(semantics, iord,
-								_getAttributeAsDbl(0, semantics, iord));
-				}
-				ptDst.setXY(m_envelope.xmin, m_envelope.ymin);
-				return;
+		case 0: {
+			for (int i = 0; i < nattrib; i++) {
+				int semantics = m_description.getSemantics(i);
+				int ncomp = VertexDescription.getComponentCount(semantics);
+				for (int iord = 0; iord < ncomp; iord++)
+					ptDst.setAttribute(semantics, iord,
+							_getAttributeAsDbl(0, semantics, iord));
 			}
+			ptDst.setXY(m_envelope.xmin, m_envelope.ymin);
+			return;
+		}
 
-			case 1: {
-				for (int i = 0; i < nattrib; i++) {
-					int semantics = m_description.getSemantics(i);
-					int ncomp = VertexDescription.getComponentCount(semantics);
-					for (int iord = 0; iord < ncomp; iord++)
-						ptDst.setAttribute(semantics, iord,
-								_getAttributeAsDbl(1, semantics, iord));
-				}
-				ptDst.setXY(m_envelope.xmin, m_envelope.ymax);
-				return;
+		case 1: {
+			for (int i = 0; i < nattrib; i++) {
+				int semantics = m_description.getSemantics(i);
+				int ncomp = VertexDescription.getComponentCount(semantics);
+				for (int iord = 0; iord < ncomp; iord++)
+					ptDst.setAttribute(semantics, iord,
+							_getAttributeAsDbl(1, semantics, iord));
 			}
-			case 2: {
-				for (int i = 0; i < nattrib; i++) {
-					int semantics = m_description.getSemantics(i);
-					int ncomp = VertexDescription.getComponentCount(semantics);
-					for (int iord = 0; iord < ncomp; iord++)
-						ptDst.setAttribute(semantics, iord,
-								_getAttributeAsDbl(0, semantics, iord));
-				}
-				ptDst.setXY(m_envelope.xmax, m_envelope.ymax);
+			ptDst.setXY(m_envelope.xmin, m_envelope.ymax);
+			return;
+		}
+		case 2: {
+			for (int i = 0; i < nattrib; i++) {
+				int semantics = m_description.getSemantics(i);
+				int ncomp = VertexDescription.getComponentCount(semantics);
+				for (int iord = 0; iord < ncomp; iord++)
+					ptDst.setAttribute(semantics, iord,
+							_getAttributeAsDbl(0, semantics, iord));
+			}
+			ptDst.setXY(m_envelope.xmax, m_envelope.ymax);
 
-				return;
+			return;
+		}
+		case 3: {
+			for (int i = 0; i < nattrib; i++) {
+				int semantics = m_description.getSemantics(i);
+				int ncomp = VertexDescription.getComponentCount(semantics);
+				for (int iord = 0; iord < ncomp; iord++)
+					ptDst.setAttribute(semantics, iord,
+							_getAttributeAsDbl(1, semantics, iord));
 			}
-			case 3: {
-				for (int i = 0; i < nattrib; i++) {
-					int semantics = m_description.getSemantics(i);
-					int ncomp = VertexDescription.getComponentCount(semantics);
-					for (int iord = 0; iord < ncomp; iord++)
-						ptDst.setAttribute(semantics, iord,
-								_getAttributeAsDbl(1, semantics, iord));
-				}
-				ptDst.setXY(m_envelope.xmax, m_envelope.ymin);
-				return;
-			}
-			default:
-				throw new IndexOutOfBoundsException();
+			ptDst.setXY(m_envelope.xmax, m_envelope.ymin);
+			return;
+		}
+		default:
+			throw new IndexOutOfBoundsException();
 		}
 	}
 
@@ -588,7 +614,6 @@ public class Envelope extends Geometry implements Serializable {
 			throw new IllegalArgumentException();
 
 		int attribute_index = m_description.getAttributeIndex(semantics);
-		_ensureAttributes();
 		if (attribute_index >= 0) {
 			return m_attributes[getEndPointOffset(m_description, end_point)
 					+ m_description.getPointAttributeOffset_(attribute_index)
@@ -599,7 +624,7 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	void setAttributeAsDblImpl_(int end_point, int semantics, int ordinate,
-	                            double value) {
+			double value) {
 		assert (end_point == 0 || end_point == 1);
 
 		if (semantics == VertexDescription.Semantics.POSITION) {
@@ -614,7 +639,7 @@ public class Envelope extends Geometry implements Serializable {
 				else
 					m_envelope.xmin = value;
 			}
-
+			
 			return;
 		}
 
@@ -623,7 +648,6 @@ public class Envelope extends Geometry implements Serializable {
 			throw new IllegalArgumentException();
 
 		addAttribute(semantics);
-		_ensureAttributes();
 		int attribute_index = m_description.getAttributeIndex(semantics);
 		m_attributes[getEndPointOffset(m_description, end_point)
 				+ m_description.getPointAttributeOffset_(attribute_index) - 2
@@ -633,71 +657,62 @@ public class Envelope extends Geometry implements Serializable {
 	void _ensureAttributes() {
 		_touch();
 		if (m_attributes == null && m_description.getTotalComponentCount() > 2) {
-			m_attributes = new double[(m_description.getTotalComponentCount() - 2) * 2];
+			int halfLength = m_description.getTotalComponentCount() - 2;
+			m_attributes = new double[halfLength * 2];
 			int offset0 = _getEndPointOffset(m_description, 0);
 			int offset1 = _getEndPointOffset(m_description, 1);
-
-			int j = 0;
-			for (int i = 1, n = m_description.getAttributeCount(); i < n; i++) {
-				int semantics = m_description.getSemantics(i);
-				int nords = VertexDescription.getComponentCount(semantics);
-				double d = VertexDescription.getDefaultValue(semantics);
-				for (int ord = 0; ord < nords; ord++) {
-					m_attributes[offset0 + j] = d;
-					m_attributes[offset1 + j] = d;
-					j++;
-				}
-			}
+			System.arraycopy(m_description._getDefaultPointAttributes(), 2, m_attributes, offset0, halfLength);
+			System.arraycopy(m_description._getDefaultPointAttributes(), 2, m_attributes, offset1, halfLength);
 		}
 	}
 
 	@Override
 	protected void _assignVertexDescriptionImpl(VertexDescription newDescription) {
-		if (m_attributes == null) {
-			m_description = newDescription;
-			return;
-		}
-
 		if (newDescription.getTotalComponentCount() > 2) {
 			int[] mapping = VertexDescriptionDesignerImpl.mapAttributes(newDescription, m_description);
-
+			
 			double[] newAttributes = new double[(newDescription.getTotalComponentCount() - 2) * 2];
-
+			
 			int old_offset0 = _getEndPointOffset(m_description, 0);
 			int old_offset1 = _getEndPointOffset(m_description, 1);
-
+	
 			int new_offset0 = _getEndPointOffset(newDescription, 0);
 			int new_offset1 = _getEndPointOffset(newDescription, 1);
-
+			
 			int j = 0;
 			for (int i = 1, n = newDescription.getAttributeCount(); i < n; i++) {
 				int semantics = newDescription.getSemantics(i);
 				int nords = VertexDescription.getComponentCount(semantics);
-				if (mapping[i] == -1) {
+				if (mapping[i] == -1)
+				{
 					double d = VertexDescription.getDefaultValue(semantics);
-					for (int ord = 0; ord < nords; ord++) {
+					for (int ord = 0; ord < nords; ord++)
+					{
 						newAttributes[new_offset0 + j] = d;
 						newAttributes[new_offset1 + j] = d;
 						j++;
 					}
-				} else {
+				}
+				else {
 					int m = mapping[i];
 					int offset = m_description._getPointAttributeOffset(m) - 2;
-					for (int ord = 0; ord < nords; ord++) {
+					for (int ord = 0; ord < nords; ord++)
+					{
 						newAttributes[new_offset0 + j] = m_attributes[old_offset0 + offset];
 						newAttributes[new_offset1 + j] = m_attributes[old_offset1 + offset];
 						j++;
 						offset++;
 					}
 				}
-
+					 
 			}
-
+			
 			m_attributes = newAttributes;
-		} else {
+		}
+		else {
 			m_attributes = null;
 		}
-
+		
 		m_description = newDescription;
 	}
 
@@ -705,8 +720,6 @@ public class Envelope extends Geometry implements Serializable {
 		if (m_envelope.isEmpty())
 			throw new GeometryException(
 					"This operation was performed on an Empty Geometry.");
-
-		// _ASSERT(endPoint == 0 || endPoint == 1);
 
 		if (semantics == Semantics.POSITION) {
 			if (endPoint != 0) {
@@ -722,7 +735,6 @@ public class Envelope extends Geometry implements Serializable {
 
 		int attributeIndex = m_description.getAttributeIndex(semantics);
 		if (attributeIndex >= 0) {
-			_ensureAttributes();
 			return m_attributes[_getEndPointOffset(m_description, endPoint)
 					+ m_description._getPointAttributeOffset(attributeIndex)
 					- 2 + ordinate];
@@ -731,7 +743,7 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	void _setAttributeAsDbl(int endPoint, int semantics, int ordinate,
-	                        double value) {
+			double value) {
 		_touch();
 		// _ASSERT(endPoint == 0 || endPoint == 1);
 
@@ -747,7 +759,7 @@ public class Envelope extends Geometry implements Serializable {
 				else
 					m_envelope.xmin = value;
 			}
-
+			
 			return;
 		}
 
@@ -756,14 +768,10 @@ public class Envelope extends Geometry implements Serializable {
 			throw new IndexOutOfBoundsException();
 
 		if (!hasAttribute(semantics)) {
-			if (VertexDescription.isDefaultValue(semantics, value))
-				return;
-
 			addAttribute(semantics);
 		}
 
 		int attributeIndex = m_description.getAttributeIndex(semantics);
-		_ensureAttributes();
 		m_attributes[_getEndPointOffset(m_description, endPoint)
 				+ m_description._getPointAttributeOffset(attributeIndex) - 2
 				+ ordinate] = value;
@@ -784,8 +792,9 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Changes this envelope to be the intersection of itself with the other
 	 * envelope.
-	 *
-	 * @param other The envelope to intersect.
+	 * 
+	 * @param other
+	 *            The envelope to intersect.
 	 * @return Returns true if the result is not empty.
 	 */
 	public boolean intersect(Envelope other) {
@@ -797,8 +806,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns true if the envelope and the other given envelope intersect.
-	 *
-	 * @param other The envelope to with which to test intersection.
+	 * 
+	 * @param other
+	 *            The envelope to with which to test intersection.
 	 * @return Returns true if the two envelopes intersect.
 	 */
 	public boolean isIntersecting(Envelope other) {// TODO: attributes.
@@ -808,10 +818,13 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Sets the envelope's corners to be centered around the specified point,
 	 * using its center, width, and height.
-	 *
-	 * @param c The point around which to center the envelope.
-	 * @param w The width to be set for the envelope.
-	 * @param h The height to be set for this envelope.
+	 * 
+	 * @param c
+	 *            The point around which to center the envelope.
+	 * @param w
+	 *            The width to be set for the envelope.
+	 * @param h
+	 *            The height to be set for this envelope.
 	 */
 	public void centerAt(Point c, double w, double h) {
 		_touch();
@@ -825,9 +838,11 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Offsets the envelope by the specified distances along x and y-coordinates.
-	 *
-	 * @param dx The X offset to be applied.
-	 * @param dy The Y offset to be applied.
+	 * 
+	 * @param dx
+	 *            The X offset to be applied.
+	 * @param dy
+	 *            The Y offset to be applied.
 	 */
 	public void offset(double dx, double dy) {
 		_touch();
@@ -846,7 +861,7 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Gets the center point of the envelope. The center point occurs at: ((XMin
 	 * + XMax) / 2, (YMin + YMax) / 2).
-	 *
+	 * 
 	 * @return The center point of the envelope.
 	 */
 	public Point2D getCenter2D() {
@@ -855,7 +870,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the center point of the envelope.
-	 *
+	 * 
 	 * @return The center point of the envelope.
 	 */
 	public Point getCenter() {
@@ -880,8 +895,9 @@ public class Envelope extends Geometry implements Serializable {
 	/**
 	 * Centers the envelope around the specified point preserving the envelope's
 	 * width and height.
-	 *
-	 * @param c The new center point.
+	 * 
+	 * @param c
+	 *            The new center point.
 	 */
 	public void centerAt(Point c) {
 		_touch();
@@ -894,7 +910,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the envelope's lower left corner point.
-	 *
+	 * 
 	 * @return Returns the lower left corner point.
 	 */
 	public Point getLowerLeft() {
@@ -903,7 +919,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the envelope's upper right corner point.
-	 *
+	 * 
 	 * @return Returns the upper right corner point.
 	 */
 	public Point getUpperRight() {
@@ -912,7 +928,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the envelope's lower right corner point.
-	 *
+	 * 
 	 * @return Returns the lower right corner point.
 	 */
 	public Point getLowerRight() {
@@ -921,7 +937,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the envelope's upper left corner point.
-	 *
+	 * 
 	 * @return Returns the upper left corner point.
 	 */
 	public Point getUpperLeft() {
@@ -930,8 +946,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Checks if this envelope contains (covers) the specified point.
-	 *
-	 * @param p The Point to be tested for coverage.
+	 * 
+	 * @param p
+	 *            The Point to be tested for coverage.
 	 * @return TRUE if this envelope contains (covers) the specified point.
 	 */
 	public boolean contains(Point p) {
@@ -942,8 +959,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Checks if this envelope contains (covers) other envelope.
-	 *
-	 * @param env The envelope to be tested for coverage.
+	 * 
+	 * @param env
+	 *            The envelope to be tested for coverage.
 	 * @return TRUE if this envelope contains (covers) the specified envelope.
 	 */
 	public boolean contains(Envelope env) {
@@ -977,7 +995,7 @@ public class Envelope extends Geometry implements Serializable {
 			return false;
 
 		for (int i = 0, n = (m_description.getTotalComponentCount() - 2) * 2; i < n; i++)
-			if (m_attributes[i] != other.m_attributes[i])
+			if (!NumberUtils.isEqualNonIEEE(m_attributes[i], other.m_attributes[i]))
 				return false;
 
 		return true;
@@ -985,14 +1003,14 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns a hash code value for this envelope.
-	 *
+	 * 
 	 * @return A hash code value for this envelope.
 	 */
 	@Override
 	public int hashCode() {
 		int hashCode = m_description.hashCode();
 		hashCode = NumberUtils.hash(hashCode, m_envelope.hashCode());
-		if (!isEmpty() && m_attributes != null) {
+		if (!isEmpty()) {
 			for (int i = 0, n = (m_description.getTotalComponentCount() - 2) * 2; i < n; i++) {
 				hashCode = NumberUtils.hash(hashCode, m_attributes[i]);
 			}
@@ -1002,7 +1020,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the X coordinate of the left corners of the envelope.
-	 *
+	 * 
 	 * @return The X coordinate of the left corners.
 	 */
 	public final double getXMin() {
@@ -1011,7 +1029,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the Y coordinate of the bottom corners of the envelope.
-	 *
+	 * 
 	 * @return The Y coordinate of the bottom corners.
 	 */
 	public final double getYMin() {
@@ -1020,7 +1038,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the X coordinate of the right corners of the envelope.
-	 *
+	 * 
 	 * @return The X coordinate of the right corners.
 	 */
 	public final double getXMax() {
@@ -1029,7 +1047,7 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Returns the Y coordinate of the top corners of the envelope.
-	 *
+	 * 
 	 * @return The Y coordinate of the top corners.
 	 */
 	public final double getYMax() {
@@ -1038,8 +1056,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Sets the left X coordinate.
-	 *
-	 * @param x The X coordinate of the left corner
+	 * 
+	 * @param x
+	 *            The X coordinate of the left corner
 	 */
 	public void setXMin(double x) {
 		_touch();
@@ -1048,8 +1067,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Sets the right X coordinate.
-	 *
-	 * @param x The X coordinate of the right corner.
+	 * 
+	 * @param x
+	 *            The X coordinate of the right corner.
 	 */
 	public void setXMax(double x) {
 		_touch();
@@ -1058,8 +1078,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Sets the bottom Y coordinate.
-	 *
-	 * @param y the Y coordinate of the bottom corner.
+	 * 
+	 * @param y
+	 *            the Y coordinate of the bottom corner.
 	 */
 	public void setYMin(double y) {
 		_touch();
@@ -1068,8 +1089,9 @@ public class Envelope extends Geometry implements Serializable {
 
 	/**
 	 * Sets the top Y coordinate.
-	 *
-	 * @param y The Y coordinate of the top corner.
+	 * 
+	 * @param y
+	 *            The Y coordinate of the top corner.
 	 */
 	public void setYMax(double y) {
 		_touch();
@@ -1099,15 +1121,15 @@ public class Envelope extends Geometry implements Serializable {
 	}
 
 	/**
-	 * The output of this method can be only used for debugging. It is subject to change without notice.
+	 * The output of this method can be only used for debugging. It is subject to change without notice. 
 	 */
 	@Override
 	public String toString() {
 		if (isEmpty())
 			return "Envelope: []";
-
-		String s = "Envelope: [" + m_envelope.xmin + ", " + m_envelope.ymin + ", " + m_envelope.xmax + ", " + m_envelope.ymax + "]";
+		
+		String s = "Envelope: [" + m_envelope.xmin + ", " + m_envelope.ymin + ", " + m_envelope.xmax + ", " + m_envelope.ymax +"]"; 
 		return s;
 	}
-
+    
 }

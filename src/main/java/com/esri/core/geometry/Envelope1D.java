@@ -48,7 +48,7 @@ public final class Envelope1D implements Serializable {
 	public Envelope1D(Envelope1D other) {
 		setCoords(other);
 	}
-
+	
 	public void setCoords(double _vmin, double _vmax) {
 		vmin = _vmin;
 		vmax = _vmax;
@@ -58,7 +58,7 @@ public final class Envelope1D implements Serializable {
 	public void setCoords(Envelope1D other) {
 		setCoords(other.vmin, other.vmax);
 	}
-
+	
 	public void normalize() {
 		if (NumberUtils.isNaN(vmin))
 			return;
@@ -133,8 +133,11 @@ public final class Envelope1D implements Serializable {
 	/**
 	 * Returns True if the envelope contains the other envelope (boundary
 	 * inclusive). Note: Will return false if either envelope is empty.
+	 * @param other The other envelope.
+	 * @return Return true if this contains the other.
 	 */
-	public boolean contains(/* const */Envelope1D other) /* const */ {
+	public boolean contains(Envelope1D other)
+	{
 		return other.vmin >= vmin && other.vmax <= vmax;
 	}
 
@@ -166,10 +169,10 @@ public final class Envelope1D implements Serializable {
 	double _calculateToleranceFromEnvelope() {
 		if (isEmpty())
 			return NumberUtils.doubleEps() * 100.0; // GEOMTERYX_EPSFACTOR
-		// 100.0;
+													// 100.0;
 		double r = Math.abs(vmin) + Math.abs(vmax) + 1;
 		return r * NumberUtils.doubleEps() * 100.0; // GEOMTERYX_EPSFACTOR
-		// 100.0;
+													// 100.0;
 	}
 
 	void normalizeNoNaN_() {
@@ -186,20 +189,24 @@ public final class Envelope1D implements Serializable {
 		normalizeNoNaN_();
 	}
 
-	public double snapClip(double v) /* const */ {
+	public double snapClip(double v) /* const */
+	{
 		return NumberUtils.snap(v, vmin, vmax);
 	}
 
-	public double getWidth() /* const */ {
+	public double getWidth() /* const */
+	{
 		return vmax - vmin;
 	}
 
-	public double getCenter() /* const */ {
+	public double getCenter() /* const */
+	{
 		return 0.5 * (vmin + vmax);
 	}
-
+	
 	@Override
-	public boolean equals(Object _other) {
+    public boolean equals(Object _other)
+    {
 		if (_other == this)
 			return true;
 
@@ -214,11 +221,17 @@ public final class Envelope1D implements Serializable {
 			return false;
 
 		return true;
-	}
-
+    }
+	
 	@Override
 	public int hashCode() {
-		return NumberUtils.hash(NumberUtils.hash(vmin), vmax);
+		if (isEmpty()) {
+			return NumberUtils.hash(NumberUtils.TheNaN);
+		}
+		
+		int hash = NumberUtils.hash(vmin);
+		hash = NumberUtils.hash(hash, vmax);
+		return hash;
 	}
-
+	
 }

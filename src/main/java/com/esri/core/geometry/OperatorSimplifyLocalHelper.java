@@ -49,15 +49,17 @@ class OperatorSimplifyLocalHelper {
 
 		// The value returned by GetReversed is interpreted differently in
 		// checkSelfIntersections_ and checkValidRingOrientation_
-		boolean getReversed() /* const */ {
+		boolean getReversed() /* const */
+		{
 			return (m_flags & 1) != 0;
 		}
 
-		int getRightSide() /* const */ {
+		int getRightSide() /* const */
+		{
 			return getReversed() ? 0 : 1; // 0 means there should be an
-			// emptiness on the right side of
-			// the edge, 1 means there is
-			// interior
+											// emptiness on the right side of
+											// the edge, 1 means there is
+											// interior
 		}
 	}
 
@@ -84,12 +86,12 @@ class OperatorSimplifyLocalHelper {
 
 	private Treap m_AET;
 	private AttributeStreamOfInt32 m_xyToNode1; // for each vertex, contains -1,
-	// or the edge node.
+												// or the edge node.
 	private AttributeStreamOfInt32 m_xyToNode2; // for each vertex, contains -1,
-	// or the edge node.
+												// or the edge node.
 	private AttributeStreamOfInt32 m_pathOrientations; // 0 if undefined, -1 for
-	// counterclockwise, 1
-	// for clockwise.
+														// counterclockwise, 1
+														// for clockwise.
 	private AttributeStreamOfInt32 m_pathParentage;
 	private int m_unknownOrientationPathCount;
 	private double m_yScanline;
@@ -106,24 +108,24 @@ class OperatorSimplifyLocalHelper {
 		m_bPlanarSimplify = true;
 		if (Geometry.isMultiPath(m_geometry.getType().value())) {
 			if (!checkStructure_()) // check structure of geometry(no zero
-				// length paths, etc)
+									// length paths, etc)
 				return 0;
 
 			if (!checkDegenerateSegments_(false)) // check for degenerate
-				// segments(only 2D,no zs or
-				// other attributes)
+													// segments(only 2D,no zs or
+													// other attributes)
 				return 0;
 		}
 
 		if (!checkClustering_()) // check clustering(points are either
-			// coincident,or further than tolerance)
+									// coincident,or further than tolerance)
 			return 0;
 
 		if (!Geometry.isMultiPath(m_geometry.getType().value()))
 			return 2; // multipoint is simple
 
 		if (!checkCracking_()) // check that there are no self intersections and
-			// overlaps among segments.
+								// overlaps among segments.
 			return 0;
 
 		if (m_geometry.getType() == Geometry.Type.Polyline) {
@@ -134,8 +136,8 @@ class OperatorSimplifyLocalHelper {
 		}
 
 		if (!checkSelfIntersections_()) // check that there are no other self
-			// intersections (for the cases of
-			// several segments connect in a point)
+										// intersections (for the cases of
+										// several segments connect in a point)
 			return 0;
 
 		// check that every hole is counterclockwise, and every exterior is
@@ -157,7 +159,7 @@ class OperatorSimplifyLocalHelper {
 				return false;
 
 			return (x1 == x2 && y1 == y2); // points either coincide or
-			// further,than the tolerance
+											// further,than the tolerance
 		}
 
 		return b;
@@ -168,7 +170,8 @@ class OperatorSimplifyLocalHelper {
 		int minsize = multiPathImpl.m_bPolygon ? 3 : 2;
 		for (int ipath = 0, npath = multiPathImpl.getPathCount(); ipath < npath; ipath++) {
 			if (multiPathImpl.getPathSize(ipath) < minsize) {
-				m_nonSimpleResult = new NonSimpleResult(NonSimpleResult.Reason.Structure, ipath, 0);
+				m_nonSimpleResult = new NonSimpleResult(
+						NonSimpleResult.Reason.Structure, ipath, 0);
 				return false;
 			}
 		}
@@ -186,8 +189,7 @@ class OperatorSimplifyLocalHelper {
 				.calculateZToleranceFromGeometry(m_sr, multiPathImpl, false);
 		while (segIter.nextPath()) {
 			while (segIter.hasNextSegment()) {
-				/* const */
-				Segment seg = segIter.nextSegment();
+				/* const */Segment seg = segIter.nextSegment();
 				double length = seg.calculateLength2D();
 				if (length > m_toleranceIsSimple)
 					continue;
@@ -260,9 +262,9 @@ class OperatorSimplifyLocalHelper {
 			int pairIndex = m_pairIndices.get(index);
 			int pair = m_pairs.get(pairIndex);
 			int xyindex = pair >> 1; // k = 2n or 2n + 1 represent a vertical
-			// segment for the same vertex.
-			// Therefore, k / 2 represents a vertex
-			// index
+										// segment for the same vertex.
+										// Therefore, k / 2 represents a vertex
+										// index
 			// Points need to be either exactly equal or further than 2 *
 			// tolerance apart.
 			if ((pair & 1) == 0) {// bottom element
@@ -272,7 +274,7 @@ class OperatorSimplifyLocalHelper {
 				int leftneighbour = m_AET.getPrev(aetNode);
 				if (leftneighbour != Treap.nullNode()
 						&& !testToleranceDistance_(
-						m_AET.getElement(leftneighbour), xyindex)) {
+								m_AET.getElement(leftneighbour), xyindex)) {
 					m_nonSimpleResult = new NonSimpleResult(
 							NonSimpleResult.Reason.Clustering, xyindex,
 							m_AET.getElement(leftneighbour));
@@ -281,16 +283,16 @@ class OperatorSimplifyLocalHelper {
 				int rightneighbour = m_AET.getNext(aetNode);
 				if (rightneighbour != Treap.nullNode()
 						&& !testToleranceDistance_(
-						m_AET.getElement(rightneighbour), xyindex)) {
+								m_AET.getElement(rightneighbour), xyindex)) {
 					m_nonSimpleResult = new NonSimpleResult(
 							NonSimpleResult.Reason.Clustering, xyindex,
 							m_AET.getElement(rightneighbour));
 					return false;
 				}
 			} else { // top
-				// get left and right neighbours, and remove the element
-				// from AET. Then test the neighbours with the
-				// tolerance.
+						// get left and right neighbours, and remove the element
+						// from AET. Then test the neighbours with the
+						// tolerance.
 				int aetNode = m_AET.search(xyindex, -1);
 				int leftneighbour = m_AET.getPrev(aetNode);
 				int rightneighbour = m_AET.getNext(aetNode);
@@ -298,8 +300,8 @@ class OperatorSimplifyLocalHelper {
 				if (leftneighbour != Treap.nullNode()
 						&& rightneighbour != Treap.nullNode()
 						&& !testToleranceDistance_(
-						m_AET.getElement(leftneighbour),
-						m_AET.getElement(rightneighbour))) {
+								m_AET.getElement(leftneighbour),
+								m_AET.getElement(rightneighbour))) {
 					m_nonSimpleResult = new NonSimpleResult(
 							NonSimpleResult.Reason.Clustering,
 							m_AET.getElement(leftneighbour),
@@ -325,7 +327,7 @@ class OperatorSimplifyLocalHelper {
 	}
 
 	private boolean checkCrackingPlanesweep_() // cracker,that uses planesweep
-	// algorithm.
+												// algorithm.
 	{
 		EditShape editShape = new EditShape();
 		editShape.addGeometry(m_geometry);
@@ -344,8 +346,8 @@ class OperatorSimplifyLocalHelper {
 	}
 
 	private boolean checkCrackingBrute_() // cracker, that uses brute force (a
-	// double loop) to find segment
-	// intersections.
+											// double loop) to find segment
+											// intersections.
 	{
 		MultiPathImpl multiPathImpl = (MultiPathImpl) m_geometry._getImpl();
 		// Implementation without a QuadTreeImpl accelerator
@@ -354,14 +356,12 @@ class OperatorSimplifyLocalHelper {
 		// Envelope2D env2D;
 		while (segIter1.nextPath()) {
 			while (segIter1.hasNextSegment()) {
-				/* const */
-				Segment seg1 = segIter1.nextSegment();
+				/* const */Segment seg1 = segIter1.nextSegment();
 				if (!segIter1.isLastSegmentInPath() || !segIter1.isLastPath()) {
 					segIter2.resetTo(segIter1);
 					do {
 						while (segIter2.hasNextSegment()) {
-							/* const */
-							Segment seg2 = segIter2.nextSegment();
+							/* const */Segment seg2 = segIter2.nextSegment();
 							int res = seg1._isIntersecting(seg2,
 									m_toleranceIsSimple, true);
 							if (res != 0) {
@@ -387,14 +387,14 @@ class OperatorSimplifyLocalHelper {
 		// polygon.
 		m_lineEdgesRecycle.clear();
 		m_lineEdgesRecycle.ensureCapacity(20);// we reuse the edges while going
-		// through a polygon.
+												// through a polygon.
 
 		m_recycledSegIter = multiPathImpl.querySegmentIterator();
 		m_recycledSegIter.setCirculator(true);
 
 		AttributeStreamOfInt32 bunch = new AttributeStreamOfInt32(0);// stores
-		// coincident
-		// vertices
+																		// coincident
+																		// vertices
 		bunch.reserve(10);
 		int pointCount = multiPathImpl.getPointCount();
 		double xprev = NumberUtils.TheNaN;
@@ -437,9 +437,7 @@ class OperatorSimplifyLocalHelper {
 		int ipath;
 		int ivertex;
 		boolean boundary;
-	}
-
-	;
+	};
 
 	static final class Vertex_info_pl {
 		double x;
@@ -448,9 +446,7 @@ class OperatorSimplifyLocalHelper {
 		int ivertex;
 		boolean boundary;
 		boolean end_point;
-	}
-
-	;
+	};
 
 	boolean checkSelfIntersectionsPolylinePlanar_() {
 		MultiPathImpl multiPathImpl = (MultiPathImpl) m_geometry._getImpl();
@@ -480,10 +476,12 @@ class OperatorSimplifyLocalHelper {
 					|| (xyindex == path_last);
 			if (m_bOGCRestrictions)
 				vi_prev.boundary = !is_closed_path && vi_prev.end_point;
-			else
+			else {
 				// for regular planar simplify, only the end points are allowed
 				// to coincide
 				vi_prev.boundary = vi_prev.end_point;
+			}
+			
 			vi_prev.ipath = ipath;
 			vi_prev.x = pt.x;
 			vi_prev.y = pt.y;
@@ -510,11 +508,11 @@ class OperatorSimplifyLocalHelper {
 			boolean end_point = (xyindex == path_start)
 					|| (xyindex == path_last);
 			if (m_bOGCRestrictions)
-				boundary = !is_closed_path && vi_prev.end_point;
+				boundary = !is_closed_path && end_point;
 			else
 				// for regular planar simplify, only the end points are allowed
 				// to coincide
-				boundary = vi_prev.end_point;
+				boundary = end_point;
 
 			vi.x = pt.x;
 			vi.y = pt.y;
@@ -526,22 +524,12 @@ class OperatorSimplifyLocalHelper {
 			if (vi.x == vi_prev.x && vi.y == vi_prev.y) {
 				if (m_bOGCRestrictions) {
 					if (!vi.boundary || !vi_prev.boundary) {
+						 // check that this is not the endpoints of a closed path						
 						if ((vi.ipath != vi_prev.ipath)
-								|| (!vi.end_point && !vi_prev.end_point))// check
-						// that
-						// this
-						// is
-						// not
-						// the
-						// endpoints
-						// of
-						// a
-						// closed
-						// path
-						{
+								|| (!vi.end_point && !vi_prev.end_point)) {
 							// one of coincident vertices is not on the boundary
-							// this is either Non_simple_result::cross_over or
-							// Non_simple_result::ogc_self_tangency.
+							// this is either NonSimpleResult.CrossOver or
+							// NonSimpleResult.OGCPolylineSelfTangency.
 							// too expensive to distinguish between the two.
 							m_nonSimpleResult = new NonSimpleResult(
 									NonSimpleResult.Reason.OGCPolylineSelfTangency,
@@ -550,12 +538,9 @@ class OperatorSimplifyLocalHelper {
 						}
 					}
 				} else {
-					if (!vi.end_point || !vi_prev.end_point) {// one of
-						// coincident
-						// vertices is
-						// not an
-						// endpoint
-						m_nonSimpleResult = new NonSimpleResult(
+					if (!vi.end_point || !vi_prev.end_point) {
+						 //one of coincident vertices is not an endpoint
+						 m_nonSimpleResult = new NonSimpleResult(
 								NonSimpleResult.Reason.CrossOver, vi.ivertex,
 								vi_prev.ivertex);
 						return false;// common point not on the boundary
@@ -579,7 +564,7 @@ class OperatorSimplifyLocalHelper {
 		int ipolygon;
 
 		Vertex_info_pg(double x_, double y_, int ipath_, int xyindex_,
-		               int polygon_) {
+				int polygon_) {
 			x = x_;
 			y = y_;
 			ipath = ipath_;
@@ -591,9 +576,7 @@ class OperatorSimplifyLocalHelper {
 			return x == other.x && y == other.y && ipath == other.ipath
 					&& ivertex == other.ivertex && ipolygon == other.ipolygon;
 		}
-	}
-
-	;
+	};
 
 	boolean check_self_intersections_polygons_OGC_() {
 		MultiPathImpl multiPathImpl = (MultiPathImpl) (m_geometry._getImpl());
@@ -663,23 +646,23 @@ class OperatorSimplifyLocalHelper {
 					return false;
 				} else if (ring_to_polygon[vi.ipath] >= 0
 						&& ring_to_polygon[vi.ipath] == ring_to_polygon[vi_prev.ipath]) {// only
-					// add
-					// rings
-					// from
-					// polygons
-					// with
-					// holes.
-					// Only
-					// interested
-					// in
-					// touching
-					// rings
-					// that
-					// belong
-					// to
-					// the
-					// same
-					// polygon
+																							// add
+																							// rings
+																							// from
+																							// polygons
+																							// with
+																							// holes.
+																							// Only
+																							// interested
+																							// in
+																							// touching
+																							// rings
+																							// that
+																							// belong
+																							// to
+																							// the
+																							// same
+																							// polygon
 					if (intersections.size() == 0
 							|| intersections.get(intersections.size() - 1) != vi_prev)
 						intersections.add(vi_prev);
@@ -718,11 +701,11 @@ class OperatorSimplifyLocalHelper {
 				ring_to_polygon[cur.ipath] = rnode_index;
 			}
 			graph.addElement(rnode_index, vnode_index); // add to rnode
-			// adjacency list the
-			// current vnode
+														// adjacency list the
+														// current vnode
 			graph.addElement(vnode_index, rnode_index); // add to vnode
-			// adjacency list the
-			// rnode
+														// adjacency list the
+														// rnode
 		}
 
 		AttributeStreamOfInt32 depth_first_stack = new AttributeStreamOfInt32(0);
@@ -733,7 +716,7 @@ class OperatorSimplifyLocalHelper {
 			int ncolor = graph.getListData(node);
 			if ((ncolor & 1) != 0 || (ncolor & 2) == 0)
 				continue;// already visited or this is a vnode (we do not want
-			// to start from vnode).
+							// to start from vnode).
 
 			int bad_rnode = -1;
 			depth_first_stack.add(node);
@@ -763,7 +746,7 @@ class OperatorSimplifyLocalHelper {
 						continue;// avoid going back to where we just came from
 					depth_first_stack.add(adjacent_node_data);
 					depth_first_stack.add(cur_node);// push cur_node as parent
-					// of adjacent_node
+													// of adjacent_node
 				}
 			}
 
@@ -801,7 +784,7 @@ class OperatorSimplifyLocalHelper {
 		}
 
 		if (multiPathImpl.getPathCount() == 1) {// optimization for a single
-			// polygon
+												// polygon
 			if (m_bOGCRestrictions) {
 				if (!check_self_intersections_polygons_OGC_())
 					return 0;
@@ -824,9 +807,9 @@ class OperatorSimplifyLocalHelper {
 		for (int ipath = 0, n = multiPathImpl.getPathCount(); ipath < n; ipath++) {
 			double area = multiPathImpl.calculateRingArea2D(ipath);
 			m_pathOrientations.write(ipath, area < 0 ? 0 : 256); // 8th bit
-			// is
-			// existing
-			// orientation
+																	// is
+																	// existing
+																	// orientation
 			if (area > 0) {
 				parent_ring = ipath;
 				exteriorArea = area;
@@ -860,8 +843,8 @@ class OperatorSimplifyLocalHelper {
 		int pointCount = multiPathImpl.getPointCount();
 		m_yScanline = NumberUtils.TheNaN;
 		AttributeStreamOfInt32 bunch = new AttributeStreamOfInt32(0); // stores
-		// coincident
-		// vertices
+																		// coincident
+																		// vertices
 		bunch.reserve(10);
 		// Each vertex has two edges attached.These two arrays map vertices to
 		// edges as nodes in the m_AET
@@ -910,7 +893,7 @@ class OperatorSimplifyLocalHelper {
 		if (m_bOGCRestrictions) {
 			if (m_nonSimpleResult.m_reason != NonSimpleResult.Reason.NotDetermined)
 				return 0;// cannot proceed with OGC verification if the ring
-			// order is broken (cannot decide polygons then).
+							// order is broken (cannot decide polygons then).
 
 			if (!check_self_intersections_polygons_OGC_())
 				return 0;
@@ -939,16 +922,14 @@ class OperatorSimplifyLocalHelper {
 		for (int i = 0, n = bunch.size(); i < n; i++) {
 			int xyindex = bunch.get(i);
 			m_recycledSegIter.resetToVertex(xyindex);// the iterator is
-			// circular.
-			/* const */
-			Segment seg1 = m_recycledSegIter.previousSegment();
+														// circular.
+			/* const */Segment seg1 = m_recycledSegIter.previousSegment();
 			m_edges.add(createEdge_(seg1, xyindex,
 					m_recycledSegIter.getPathIndex(), true));
 			m_recycledSegIter.nextSegment();// Need to skip one,because of the
-			// previousSegment call
+											// previousSegment call
 			// before (otherwise will get same segment again)
-			/* const */
-			Segment seg2 = m_recycledSegIter.nextSegment();
+			/* const */Segment seg2 = m_recycledSegIter.nextSegment();
 			m_edges.add(createEdge_(seg2, xyindex,
 					m_recycledSegIter.getPathIndex(), false));
 		}
@@ -1041,10 +1022,10 @@ class OperatorSimplifyLocalHelper {
 			int xyindex = bunch.get(i);
 			int aetNode = m_xyToNode1.read(xyindex);
 			if (aetNode != Treap.nullNode()) {// We found that there is an edge
-				// in AET, attached to the
-				// xyindex vertex. This edge
-				// goes out of scope. Delete it
-				// from AET.
+												// in AET, attached to the
+												// xyindex vertex. This edge
+												// goes out of scope. Delete it
+												// from AET.
 				int edgeIndex = m_AET.getElement(aetNode);
 				m_FreeEdges.add(edgeIndex);
 				m_AET.deleteNode(aetNode, -1);
@@ -1055,10 +1036,10 @@ class OperatorSimplifyLocalHelper {
 
 			aetNode = m_xyToNode2.read(xyindex);
 			if (aetNode != Treap.nullNode()) {// We found that there is an edge
-				// in AET, attached to the
-				// xyindex vertex. This edge
-				// goes out of scope. Delete it
-				// from AET.
+												// in AET, attached to the
+												// xyindex vertex. This edge
+												// goes out of scope. Delete it
+												// from AET.
 				int edgeIndex = m_AET.getElement(aetNode);
 				m_FreeEdges.add(edgeIndex);
 				m_AET.deleteNode(aetNode, -1);
@@ -1072,14 +1053,14 @@ class OperatorSimplifyLocalHelper {
 		for (int i = 0, n = bunch.size(); i < n; i++) {
 			int xyindex = bunch.get(i);
 			m_recycledSegIter.resetToVertex(xyindex);// the iterator is
-			// circular.
+														// circular.
 			Segment seg1 = m_recycledSegIter.previousSegment();// this
-			// segment
-			// has
-			// end
-			// point
-			// at
-			// xyindex
+																// segment
+																// has
+																// end
+																// point
+																// at
+																// xyindex
 			if (seg1.getStartY() > seg1.getEndY())// do not allow horizontal
 			// segments in here
 			{
@@ -1187,11 +1168,11 @@ class OperatorSimplifyLocalHelper {
 					}
 
 					if (node == Treap.nullNode()) {// if no edges have ring
-						// orientation known, then
-						// start
-						// from the left most and it
-						// has
-						// to be exterior ring.
+													// orientation known, then
+													// start
+													// from the left most and it
+													// has
+													// to be exterior ring.
 						oddEven = 1;
 						node = prevNode;
 					} else {
@@ -1260,15 +1241,15 @@ class OperatorSimplifyLocalHelper {
 	}
 
 	private Edge createEdge_(/* const */Segment seg, int xyindex, int pathIndex,
-	                                    boolean bReversed) {
+			boolean bReversed) {
 		Edge edge;
 		Geometry.Type gt = seg.getType();
 		if (gt == Geometry.Type.Line) {
 			edge = createEdgeLine_(seg);
 		} else {
 			throw GeometryException.GeometryInternalError(); // implement
-			// recycling for
-			// curves
+															// recycling for
+															// curves
 		}
 		edge.m_vertexIndex = xyindex;
 		edge.m_pathIndex = pathIndex;
@@ -1352,7 +1333,7 @@ class OperatorSimplifyLocalHelper {
 					// assert(0); //ST: not a bug. just curious to see this
 					// happens.
 					y = miny; // apparently, one of the segments is almost
-					// horizontal line.
+								// horizontal line.
 				}
 				x1 = edge1.m_segment.intersectionOfYMonotonicWithAxisX(y, 0);
 				x2 = edge2.m_segment.intersectionOfYMonotonicWithAxisX(y, 0);
@@ -1504,10 +1485,8 @@ class OperatorSimplifyLocalHelper {
 			while (segIterFwd.hasNextSegment()) {
 				assert (segIterBwd.hasPreviousSegment());
 
-				/* const */
-				Segment segFwd = segIterFwd.nextSegment();
-				/* const */
-				Segment segBwd = segIterBwd.previousSegment();
+				/* const */Segment segFwd = segIterFwd.nextSegment();
+				/* const */Segment segBwd = segIterBwd.previousSegment();
 
 				int idx1 = segIterFwd.getStartPointIndex();
 				int idx2 = segIterBwd.getStartPointIndex();
@@ -1517,10 +1496,10 @@ class OperatorSimplifyLocalHelper {
 				if (bFirst) {
 					// add the very first and the very last point indices
 					fwdStack.add(segIterFwd.getStartPointIndex());// first goes
-					// to
-					// fwdStack
+																	// to
+																	// fwdStack
 					bwdStack.add(segIterBwd.getEndPointIndex());// last goes to
-					// bwdStack
+																// bwdStack
 					bFirst = false;
 				}
 
@@ -1662,7 +1641,7 @@ class OperatorSimplifyLocalHelper {
 						true, false, m_progressTracker);
 			}
 		}
-
+		
 		m_editShape = new EditShape();
 		m_editShape.addGeometry(m_geometry);
 
@@ -1672,22 +1651,22 @@ class OperatorSimplifyLocalHelper {
 				CrackAndCluster.execute(m_editShape, m_toleranceSimplify,
 						m_progressTracker, true);
 			}
-
+	
 			if (m_geometry.getType().equals(Geometry.Type.Polygon)) {
 				Simplificator.execute(m_editShape, m_editShape.getFirstGeometry(),
 						m_knownSimpleResult, false, m_progressTracker);
 			}
 		}
-
+		
 		m_geometry = m_editShape.getGeometry(m_editShape.getFirstGeometry()); // extract
-		// the
-		// result
-		// of
-		// simplify
+																				// the
+																				// result
+																				// of
+																				// simplify
 
 		if (m_geometry.getType().equals(Geometry.Type.Polygon)) {
-			((MultiPathImpl) m_geometry._getImpl())._updateOGCFlags();
-			((Polygon) m_geometry).setFillRule(Polygon.FillRule.enumFillRuleOddEven);
+			((MultiPathImpl)m_geometry._getImpl())._updateOGCFlags();
+			((Polygon)m_geometry).setFillRule(Polygon.FillRule.enumFillRuleOddEven);
 		}
 
 		// We have simplified the geometry using the given tolerance. Now mark
@@ -1703,8 +1682,8 @@ class OperatorSimplifyLocalHelper {
 	NonSimpleResult m_nonSimpleResult;
 
 	OperatorSimplifyLocalHelper(Geometry geometry,
-	                            SpatialReference spatialReference, int knownSimpleResult,
-	                            ProgressTracker progressTracker, boolean bOGCRestrictions) {
+			SpatialReference spatialReference, int knownSimpleResult,
+			ProgressTracker progressTracker, boolean bOGCRestrictions) {
 
 		m_description = geometry.getDescription();
 		m_geometry = geometry;
@@ -1727,7 +1706,6 @@ class OperatorSimplifyLocalHelper {
 	}
 
 	// Returns 0 non-simple, 1 weak simple, 2 strong simple
-
 	/**
 	 * The code is executed in the 2D plane only.Attributes are ignored.
 	 * MultiPoint-check for clustering. Polyline -check for clustering and
@@ -1735,8 +1713,8 @@ class OperatorSimplifyLocalHelper {
 	 * self-intersections,and correct ring ordering.
 	 */
 	static protected int isSimplePlanar(/* const */Geometry geometry, /* const */
-	                                               SpatialReference spatialReference, boolean bForce,
-	                                               ProgressTracker progressTracker) {
+	SpatialReference spatialReference, boolean bForce,
+			ProgressTracker progressTracker) {
 		assert (false); // this code is not called yet.
 		if (geometry.isEmpty())
 			return 1;
@@ -1785,14 +1763,14 @@ class OperatorSimplifyLocalHelper {
 
 	/**
 	 * Checks if Geometry is simple for storing in DB:
-	 * <p>
+	 * 
 	 * MultiPoint:check that no points coincide.tolerance is ignored.
 	 * Polyline:ensure there no segments degenerate segments. Polygon:Same as
 	 * IsSimplePlanar.
 	 */
 	static protected int isSimpleAsFeature(/* const */Geometry geometry, /* const */
-	                                                  SpatialReference spatialReference, boolean bForce, NonSimpleResult result,
-	                                                  ProgressTracker progressTracker) {
+	SpatialReference spatialReference, boolean bForce, NonSimpleResult result,
+			ProgressTracker progressTracker) {
 		if (result != null) {
 			result.m_reason = NonSimpleResult.Reason.NotDetermined;
 			result.m_vertexIndex1 = -1;
@@ -1807,8 +1785,7 @@ class OperatorSimplifyLocalHelper {
 		double tolerance = InternalUtils.calculateToleranceFromGeometry(
 				spatialReference, geometry, false);
 		if (gt == Geometry.Type.Envelope) {
-			/* const */
-			Envelope env = (Envelope) geometry;
+			/* const */Envelope env = (Envelope) geometry;
 			Envelope2D env2D = new Envelope2D();
 			env.queryEnvelope2D(env2D);
 			if (env2D.isDegenerate(tolerance)) {
@@ -1821,8 +1798,7 @@ class OperatorSimplifyLocalHelper {
 			}
 			return 1;
 		} else if (Geometry.isSegment(gt.value())) {
-			/* const */
-			Segment seg = (Segment) geometry;
+			/* const */Segment seg = (Segment) geometry;
 			Polyline polyline = new Polyline(seg.getDescription());
 			polyline.addSegment(seg, true);
 			return isSimpleAsFeature(polyline, spatialReference, bForce,
@@ -1862,8 +1838,8 @@ class OperatorSimplifyLocalHelper {
 	}
 
 	static int isSimpleOGC(/* const */Geometry geometry, /* const */
-	                                  SpatialReference spatialReference, boolean bForce, NonSimpleResult result,
-	                                  ProgressTracker progressTracker) {
+	SpatialReference spatialReference, boolean bForce, NonSimpleResult result,
+			ProgressTracker progressTracker) {
 		if (result != null) {
 			result.m_reason = NonSimpleResult.Reason.NotDetermined;
 			result.m_vertexIndex1 = -1;
@@ -1878,8 +1854,7 @@ class OperatorSimplifyLocalHelper {
 		double tolerance = InternalUtils.calculateToleranceFromGeometry(
 				spatialReference, geometry, false);
 		if (gt == Geometry.Type.Envelope) {
-			/* const */
-			Envelope env = (Envelope) geometry;
+			/* const */Envelope env = (Envelope) geometry;
 			Envelope2D env2D = new Envelope2D();
 			env.queryEnvelope2D(env2D);
 			if (env2D.isDegenerate(tolerance)) {
@@ -1892,8 +1867,7 @@ class OperatorSimplifyLocalHelper {
 			}
 			return 1;
 		} else if (Geometry.isSegment(gt.value())) {
-			/* const */
-			Segment seg = (Segment) geometry;
+			/* const */Segment seg = (Segment) geometry;
 			Polyline polyline = new Polyline(seg.getDescription());
 			polyline.addSegment(seg, true);
 			return isSimpleAsFeature(polyline, spatialReference, bForce,
@@ -1921,17 +1895,17 @@ class OperatorSimplifyLocalHelper {
 
 	/**
 	 * Simplifies geometries for storing in DB:
-	 * <p>
+	 * 
 	 * MultiPoint:check that no points coincide.tolerance is ignored.
 	 * Polyline:ensure there no segments degenerate segments. Polygon:cracks and
 	 * clusters using cluster tolerance and resolves all self intersections,
 	 * orients rings properly and arranges the rings in the OGC order.
-	 * <p>
+	 * 
 	 * Returns simplified geometry.
 	 */
 	static protected Geometry simplifyAsFeature(/* const */Geometry geometry, /* const */
-	                                                       SpatialReference spatialReference, boolean bForce,
-	                                                       ProgressTracker progressTracker) {
+	SpatialReference spatialReference, boolean bForce,
+			ProgressTracker progressTracker) {
 		if (geometry.isEmpty())
 			return geometry;
 		Geometry.Type gt = geometry.getType();
@@ -1946,7 +1920,7 @@ class OperatorSimplifyLocalHelper {
 			env.queryEnvelope2D(env2D);
 			if (env2D.isDegenerate(tolerance)) {
 				return (Geometry) (env.createInstance()); // return empty
-				// geometry
+															// geometry
 			}
 			return geometry;
 		} else if (Geometry.isSegment(gt.value())) {
@@ -1967,12 +1941,13 @@ class OperatorSimplifyLocalHelper {
 		// From the first sight it seems the SimplePlanar implies
 		// SimpleAsFeature.
 		if (knownSimpleResult == GeometryXSimple.Strong) {
-			if (gt == Geometry.Type.Polygon && ((Polygon) geometry).getFillRule() != Polygon.FillRule.enumFillRuleOddEven) {
-				Geometry res = geometry.copy();
-				((Polygon) res).setFillRule(Polygon.FillRule.enumFillRuleOddEven);//standardize on odd_even fill rule
-				return res;
-			}
-
+	        if (gt == Geometry.Type.Polygon && ((Polygon)geometry).getFillRule() != Polygon.FillRule.enumFillRuleOddEven)
+	        {
+	          Geometry res = geometry.copy();
+	          ((Polygon)res).setFillRule(Polygon.FillRule.enumFillRuleOddEven);//standardize on odd_even fill rule
+	          return res;
+	        }			
+	        
 			return geometry;
 		}
 
@@ -1997,17 +1972,17 @@ class OperatorSimplifyLocalHelper {
 
 	/**
 	 * Simplifies geometries for storing in OGC format:
-	 * <p>
+	 * 
 	 * MultiPoint:check that no points coincide.tolerance is ignored.
 	 * Polyline:ensure there no segments degenerate segments. Polygon:cracks and
 	 * clusters using cluster tolerance and resolves all self intersections,
 	 * orients rings properly and arranges the rings in the OGC order.
-	 * <p>
+	 * 
 	 * Returns simplified geometry.
 	 */
 	static Geometry simplifyOGC(/* const */Geometry geometry, /* const */
-	                                       SpatialReference spatialReference, boolean bForce,
-	                                       ProgressTracker progressTracker) {
+	SpatialReference spatialReference, boolean bForce,
+			ProgressTracker progressTracker) {
 		if (geometry.isEmpty())
 			return geometry;
 		Geometry.Type gt = geometry.getType();
@@ -2022,7 +1997,7 @@ class OperatorSimplifyLocalHelper {
 			env.queryEnvelope2D(env2D);
 			if (env2D.isDegenerate(tolerance)) {
 				return (Geometry) (env.createInstance()); // return empty
-				// geometry
+															// geometry
 			}
 			return geometry;
 		} else if (Geometry.isSegment(gt.value())) {
@@ -2100,13 +2075,14 @@ class OperatorSimplifyLocalHelper {
 		}
 
 		@Override
-		public double getValue(int index) /* const */ {
+		public double getValue(int index) /* const */
+		{
 			int pair = parent.m_pairs.get(index);
 			int xy1 = pair >> 1;
 			parent.m_xy.read(2 * xy1, pt1_dummy);
 			double y = pt1_dummy.y
 					+ (((pair & 1) != 0) ? parent.m_toleranceIsSimple
-					: -parent.m_toleranceIsSimple);
+							: -parent.m_toleranceIsSimple);
 			return y;
 		}
 	}
@@ -2222,7 +2198,7 @@ class OperatorSimplifyLocalHelper {
 					* (Math.abs(v2.x * v1.y) + Math.abs(v2.y * v1.x));
 			if (Math.abs(cross) <= crossError) {
 				cross--; // To avoid warning of "this line has no effect" from
-				// cross = cross.
+							// cross = cross.
 				cross++;
 			}
 			assert (Math.abs(cross) > crossError);

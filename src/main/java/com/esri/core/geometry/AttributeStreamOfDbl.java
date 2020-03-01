@@ -98,7 +98,8 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	/**
 	 * Reads a value from the buffer at given offset.
 	 *
-	 * @param offset is the element number in the stream.
+	 * @param offset
+	 *            is the element number in the stream.
 	 */
 	public double read(int offset) {
 		return m_buffer[offset];
@@ -111,8 +112,10 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	/**
 	 * Overwrites given element with new value.
 	 *
-	 * @param offset is the element number in the stream.
-	 * @param value  is the value to write.
+	 * @param offset
+	 *            is the element number in the stream.
+	 * @param value
+	 *            is the value to write.
 	 */
 	public void write(int offset, double value) {
 		if (m_bReadonly) {
@@ -131,7 +134,8 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	/**
 	 * Reads a value from the buffer at given offset.
 	 *
-	 * @param offset is the element number in the stream.
+	 * @param offset
+	 *            is the element number in the stream.
 	 */
 	public void read(int offset, Point2D outPoint) {
 		outPoint.x = m_buffer[offset];
@@ -141,8 +145,10 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	/**
 	 * Overwrites given element with new value.
 	 *
-	 * @param offset is the element number in the stream.
-	 * @param value  is the value to write.
+	 * @param offset
+	 *            is the element number in the stream.
+	 * @param value
+	 *            is the value to write.
 	 */
 	void write(int offset, Point2D point) {
 		if (m_bReadonly) {
@@ -172,7 +178,8 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_ATTRIBUTE_STREAM_OF_DBL + sizeOfDoubleArray(m_buffer.length);
 	}
 
@@ -344,7 +351,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 			end = size;
 
 		for (int i = start; i < end; i++)
-			if (read(i) != _other.read(i))
+			if (!NumberUtils.isEqualNonIEEE(read(i), _other.read(i)))
 				return false;
 
 		return true;
@@ -352,7 +359,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void addRange(AttributeStreamBase src, int start, int count,
-	                     boolean bForward, int stride) {
+			boolean bForward, int stride) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -405,7 +412,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void insertRange(int start, AttributeStreamBase src, int srcStart,
-	                        int count, boolean bForward, int stride, int validSize) {
+			int count, boolean bForward, int stride, int validSize) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -459,7 +466,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void insertAttributes(int start, Point pt, int semantics,
-	                             int validSize) {
+			int validSize) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -488,7 +495,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	// be even, arrayOffset is an index of the zeroth dimension (i.e. you can't
 	// start writing from dst[0,1])
 	public void writeRange(int streamOffset, int count, double[][] src,
-	                       int arrayOffset, boolean bForward) {
+			int arrayOffset, boolean bForward) {
 		if (streamOffset < 0 || count < 0 || arrayOffset < 0
 				|| count > NumberUtils.intMax())
 			throw new IllegalArgumentException();
@@ -516,7 +523,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	}
 
 	public void writeRange(int streamOffset, int count, double[] src,
-	                       int arrayOffset, boolean bForward) {
+			int arrayOffset, boolean bForward) {
 		if (streamOffset < 0 || count < 0 || arrayOffset < 0)
 			throw new IllegalArgumentException();
 
@@ -566,7 +573,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	// array<double,2>^ dst, int arrayOffset, bool bForward)
 
 	public void readRange(int streamOffset, int count, double[][] dst,
-	                      int arrayOffset, boolean bForward) {
+			int arrayOffset, boolean bForward) {
 		if (streamOffset < 0 || count < 0 || arrayOffset < 0
 				|| count > NumberUtils.intMax()
 				|| size() < count + streamOffset)
@@ -610,7 +617,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void readRange(int srcStart, int count, ByteBuffer dst,
-	                      int dstOffset, boolean bForward) {
+			int dstOffset, boolean bForward) {
 		if (srcStart < 0 || count < 0 || dstOffset < 0
 				|| size() < count + srcStart)
 			throw new IllegalArgumentException();
@@ -671,7 +678,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void writeRange(int startElement, int count,
-	                       AttributeStreamBase _src, int srcStart, boolean bForward, int stride) {
+			AttributeStreamBase _src, int srcStart, boolean bForward, int stride) {
 		if (startElement < 0 || count < 0 || srcStart < 0)
 			throw new IllegalArgumentException();
 
@@ -726,7 +733,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	}
 
 	private void _selfWriteRangeImpl(int toElement, int count, int fromElement,
-	                                 boolean bForward, int stride) {
+			boolean bForward, int stride) {
 
 		// writing from to this stream.
 		if (bForward) {
@@ -756,7 +763,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 
 	@Override
 	public void writeRange(int startElement, int count, ByteBuffer src,
-	                       int offsetBytes, boolean bForward) {
+			int offsetBytes, boolean bForward) {
 		if (startElement < 0 || count < 0 || offsetBytes < 0)
 			throw new IllegalArgumentException();
 
@@ -785,7 +792,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	}
 
 	public void writeRange(int streamOffset, int pointCount, Point2D[] src,
-	                       int arrayOffset, boolean bForward) {
+			int arrayOffset, boolean bForward) {
 		if (streamOffset < 0 || pointCount < 0 || arrayOffset < 0)
 			throw new IllegalArgumentException();
 
@@ -820,7 +827,7 @@ final class AttributeStreamOfDbl extends AttributeStreamBase {
 	// half
 	// of the elements of the array
 	public void readRange(int srcStart, int count, double[] dst, int dstOffset,
-	                      boolean bForward) {
+			boolean bForward) {
 		if (srcStart < 0 || count < 0 || dstOffset < 0
 				|| size() < count + srcStart)
 			throw new IllegalArgumentException();

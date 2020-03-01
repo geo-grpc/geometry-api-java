@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,13 +23,21 @@
  */
 package com.esri.core.geometry;
 
+import java.io.Serializable;
+
+import static com.esri.core.geometry.SizeOf.SIZE_OF_STRIDED_INDEX_TYPE_COLLECTION;
+import static com.esri.core.geometry.SizeOf.sizeOfIntArray;
+import static com.esri.core.geometry.SizeOf.sizeOfObjectArray;
+
 /**
  * A collection of strides of Index_type elements. To be used when one needs a
  * collection of homogeneous elements that contain only integer fields (i.e.
  * structs with Index_type members) Recycles the strides. Allows for constant
  * time creation and deletion of an element.
  */
-final class StridedIndexTypeCollection {
+final class StridedIndexTypeCollection implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private int[][] m_buffer = null;
 	private int m_firstFree = -1;
 	private int m_last = 0;
@@ -41,21 +49,21 @@ final class StridedIndexTypeCollection {
 	private int m_blockSize;
 
 	/*
-     private final static int m_realBlockSize = 2048;//if you change this, change m_blockSize, m_blockPower, m_blockMask, and st_sizes
+	 private final static int m_realBlockSize = 2048;//if you change this, change m_blockSize, m_blockPower, m_blockMask, and st_sizes
 	 private final static int m_blockMask = 0x7FF;
 	 private final static int m_blockPower = 11;
 	 private final static int[] st_sizes = {16, 32, 64, 128, 256, 512, 1024, 2048};
 	 */
 
 	private final static int m_realBlockSize = 16384;// if you change this,
-	// change m_blockSize,
-	// m_blockPower,
-	// m_blockMask, and
-	// st_sizes
+														// change m_blockSize,
+														// m_blockPower,
+														// m_blockMask, and
+														// st_sizes
 	private final static int m_blockMask = 0x3FFF;
 	private final static int m_blockPower = 14;
-	private final static int[] st_sizes = {16, 32, 64, 128, 256, 512, 1024,
-			2048, 4096, 8192, 16384};
+	private final static int[] st_sizes = { 16, 32, 64, 128, 256, 512, 1024,
+			2048, 4096, 8192, 16384 };
 
 	StridedIndexTypeCollection(int stride) {
 		m_stride = stride;
@@ -67,9 +75,9 @@ final class StridedIndexTypeCollection {
 		m_buffer[element >> m_blockPower][(element & m_blockMask) + 1] = -0x7eadbeed;
 		return true;
 	}
-
+	
 	void deleteElement(int element) {
-		assert (dbgdelete_(element));
+		assert(dbgdelete_(element));
 		int totalStrides = (element >> m_blockPower) * m_blockSize
 				* m_realStride + (element & m_blockMask);
 		if (totalStrides < m_last * m_realStride) {
@@ -84,14 +92,14 @@ final class StridedIndexTypeCollection {
 
 	// Returns the given field of the element.
 	int getField(int element, int field) {
-		assert (m_buffer[element >> m_blockPower][(element & m_blockMask) + 1] != -0x7eadbeed);
+		assert(m_buffer[element >> m_blockPower][(element & m_blockMask) + 1] != -0x7eadbeed);
 		return m_buffer[element >> m_blockPower][(element & m_blockMask)
 				+ field];
 	}
 
 	// Sets the given field of the element.
 	void setField(int element, int field, int value) {
-		assert (m_buffer[element >> m_blockPower][(element & m_blockMask) + 1] != -0x7eadbeed);
+		assert(m_buffer[element >> m_blockPower][(element & m_blockMask) + 1] != -0x7eadbeed);
 		m_buffer[element >> m_blockPower][(element & m_blockMask) + field] = value;
 	}
 
@@ -110,7 +118,7 @@ final class StridedIndexTypeCollection {
 						: (long) 1;
 				if (newcap > Integer.MAX_VALUE)
 					newcap = Integer.MAX_VALUE;// cannot grow past 2gb elements
-				// presently
+												// presently
 
 				if (newcap == m_capacity)
 					throw new IndexOutOfBoundsException();
@@ -272,5 +280,19 @@ final class StridedIndexTypeCollection {
 				m_capacity += m_blockSize;
 			}
 		}
+	}
+
+	public long estimateMemorySize()
+	{
+		long size = SIZE_OF_STRIDED_INDEX_TYPE_COLLECTION;
+		if (m_buffer != null) {
+			size += sizeOfObjectArray(m_buffer.length);
+			for (int i = 0; i< m_buffer.length; i++) {
+				if (m_buffer[i] != null) {
+					size += sizeOfIntArray(m_buffer[i].length);
+				}
+			}
+		}
+		return size;
 	}
 }

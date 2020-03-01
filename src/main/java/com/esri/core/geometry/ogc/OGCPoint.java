@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ import java.nio.ByteBuffer;
 import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_POINT;
 
 public final class OGCPoint extends OGCGeometry {
+	public static String TYPE = "Point";
+	
 	public OGCPoint(Point pt, SpatialReference sr) {
 		point = pt;
 		esriSR = sr;
@@ -76,11 +78,12 @@ public final class OGCPoint extends OGCGeometry {
 
 	@Override
 	public String geometryType() {
-		return "Point";
+		return TYPE;
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_OGC_POINT + (point != null ? point.estimateMemorySize() : 0);
 	}
 
@@ -106,10 +109,16 @@ public final class OGCPoint extends OGCGeometry {
 	public com.esri.core.geometry.Geometry getEsriGeometry() {
 		return point;
 	}
-
+	
 	@Override
-	public OGCGeometry convertToMulti() {
+	public OGCGeometry convertToMulti()
+	{
 		return new OGCMultiPoint(point, esriSR);
+	}
+	
+	@Override
+	public OGCGeometry reduceFromMulti() {
+		return this;
 	}
 
 	com.esri.core.geometry.Point point;

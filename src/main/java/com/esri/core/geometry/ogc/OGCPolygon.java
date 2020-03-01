@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ import java.nio.ByteBuffer;
 import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_POLYGON;
 
 public class OGCPolygon extends OGCSurface {
+	public static String TYPE = "Polygon";
+	
 	public OGCPolygon(Polygon src, int exteriorRing, SpatialReference sr) {
 		polygon = new Polygon();
 		for (int i = exteriorRing, n = src.getPathCount(); i < n; i++) {
@@ -74,7 +76,6 @@ public class OGCPolygon extends OGCSurface {
 
 	/**
 	 * Returns the exterior ring of this Polygon.
-	 *
 	 * @return OGCLinearRing instance.
 	 */
 	public OGCLineString exteriorRing() {
@@ -93,7 +94,6 @@ public class OGCPolygon extends OGCSurface {
 
 	/**
 	 * Returns the Nth interior ring for this Polygon as a LineString.
-	 *
 	 * @param n The 0 based index of the interior ring.
 	 * @return OGCLinearRing instance.
 	 */
@@ -111,11 +111,12 @@ public class OGCPolygon extends OGCSurface {
 
 	@Override
 	public String geometryType() {
-		return "Polygon";
+		return TYPE;
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_OGC_POLYGON + (polygon != null ? polygon.estimateMemorySize() : 0);
 	}
 
@@ -137,9 +138,15 @@ public class OGCPolygon extends OGCSurface {
 	}
 
 	@Override
-	public OGCGeometry convertToMulti() {
+	public OGCGeometry convertToMulti()
+	{
 		return new OGCMultiPolygon(polygon, esriSR);
 	}
-
+	
+	@Override
+	public OGCGeometry reduceFromMulti() {
+		return this;
+	}
+	
 	Polygon polygon;
 }

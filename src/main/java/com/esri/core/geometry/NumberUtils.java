@@ -72,7 +72,7 @@ public class NumberUtils {
 	public static int hashCombine(int hash1, int hash2) {
 		return (hash1 * 31 + hash2) & 0x7FFFFFFF;
 	}
-
+	
 	//makes a hash out of an int
 	static int hash(int n) {
 		int hash = 5381;
@@ -134,7 +134,20 @@ public class NumberUtils {
 
 	static int nextRand(int prevRand) {
 		return (1103515245 * prevRand + 12345) & intMax(); // according to Wiki,
-		// this is gcc's
+															// this is gcc's
+	}
+	
+	/**
+	 * Returns true if two values are equal (also can compare inf and nan).
+	 */
+	static boolean isEqualNonIEEE(double a, double b) {
+		return a == b || (Double.isNaN(a) && Double.isNaN(b));
 	}
 
+	/**
+	 * Returns true if two values are equal (also can compare inf and nan).
+	 */
+	static boolean isEqualNonIEEE(double a, double b, double tolerance) {
+		return a == b || Math.abs(a - b) <= tolerance || (Double.isNaN(a) && Double.isNaN(b));
+	}
 }

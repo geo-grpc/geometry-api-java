@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2015 Esri
+ Copyright 1995-2017 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 
 /**
- * An abstract class that represent the basic OperatorFactory interface.
+ *An abstract class that represent the basic OperatorFactory interface.
  */
 public class OperatorFactoryLocal extends OperatorFactory {
 	private static final OperatorFactoryLocal INSTANCE = new OperatorFactoryLocal();
@@ -57,6 +57,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
 		st_supportedOperators.put(Type.ImportFromESRIShape, new OperatorImportFromESRIShapeLocal());
 
 		st_supportedOperators.put(Type.Proximity2D, new OperatorProximity2DLocal());
+		st_supportedOperators.put(Type.Centroid2D, new OperatorCentroid2DLocal());
 		st_supportedOperators.put(Type.DensifyByLength, new OperatorDensifyByLengthLocal());
 
 		st_supportedOperators.put(Type.Relate, new OperatorRelateLocal());
@@ -116,7 +117,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
 
 
 	/**
-	 * Returns a reference to the singleton.
+	 *Returns a reference to the singleton.
 	 */
 	public static OperatorFactoryLocal getInstance() {
 		return INSTANCE;
@@ -137,8 +138,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
 	}
 
 	public static void saveJSONToTextFileDbg(String file_name,
-	                                         Geometry geometry,
-	                                         SpatialReference spatial_ref) {
+			Geometry geometry, SpatialReference spatial_ref) {
 		if (file_name == null) {
 			throw new IllegalArgumentException();
 		}
@@ -163,19 +163,27 @@ public class OperatorFactoryLocal extends OperatorFactory {
 		}
 
 		String jsonString = null;
+		Reader reader = null;
 		try {
 			FileInputStream stream = new FileInputStream(file_name);
-			Reader reader = new BufferedReader(new InputStreamReader(stream));
+			reader = new BufferedReader(new InputStreamReader(stream));
 			StringBuilder builder = new StringBuilder();
 			char[] buffer = new char[8192];
 			int read;
 			while ((read = reader.read(buffer, 0, buffer.length)) > 0) {
 				builder.append(buffer, 0, read);
 			}
-			stream.close();
 
 			jsonString = builder.toString();
 		} catch (Exception ex) {
+		}
+		finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		MapGeometry mapGeom = OperatorImportFromJson.local().execute(Geometry.Type.Unknown, jsonString);
@@ -235,7 +243,7 @@ public class OperatorFactoryLocal extends OperatorFactory {
 	}
 
 	public static void saveToWKTFileDbg(String file_name,
-	                                    Geometry geometry, SpatialReference spatial_ref) {
+			Geometry geometry, SpatialReference spatial_ref) {
 		if (file_name == null) {
 			throw new IllegalArgumentException();
 		}
@@ -257,19 +265,27 @@ public class OperatorFactoryLocal extends OperatorFactory {
 		}
 
 		String s = null;
+		Reader reader = null;
 		try {
 			FileInputStream stream = new FileInputStream(file_name);
-			Reader reader = new BufferedReader(new InputStreamReader(stream));
+			reader = new BufferedReader(new InputStreamReader(stream));
 			StringBuilder builder = new StringBuilder();
 			char[] buffer = new char[8192];
 			int read;
 			while ((read = reader.read(buffer, 0, buffer.length)) > 0) {
 				builder.append(buffer, 0, read);
 			}
-			stream.close();
 
 			s = builder.toString();
 		} catch (Exception ex) {
+		}
+		finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		return OperatorImportFromWkt.local().execute(0, Geometry.Type.Unknown, s, null);

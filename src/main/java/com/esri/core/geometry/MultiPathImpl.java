@@ -55,27 +55,33 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	private int m_currentPathIndex;
 	private int m_fill_rule = Polygon.FillRule.enumFillRuleOddEven;
 
-	static int[] _segmentParamSizes = {0, 0, 6, 0, 8, 0}; // None, Line,
-	// Bezier, XXX, Arc,
-	// XXX;
+	static int[] _segmentParamSizes = { 0, 0, 6, 0, 8, 0 }; // None, Line,
+															// Bezier, XXX, Arc,
+															// XXX;
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		long size = SIZE_OF_MULTI_PATH_IMPL +
-				+(m_envelope != null ? m_envelope.estimateMemorySize() : 0)
-				+ (m_moveToPoint != null ? m_moveToPoint.estimateMemorySize() : 0)
-				+ (m_cachedRingAreas2D != null ? m_cachedRingAreas2D.estimateMemorySize() : 0)
-				+ m_paths.estimateMemorySize()
-				+ m_pathFlags.estimateMemorySize()
-				+ (m_segmentFlags != null ? m_segmentFlags.estimateMemorySize() : 0)
-				+ (m_segmentParamIndex != null ? m_segmentParamIndex.estimateMemorySize() : 0)
-				+ (m_segmentParams != null ? m_segmentParams.estimateMemorySize() : 0);
+			+ (m_envelope != null ? m_envelope.estimateMemorySize() : 0)
+			+ (m_moveToPoint != null ? m_moveToPoint.estimateMemorySize() : 0)
+			+ (m_cachedRingAreas2D != null ? m_cachedRingAreas2D.estimateMemorySize() : 0)
+			+ (m_paths != null ? m_paths.estimateMemorySize() : 0)
+			+ (m_pathFlags != null ? m_pathFlags.estimateMemorySize() : 0)
+			+ (m_segmentFlags != null ? m_segmentFlags.estimateMemorySize() : 0)
+			+ (m_segmentParamIndex != null ? m_segmentParamIndex.estimateMemorySize() : 0)
+			+ (m_segmentParams != null ? m_segmentParams.estimateMemorySize() : 0);
 
 		if (m_vertexAttributes != null) {
 			for (int i = 0; i < m_vertexAttributes.length; i++) {
 				size += m_vertexAttributes[i].estimateMemorySize();
 			}
 		}
+
+		if (m_accelerators != null) {
+			size += m_accelerators.estimateMemorySize();
+		}
+
 		return size;
 	}
 
@@ -125,7 +131,6 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Starts a new Path at the Point.
 	 */
@@ -155,7 +160,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	public void startPath(Point point) {
 		if (point.isEmpty())
 			throw new IllegalArgumentException();// throw new
-		// IllegalArgumentException();
+													// IllegalArgumentException();
 
 		mergeVertexDescription(point.getDescription());
 		_initPathStartPoint();
@@ -172,7 +177,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		// Called for each new segment being added.
 		if (m_bPathStarted) {
 			_initPathStartPoint();// make sure the m_movetoPoint exists and has
-			// right vertex description
+									// right vertex description
 
 			// The new path is started. Need to grow m_parts and m_pathFlags.
 			if (m_paths == null) {
@@ -198,21 +203,21 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 		int oldcount = m_pointCount;
 		m_paths.write(m_paths.size() - 1, m_pointCount + resizeBy); // The
-		// NotifyModified
-		// will
-		// update
-		// the
-		// m_pointCount
-		// with this
-		// value.
+																	// NotifyModified
+																	// will
+																	// update
+																	// the
+																	// m_pointCount
+																	// with this
+																	// value.
 		_resizeImpl(oldcount + resizeBy);
 		m_pathFlags.write(m_paths.size() - 1, (byte) 0);
 
 		if (m_bPathStarted) {
 			setPointByVal(oldcount, m_moveToPoint);// setPoint(oldcount,
-			// m_moveToPoint); //finally
-			// set the start point to
-			// the geometry
+													// m_moveToPoint); //finally
+													// set the start point to
+													// the geometry
 			m_bPathStarted = false;
 		}
 	}
@@ -222,7 +227,6 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * adds a Line Segment from the last Point to the given endPoint.
 	 */
@@ -286,13 +290,12 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * adds a Cubic Bezier Segment to the current Path. The Bezier Segment
 	 * connects the current last Point and the given endPoint.
 	 */
 	public void bezierTo(Point2D controlPoint1, Point2D controlPoint2,
-	                     Point2D endPoint) {
+			Point2D endPoint) {
 		_beforeNewSegment(1);
 		setXY(m_pointCount - 1, endPoint);
 		double z;
@@ -318,8 +321,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		_touch();
 		if (m_bPolygon)
 			throw GeometryException.GeometryInternalError();// do not call this
-		// method on a
-		// polygon
+															// method on a
+															// polygon
 
 		int pathCount = getPathCount();
 		if (pathIndex > getPathCount())
@@ -335,8 +338,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		_touch();
 		if (m_bPolygon)
 			throw GeometryException.GeometryInternalError();// do not call this
-		// method on a
-		// polygon
+															// method on a
+															// polygon
 
 		int pathCount = getPathCount();
 		if (pathIndex > pathCount)
@@ -352,11 +355,11 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		int pathIndexStart = getPathStart(pathIndex);
 		int pathIndexEnd = getPathEnd(pathIndex);
 		_resizeImpl(m_pointCount + 1); // resize does not write into m_paths
-		// anymore!
+										// anymore!
 		_verifyAllStreams();
 		for (int iattr = 0, nattr = m_description.getAttributeCount(); iattr < nattr; iattr++) {
 			if (m_vertexAttributes[iattr] != null)// if
-			// (m_vertexAttributes[iattr])
+													// (m_vertexAttributes[iattr])
 			{
 				int semantics = m_description._getSemanticsImpl(iattr);
 				int comp = VertexDescription.getComponentCount(semantics);
@@ -380,8 +383,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		_touch();
 		if (m_bPolygon)
 			throw GeometryException.GeometryInternalError();// do not call this
-		// method on a
-		// polygon
+															// method on a
+															// polygon
 
 		if (m_pathFlags == null)// if (!m_pathFlags)
 			throw GeometryException.GeometryInternalError();
@@ -399,9 +402,9 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		for (int iattr = 0, nattr = m_description.getAttributeCount(); iattr < nattr; iattr++) {
 			if (m_vertexAttributes[iattr] != null) {
 				int semantics = m_description._getSemanticsImpl(iattr);// int
-				// semantics
-				// =
-				// m_description._getSemanticsImpl(iattr);
+																		// semantics
+																		// =
+																		// m_description._getSemanticsImpl(iattr);
 				int comp = VertexDescription.getComponentCount(semantics);
 				int newSize = comp * (m_pointCount + closedPathCount);
 				m_vertexAttributes[iattr].resize(newSize);
@@ -473,7 +476,6 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Closes all open curves by adding an implicit line segment from the end
 	 * point to the start point.
@@ -501,11 +503,11 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Returns the size of the segment data for the given segment type.
-	 *
-	 * @param flag is one of the segment flags from the SegmentFlags enum.
+	 * 
+	 * @param flag
+	 *            is one of the segment flags from the SegmentFlags enum.
 	 * @return the size of the segment params as the number of doubles.
 	 */
 	public static int getSegmentDataSize(byte flag) {
@@ -513,10 +515,9 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Closes last path of the MultiPathImpl with the Bezier Segment.
-	 * <p>
+	 * 
 	 * The start point of the Bezier is the last point of the path and the last
 	 * point of the bezier is the first point of the path.
 	 */
@@ -563,7 +564,6 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Returns True if the given path is closed (represents a Ring).
 	 */
@@ -586,7 +586,6 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * Returns True if the given path might have non-linear segments.
 	 */
@@ -614,12 +613,13 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * adds a rectangular closed Path to the MultiPathImpl.
-	 *
-	 * @param envSrc   is the source rectangle.
-	 * @param bReverse Creates reversed path.
+	 * 
+	 * @param envSrc
+	 *            is the source rectangle.
+	 * @param bReverse
+	 *            Creates reversed path.
 	 */
 	public void addEnvelope(Envelope2D envSrc, boolean bReverse) {
 		boolean bWasEmpty = m_pointCount == 0;
@@ -640,18 +640,19 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 		if (bWasEmpty && !bReverse) {
 			_setDirtyFlag(DirtyFlags.DirtyIsEnvelope, false);// now we no(sic?)
-			// the polypath
-			// is envelope
+																// the polypath
+																// is envelope
 		}
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
-
 	/**
 	 * adds a rectangular closed Path to the MultiPathImpl.
-	 *
-	 * @param envSrc   is the source rectangle.
-	 * @param bReverse Creates reversed path.
+	 * 
+	 * @param envSrc
+	 *            is the source rectangle.
+	 * @param bReverse
+	 *            Creates reversed path.
 	 */
 	public void addEnvelope(Envelope envSrc, boolean bReverse) {
 		if (envSrc.isEmpty())
@@ -674,8 +675,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 		if (bWasEmpty && !bReverse)
 			_setDirtyFlag(DirtyFlags.DirtyIsEnvelope, false);// now we know the
-		// polypath is
-		// envelope
+																// polypath is
+																// envelope
 	}
 
 	// Reviewed vs. Native Jan 11, 2011
@@ -694,8 +695,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	public void addSegmentsFromPath(MultiPathImpl src, int src_path_index,
-	                                int src_segment_from, int src_segment_count,
-	                                boolean b_start_new_path) {
+			int src_segment_from, int src_segment_count,
+			boolean b_start_new_path) {
 		if (!b_start_new_path && getPathCount() == 0)
 			b_start_new_path = true;
 
@@ -712,7 +713,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 		boolean bIncludesClosingSegment = src.isClosedPath(src_path_index)
 				&& src_segment_from + src_segment_count == src
-				.getSegmentCount(src_path_index);
+						.getSegmentCount(src_path_index);
 
 		if (bIncludesClosingSegment && src_segment_count == 1)
 			return;// cannot add a closing segment alone.
@@ -740,7 +741,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		if (b_start_new_path) {
 			if (src_point_count == 0)
 				return;// happens when adding a single closing segment to the
-			// new path
+						// new path
 
 			m_paths.add(m_pointCount);
 
@@ -764,15 +765,15 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 			int isrcAttr = src.m_description.getAttributeIndex(semantics);
 			if (isrcAttr < 0 || src.m_vertexAttributes[isrcAttr] == null) {// The
-				// source
-				// does
-				// not
-				// have
-				// the
-				// attribute.
-				// insert
-				// default
-				// value
+																			// source
+																			// does
+																			// not
+																			// have
+																			// the
+																			// attribute.
+																			// insert
+																			// default
+																			// value
 				double v = VertexDescription.getDefaultValue(semantics);
 				m_vertexAttributes[iattr].insertRange(comp * oldPointCount, v,
 						src_point_count * comp, comp * oldPointCount);
@@ -904,7 +905,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	// TODO: Nonlinearsegments
 	public void insertPath(int pathIndex, MultiPathImpl src, int srcPathIndex,
-	                       boolean bForward) {
+			boolean bForward) {
 		if (src == this)
 			throw new IllegalArgumentException();
 
@@ -924,7 +925,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		m_bPathStarted = false;
 
 		mergeVertexDescription(src.m_description);// merge attributes from the
-		// source
+													// source
 
 		src._verifyAllStreams();// the source need to be correct.
 
@@ -1001,7 +1002,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	public void insertPath(int pathIndex, Point2D[] points, int pointsOffset,
-	                       int count, boolean bForward) {
+			int count, boolean bForward) {
 		int oldPathCount = getPathCount();
 		if (pathIndex > oldPathCount)
 			throw new IllegalArgumentException();
@@ -1076,8 +1077,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	public void insertPoints(int pathIndex, int beforePointIndex,
-	                         MultiPathImpl src, int srcPathIndex, int srcPointIndexFrom,
-	                         int srcPointCount, boolean bForward) {
+			MultiPathImpl src, int srcPathIndex, int srcPointIndexFrom,
+			int srcPointCount, boolean bForward) {
 		if (pathIndex < 0)
 			pathIndex = getPathCount();
 
@@ -1131,12 +1132,12 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 			int isrcAttr = src.m_description.getAttributeIndex(semantics);
 			if (isrcAttr < 0 || src.m_vertexAttributes[isrcAttr] == null) // The
-			// source
-			// does
-			// not
-			// have
-			// the
-			// attribute.
+																			// source
+																			// does
+																			// not
+																			// have
+																			// the
+																			// attribute.
 			{
 				double v = VertexDescription.getDefaultValue(semantics);
 				m_vertexAttributes[iattr].insertRange(comp * absoluteIndex, v,
@@ -1146,22 +1147,22 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 			// add vertices to the given stream
 			m_vertexAttributes[iattr].insertRange(comp
-							* (pathStart + beforePointIndex),
+					* (pathStart + beforePointIndex),
 					src.m_vertexAttributes[isrcAttr], comp
 							* (srcPathStart + srcPointIndexFrom), srcPointCount
 							* comp, bForward, comp, comp * oldPointCount);
 		}
 
 		if (hasNonLinearSegments()) {// TODO: probably a bug here when a new
-			// path is added.
+										// path is added.
 			m_segmentFlags.writeRange((getPathStart(pathIndex)
-							+ beforePointIndex + srcPointCount), (oldPointCount
-							- getPathStart(pathIndex) - beforePointIndex),
+					+ beforePointIndex + srcPointCount), (oldPointCount
+					- getPathStart(pathIndex) - beforePointIndex),
 					m_segmentFlags,
 					(getPathStart(pathIndex) + beforePointIndex), true, 1);
 			m_segmentParamIndex.writeRange((getPathStart(pathIndex)
-							+ beforePointIndex + srcPointCount), (oldPointCount
-							- getPathStart(pathIndex) - beforePointIndex),
+					+ beforePointIndex + srcPointCount), (oldPointCount
+					- getPathStart(pathIndex) - beforePointIndex),
 					m_segmentParamIndex,
 					(getPathStart(pathIndex) + beforePointIndex), true, 1);
 			for (int i = getPathStart(pathIndex) + beforePointIndex, n = getPathStart(pathIndex)
@@ -1184,8 +1185,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	public void insertPoints(int pathIndex, int beforePointIndex,
-	                         Point2D[] src, int srcPointIndexFrom, int srcPointCount,
-	                         boolean bForward) {
+			Point2D[] src, int srcPointIndexFrom, int srcPointCount,
+			boolean bForward) {
 		if (pathIndex < 0)
 			pathIndex = getPathCount();
 
@@ -1222,7 +1223,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 					.writeRange(
 							comp
 									* (getPathStart(pathIndex)
-									+ beforePointIndex + srcPointCount),
+											+ beforePointIndex + srcPointCount),
 							(oldPointCount - getPathStart(pathIndex) - beforePointIndex)
 									* comp,
 							m_vertexAttributes[iattr],
@@ -1233,7 +1234,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 				// add vertices to the given stream
 				((AttributeStreamOfDbl) (AttributeStreamBase) m_vertexAttributes[iattr])
 						.writeRange(comp
-										* (getPathStart(pathIndex) + beforePointIndex),
+								* (getPathStart(pathIndex) + beforePointIndex),
 								srcPointCount, src, srcPointIndexFrom, bForward);
 			} else {
 				double v = VertexDescription.getDefaultValue(semantics);
@@ -1245,13 +1246,13 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 		if (hasNonLinearSegments()) {
 			m_segmentFlags.writeRange((getPathStart(pathIndex)
-							+ beforePointIndex + srcPointCount), (oldPointCount
-							- getPathStart(pathIndex) - beforePointIndex),
+					+ beforePointIndex + srcPointCount), (oldPointCount
+					- getPathStart(pathIndex) - beforePointIndex),
 					m_segmentFlags,
 					(getPathStart(pathIndex) + beforePointIndex), true, 1);
 			m_segmentParamIndex.writeRange((getPathStart(pathIndex)
-							+ beforePointIndex + srcPointCount), (oldPointCount
-							- getPathStart(pathIndex) - beforePointIndex),
+					+ beforePointIndex + srcPointCount), (oldPointCount
+					- getPathStart(pathIndex) - beforePointIndex),
 					m_segmentParamIndex,
 					(getPathStart(pathIndex) + beforePointIndex), true, 1);
 			m_segmentFlags.setRange((byte) SegmentFlags.enumLineSeg,
@@ -1406,7 +1407,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		notifyModified(DirtyFlags.DirtyCoordinates);
 	}
 
-	public double calculatePathLength2D(int pathIndex) /* const */ {
+	public double calculatePathLength2D(int pathIndex) /* const */
+	{
 		SegmentIteratorImpl segIter = querySegmentIteratorAtVertex(getPathStart(pathIndex));
 
 		MathUtils.KahanSummator len = new MathUtils.KahanSummator(0);
@@ -1418,7 +1420,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	double calculateSubLength2D(int from_path_index, int from_point_index,
-	                            int to_path_index, int to_point_index) {
+			int to_path_index, int to_point_index) {
 		int absolute_from_index = getPathStart(from_path_index)
 				+ from_point_index;
 		int absolute_to_index = getPathStart(to_path_index) + to_point_index;
@@ -1453,7 +1455,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	double calculateSubLength2D(int path_index, int from_point_index,
-	                            int to_point_index) {
+			int to_point_index) {
 		int absolute_from_index = getPathStart(path_index) + from_point_index;
 		int absolute_to_index = getPathStart(path_index) + to_point_index;
 
@@ -1493,7 +1495,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	// TODO: Add code fore interpolation type (none and angular)
 	void interpolateAttributes(int from_path_index, int from_point_index,
-	                           int to_path_index, int to_point_index) {
+			int to_path_index, int to_point_index) {
 		for (int ipath = from_path_index; ipath < to_path_index - 1; ipath++) {
 			if (isClosedPath(ipath))
 				throw new IllegalArgumentException(
@@ -1529,7 +1531,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	// TODO: Add code for interpolation type (none and angular)
 	void interpolateAttributesForSemantics(int semantics, int from_path_index,
-	                                       int from_point_index, int to_path_index, int to_point_index) {
+			int from_point_index, int to_path_index, int to_point_index) {
 		if (semantics == VertexDescription.Semantics.POSITION)
 			return;
 
@@ -1563,7 +1565,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	void interpolateAttributes(int path_index, int from_point_index,
-	                           int to_point_index) {
+			int to_point_index) {
 		int nattr = m_description.getAttributeCount();
 
 		if (nattr == 1)
@@ -1591,7 +1593,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	void interpolateAttributesForSemantics(int semantics, int path_index,
-	                                       int from_point_index, int to_point_index) {
+			int from_point_index, int to_point_index) {
 		if (semantics == VertexDescription.Semantics.POSITION)
 			return;
 
@@ -1619,8 +1621,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	// TODO: Add code fore interpolation type (none and angular)
 	void interpolateAttributes_(int semantics, int from_path_index,
-	                            int from_point_index, int to_path_index, int to_point_index,
-	                            double sub_length, int ordinate) {
+			int from_point_index, int to_path_index, int to_point_index,
+			double sub_length, int ordinate) {
 		SegmentIteratorImpl seg_iter = querySegmentIterator();
 
 		int absolute_from_index = getPathStart(from_path_index)
@@ -1657,7 +1659,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 					double segment_length = segment.calculateLength2D();
 					cumulative_length += segment_length;
 					double t = cumulative_length / sub_length;
-					interpolated_attribute = MathUtils.lerp(from_attribute, to_attribute, t);
+					interpolated_attribute = MathUtils.lerp(from_attribute,  to_attribute, t);
 
 					if (!seg_iter.isClosingSegment())
 						setAttribute(semantics, seg_iter.getEndPointIndex(),
@@ -1670,8 +1672,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	void interpolateAttributes_(int semantics, int path_index,
-	                            int from_point_index, int to_point_index, double sub_length,
-	                            int ordinate) {
+			int from_point_index, int to_point_index, double sub_length,
+			int ordinate) {
 		assert (m_bPolygon);
 		SegmentIteratorImpl seg_iter = querySegmentIterator();
 
@@ -1757,22 +1759,22 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 					int segmentType = (int) m_segmentFlags.read(ipoint);
 					int type = segmentType & SegmentFlags.enumSegmentMask;
 					switch (type) {
-						case SegmentFlags.enumBezierSeg: {
-							ptControl.x = m_segmentParams.read(segIndex);
-							ptControl.y = m_segmentParams.read(segIndex + 1);
-							transform.transform(ptControl, ptControl);
-							m_segmentParams.write(segIndex, ptControl.x);
-							m_segmentParams.write(segIndex + 1, ptControl.y);
+					case SegmentFlags.enumBezierSeg: {
+						ptControl.x = m_segmentParams.read(segIndex);
+						ptControl.y = m_segmentParams.read(segIndex + 1);
+						transform.transform(ptControl, ptControl);
+						m_segmentParams.write(segIndex, ptControl.x);
+						m_segmentParams.write(segIndex + 1, ptControl.y);
 
-							ptControl.x = m_segmentParams.read(segIndex + 3);
-							ptControl.y = m_segmentParams.read(segIndex + 4);
-							transform.transform(ptControl, ptControl);
-							m_segmentParams.write(segIndex + 3, ptControl.x);
-							m_segmentParams.write(segIndex + 4, ptControl.y);
-						}
+						ptControl.x = m_segmentParams.read(segIndex + 3);
+						ptControl.y = m_segmentParams.read(segIndex + 4);
+						transform.transform(ptControl, ptControl);
+						m_segmentParams.write(segIndex + 3, ptControl.x);
+						m_segmentParams.write(segIndex + 4, ptControl.y);
+					}
 						break;
-						case SegmentFlags.enumArcSeg:
-							throw GeometryException.GeometryInternalError();
+					case SegmentFlags.enumArcSeg:
+						throw GeometryException.GeometryInternalError();
 
 					}
 				}
@@ -1811,26 +1813,26 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 					int segmentType = (int) m_segmentFlags.read(ipoint);
 					int type = segmentType & (int) SegmentFlags.enumSegmentMask;
 					switch (type) {
-						case SegmentFlags.enumBezierSeg: {
-							ptControl.x = m_segmentParams.read(segIndex);
-							ptControl.y = m_segmentParams.read(segIndex + 1);
-							ptControl.z = m_segmentParams.read(segIndex + 2);
-							ptControl = transform.transform(ptControl);
-							m_segmentParams.write(segIndex, ptControl.x);
-							m_segmentParams.write(segIndex + 1, ptControl.y);
-							m_segmentParams.write(segIndex + 1, ptControl.z);
+					case SegmentFlags.enumBezierSeg: {
+						ptControl.x = m_segmentParams.read(segIndex);
+						ptControl.y = m_segmentParams.read(segIndex + 1);
+						ptControl.z = m_segmentParams.read(segIndex + 2);
+						ptControl = transform.transform(ptControl);
+						m_segmentParams.write(segIndex, ptControl.x);
+						m_segmentParams.write(segIndex + 1, ptControl.y);
+						m_segmentParams.write(segIndex + 1, ptControl.z);
 
-							ptControl.x = m_segmentParams.read(segIndex + 3);
-							ptControl.y = m_segmentParams.read(segIndex + 4);
-							ptControl.z = m_segmentParams.read(segIndex + 5);
-							ptControl = transform.transform(ptControl);
-							m_segmentParams.write(segIndex + 3, ptControl.x);
-							m_segmentParams.write(segIndex + 4, ptControl.y);
-							m_segmentParams.write(segIndex + 5, ptControl.z);
-						}
+						ptControl.x = m_segmentParams.read(segIndex + 3);
+						ptControl.y = m_segmentParams.read(segIndex + 4);
+						ptControl.z = m_segmentParams.read(segIndex + 5);
+						ptControl = transform.transform(ptControl);
+						m_segmentParams.write(segIndex + 3, ptControl.x);
+						m_segmentParams.write(segIndex + 4, ptControl.y);
+						m_segmentParams.write(segIndex + 5, ptControl.z);
+					}
 						break;
-						case SegmentFlags.enumArcSeg:
-							throw GeometryException.GeometryInternalError();
+					case SegmentFlags.enumArcSeg:
+						throw GeometryException.GeometryInternalError();
 
 					}
 				}
@@ -1870,7 +1872,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		dstPoly.m_bPathStarted = false;
 		dstPoly.m_curveParamwritePoint = m_curveParamwritePoint;
 		dstPoly.m_fill_rule = m_fill_rule;
-
+		
 		if (m_paths != null)
 			dstPoly.m_paths = new AttributeStreamOfInt32(m_paths);
 		else
@@ -1962,11 +1964,11 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 			if (!m_bPolygon) {
 				if (m_pathFlags != null
 						&& !m_pathFlags.equals(otherMultiPath.m_pathFlags, 0,
-						pathCount))
+								pathCount))
 					return false;
 			}
 		}
-
+	      
 		return super.equals(other);
 	}
 
@@ -2033,7 +2035,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	@Override
 	public void _notifyModifiedAllImpl() {
 		if (m_paths == null || m_paths.size() == 0)// if (m_paths == null ||
-			// !m_paths.size())
+													// !m_paths.size())
 			m_pointCount = 0;
 		else
 			m_pointCount = m_paths.read(m_paths.size() - 1);
@@ -2092,10 +2094,10 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 			while (segIter.nextPath()) {
 				pathArea.reset();
 				getXY(getPathStart(segIter.getPathIndex()), pt);// get the area
-				// calculation
-				// origin to be
-				// the origin of
-				// the ring.
+																// calculation
+																// origin to be
+																// the origin of
+																// the ring.
 				while (segIter.hasNextSegment()) {
 					pathArea.add(segIter.nextSegment()._calculateArea2DHelper(
 							pt.x, pt.y));
@@ -2155,8 +2157,8 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	public int getPathIndexFromPointIndex(int pointIndex) {
 		int positionHint = m_currentPathIndex;// in case of multithreading
-		// thiswould simply produce an
-		// invalid value
+												// thiswould simply produce an
+												// invalid value
 		int pathCount = getPathCount();
 
 		// Try using the hint position first to get the path index.
@@ -2179,7 +2181,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		}
 
 		if (pathCount < 5) {// TODO: time the performance to choose when to use
-			// linear search.
+							// linear search.
 			for (int i = 0; i < pathCount; i++) {
 				if (pointIndex < getPathEnd(i)) {
 					m_currentPathIndex = i;
@@ -2285,7 +2287,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	/**
 	 * Returns a reference to the AttributeStream of MultiPathImpl parts
 	 * (Paths).
-	 * <p>
+	 * 
 	 * For the non empty MultiPathImpl, that stream contains start points of the
 	 * MultiPathImpl curves. In addition, the last element is the total point
 	 * count. The number of vertices in a given part is parts[i + 1] - parts[i].
@@ -2306,7 +2308,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	/**
 	 * Returns a reference to the AttributeStream of Segment flags (SegmentFlags
 	 * flags). Can be NULL when no non-linear segments are present.
-	 * <p>
+	 * 
 	 * Segment flags indicate what kind of segment originates (starts) on the
 	 * given point. The last vertices of open Path parts has enumNone flag.
 	 */
@@ -2318,7 +2320,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	/**
 	 * Returns a reference to the AttributeStream of Path flags (PathFlags
 	 * flags).
-	 * <p>
+	 * 
 	 * Each start point of a path has a flag set to indicate if the Path is open
 	 * or closed.
 	 */
@@ -2412,7 +2414,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 
 	@Override
 	public boolean _buildRasterizedGeometryAccelerator(double toleranceXY,
-	                                                   GeometryAccelerationDegree accelDegree) {
+			GeometryAccelerationDegree accelDegree) {
 		if (m_accelerators == null)// (!m_accelerators)
 		{
 			m_accelerators = new GeometryAccelerators();
@@ -2460,7 +2462,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 	}
 
 	public void getSegment(int startVertexIndex, SegmentBuffer segBuffer,
-	                       boolean bStripAttributes) {
+			boolean bStripAttributes) {
 		int ipath = getPathIndexFromPointIndex(startVertexIndex);
 		if (startVertexIndex == getPathEnd(ipath) - 1 && !isClosedPath(ipath))
 			throw new GeometryException("index out of bounds");
@@ -2473,15 +2475,15 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 					& SegmentFlags.enumSegmentMask;
 
 		switch (segFlag) {
-			case SegmentFlags.enumLineSeg:
-				segBuffer.createLine();
-				break;
-			case SegmentFlags.enumBezierSeg:
-				throw GeometryException.GeometryInternalError();
-			case SegmentFlags.enumArcSeg:
-				throw GeometryException.GeometryInternalError();
-			default:
-				throw GeometryException.GeometryInternalError();
+		case SegmentFlags.enumLineSeg:
+			segBuffer.createLine();
+			break;
+		case SegmentFlags.enumBezierSeg:
+			throw GeometryException.GeometryInternalError();
+		case SegmentFlags.enumArcSeg:
+			throw GeometryException.GeometryInternalError();
+		default:
+			throw GeometryException.GeometryInternalError();
 		}
 
 		Segment currentSegment = segBuffer.get();
@@ -2567,7 +2569,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 			envelope.setCoords(env);
 		}
 	}
-
+	
 	@Override
 	public boolean _buildQuadTreeAccelerator(GeometryAccelerationDegree d) {
 		if (m_accelerators == null)// (!m_accelerators)
@@ -2610,7 +2612,7 @@ final class MultiPathImpl extends MultiVertexGeometryImpl {
 		return m_fill_rule;
 	}
 
-	void clearDirtyOGCFlags() {
+	void clearDirtyOGCFlags() { 
 		_setDirtyFlag(DirtyFlags.DirtyOGCFlags, false);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ import java.nio.ByteBuffer;
 import static com.esri.core.geometry.SizeOf.SIZE_OF_OGC_LINE_STRING;
 
 public class OGCLineString extends OGCCurve {
-
+	static public String TYPE = "LineString";
+	
 	/**
 	 * The number of Points in this LineString.
 	 */
@@ -67,7 +68,6 @@ public class OGCLineString extends OGCCurve {
 
 	/**
 	 * Returns the specified Point N in this LineString.
-	 *
 	 * @param n The 0 based index of the Point.
 	 */
 	public OGCPoint pointN(int n) {
@@ -83,6 +83,9 @@ public class OGCLineString extends OGCCurve {
 
 	@Override
 	public boolean isClosed() {
+		if (isEmpty())
+			return false;
+
 		return multiPath.isClosedPathInXYPlane(0);
 	}
 
@@ -94,7 +97,7 @@ public class OGCLineString extends OGCCurve {
 	}
 
 	public OGCLineString(MultiPath mp, int pathIndex, SpatialReference sr,
-	                     boolean reversed) {
+			boolean reversed) {
 		multiPath = new Polyline();
 		if (!mp.isEmpty())
 			multiPath.addPath(mp, pathIndex, !reversed);
@@ -118,11 +121,12 @@ public class OGCLineString extends OGCCurve {
 
 	@Override
 	public String geometryType() {
-		return "LineString";
+		return TYPE;
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_OGC_LINE_STRING + (multiPath != null ? multiPath.estimateMemorySize() : 0);
 	}
 
@@ -142,9 +146,15 @@ public class OGCLineString extends OGCCurve {
 	}
 
 	@Override
-	public OGCGeometry convertToMulti() {
-		return new OGCMultiLineString((Polyline) multiPath, esriSR);
+	public OGCGeometry convertToMulti()
+	{
+		return new OGCMultiLineString((Polyline)multiPath, esriSR);
 	}
-
+	
+	@Override
+	public OGCGeometry reduceFromMulti() {
+		return this;
+	}
+	
 	MultiPath multiPath;
 }

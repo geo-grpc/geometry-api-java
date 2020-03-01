@@ -56,7 +56,7 @@ public abstract class Geometry implements Serializable {
 		public final static int MultiPoint = 6 + 0x20 + 0x200; // points,
 		// multivertex
 		public final static int Polyline = 7 + 0x40 + 0x200 + 0x400; // lines,
-		// multivertex,
+																		// multivertex,
 		// multipath
 		public final static int Polygon = 8 + 0x40 + 0x80 + 0x200 + 0x400;
 	}
@@ -114,15 +114,17 @@ public abstract class Geometry implements Serializable {
 			enumValue = val;
 		}
 
-		static public Geometry.Type intToType(int geometryType) {
+		static public Geometry.Type intToType(int geometryType)
+		{
 			Geometry.Type[] v = Geometry.Type.values();
-			for (int i = 0; i < v.length; i++) {
-				if (v[i].value() == geometryType)
-					return v[i];
-			}
+            for(int i = 0; i < v.length; i++)
+            {
+                if(v[i].value() == geometryType)
+                    return v[i];
+            }
 
-			throw new IllegalArgumentException();
-		}
+            throw new IllegalArgumentException();
+        }
 	}
 
 	/**
@@ -159,13 +161,13 @@ public abstract class Geometry implements Serializable {
 	 */
 	public abstract long estimateMemorySize();
 
-	protected static long estimateMemorySize(double[] attributes) {
+	protected static long estimateMemorySize(double[] attributes)
+	{
 		return attributes != null ? sizeOfDoubleArray(attributes.length) : 0;
 	}
 
 	/**
 	 * Returns the VertexDescription of this geometry.
-	 *
 	 * @return VertexDescription
 	 */
 	public VertexDescription getDescription() {
@@ -175,7 +177,6 @@ public abstract class Geometry implements Serializable {
 	/**
 	 * Assigns the new VertexDescription by adding or dropping attributes. The
 	 * Geometry will have the src description as a result.
-	 *
 	 * @param src VertexDescription to assign.
 	 */
 	public void assignVertexDescription(VertexDescription src) {
@@ -192,7 +193,6 @@ public abstract class Geometry implements Serializable {
 	 * Merges the new VertexDescription by adding missing attributes from the
 	 * src. The Geometry will have a union of the current and the src
 	 * descriptions.
-	 *
 	 * @param src VertexDescription to merge.
 	 */
 	public void mergeVertexDescription(VertexDescription src) {
@@ -210,7 +210,6 @@ public abstract class Geometry implements Serializable {
 
 	/**
 	 * A shortcut for getDescription().hasAttribute()
-	 *
 	 * @param semantics The VertexDescription.Semantics to check.
 	 * @return Return true if the attribute is present.
 	 */
@@ -237,7 +236,6 @@ public abstract class Geometry implements Serializable {
 	 * equivalent to setting the attribute to the default value for each vertex,
 	 * However, it is faster and the result Geometry has smaller memory
 	 * footprint and smaller size when persisted.
-	 *
 	 * @param semantics The VertexDescription.Semantics to drop.
 	 */
 	public void dropAttribute(int semantics) {
@@ -259,9 +257,8 @@ public abstract class Geometry implements Serializable {
 
 	/**
 	 * Returns the min and max attribute values at the ordinate of the Geometry.
-	 *
 	 * @param semantics The semantics of the interval.
-	 * @param ordinate  The ordinate of the interval.
+	 * @param ordinate The ordinate of the interval.
 	 * @return The interval.
 	 */
 	public abstract Envelope1D queryInterval(int semantics, int ordinate);
@@ -269,21 +266,22 @@ public abstract class Geometry implements Serializable {
 	/**
 	 * Returns the axis aligned bounding box of the geometry.
 	 *
-	 * @param env The envelope to return the result in.
+	 * @param env
+	 *            The envelope to return the result in.
 	 */
 	public abstract void queryEnvelope(Envelope env);
 
 	/**
 	 * Returns tight bbox of the Geometry in X, Y plane.
-	 *
-	 * @param env The envelope to return the result in.
+	 * @param env
+	 *            The envelope to return the result in.
 	 */
 	public abstract void queryEnvelope2D(Envelope2D env);
 
 	/**
 	 * Returns tight bbox of the Geometry in 3D.
-	 *
-	 * @param env The envelope to return the result in.
+	 * @param env
+	 *            The envelope to return the result in.
 	 */
 	abstract void queryEnvelope3D(Envelope3D env);
 
@@ -291,8 +289,8 @@ public abstract class Geometry implements Serializable {
 	 * Returns the conservative bbox of the Geometry in X, Y plane. This is a
 	 * faster method than QueryEnvelope2D. However, the bbox could be larger
 	 * than the tight box.
-	 *
-	 * @param env The envelope to return the result in.
+	 * @param env
+	 *            The envelope to return the result in.
 	 */
 	public void queryLooseEnvelope2D(Envelope2D env) {
 		queryEnvelope2D(env);
@@ -302,8 +300,8 @@ public abstract class Geometry implements Serializable {
 	 * Returns tight conservative box of the Geometry in 3D. This is a faster
 	 * method than the QueryEnvelope3D. However, the box could be larger than
 	 * the tight box.
-	 *
-	 * @param env The envelope to return the result in.
+	 * @param env
+	 *            The envelope to return the result in.
 	 */
 	void queryLooseEnvelope3D(Envelope3D env) {
 		queryEnvelope3D(env);
@@ -326,20 +324,21 @@ public abstract class Geometry implements Serializable {
 	/**
 	 * Applies 2D affine transformation in XY plane.
 	 *
-	 * @param transform The affine transformation to be applied to this geometry.
+	 * @param transform
+	 *            The affine transformation to be applied to this geometry.
 	 */
 	public abstract void applyTransformation(Transformation2D transform);
 
 	/**
 	 * Applies 3D affine transformation. Adds Z attribute if it is missing.
 	 *
-	 * @param transform The affine transformation to be applied to this geometry.
+	 * @param transform
+	 *            The affine transformation to be applied to this geometry.
 	 */
 	abstract void applyTransformation(Transformation3D transform);
 
 	/**
 	 * Creates an instance of an empty geometry of the same type.
-	 *
 	 * @return The new instance.
 	 */
 	public abstract Geometry createInstance();
@@ -347,9 +346,9 @@ public abstract class Geometry implements Serializable {
 	/**
 	 * Copies this geometry to another geometry of the same type. The result
 	 * geometry is an exact copy.
-	 *
 	 * @param dst The geometry instance to copy to.
-	 * @throws GeometryException invalid_argument if the geometry is of different type.
+	 * @exception GeometryException
+	 *                invalid_argument if the geometry is of different type.
 	 */
 	public abstract void copyTo(Geometry dst);
 
@@ -441,8 +440,9 @@ public abstract class Geometry implements Serializable {
 	 * <p>
 	 * Returns 3 for objects with volume
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return The integer dimension of this geometry.
 	 */
 	public static int getDimensionFromType(int type) {
@@ -453,9 +453,10 @@ public abstract class Geometry implements Serializable {
 	 * Indicates if the integer value of the enumeration is a point type
 	 * (dimension 0).
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
-	 * @return TRUE if the geometry is a point.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
+	 * @return TRUE if the geometry is a point (a Point or a Multipoint).
 	 */
 	public static boolean isPoint(int type) {
 		return (type & 0x20) != 0;
@@ -465,8 +466,9 @@ public abstract class Geometry implements Serializable {
 	 * Indicates if the integer value of the enumeration is linear (dimension
 	 * 1).
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return TRUE if the geometry is a line.
 	 */
 	public static boolean isLinear(int type) {
@@ -477,8 +479,9 @@ public abstract class Geometry implements Serializable {
 	 * Indicates if the integer value of the enumeration is an area (dimension
 	 * 2).
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return TRUE if the geometry is a polygon.
 	 */
 	public static boolean isArea(int type) {
@@ -488,8 +491,9 @@ public abstract class Geometry implements Serializable {
 	/**
 	 * Indicates if the integer value of the enumeration is a segment.
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return TRUE if the geometry is a segment.
 	 */
 	public static boolean isSegment(int type) {
@@ -500,8 +504,9 @@ public abstract class Geometry implements Serializable {
 	 * Indicates if the integer value of the enumeration is a multivertex (ie,
 	 * multipoint, line, or area).
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return TRUE if the geometry has multiple vertices.
 	 */
 	public static boolean isMultiVertex(int type) {
@@ -512,8 +517,9 @@ public abstract class Geometry implements Serializable {
 	 * Indicates if the integer value of the enumeration is a multipath (ie,
 	 * line or area).
 	 *
-	 * @param type The integer value from geometry enumeration. You can use the
-	 *             method {@link Type#value()} to get at the integer value.
+	 * @param type
+	 *            The integer value from geometry enumeration. You can use the
+	 *            method {@link Type#value()} to get at the integer value.
 	 * @return TRUE if the geometry is a multipath.
 	 */
 	public static boolean isMultiPath(int type) {
@@ -533,11 +539,10 @@ public abstract class Geometry implements Serializable {
 
 	/**
 	 * Returns boundary of this geometry.
-	 * <p>
+	 *
 	 * Polygon and Envelope boundary is a Polyline. For Polyline and Line, the
 	 * boundary is a Multi_point consisting of path end points. For Multi_point and
 	 * Point null is returned.
-	 *
 	 * @return The boundary geometry.
 	 */
 	public abstract Geometry getBoundary();
@@ -546,9 +551,8 @@ public abstract class Geometry implements Serializable {
 	 * Replaces NaNs in the attribute with the given value.
 	 * If the geometry is not empty, it adds the attribute if geometry does not have it yet, and replaces the values.
 	 * If the geometry is empty, it adds the attribute and does not set any values.
-	 *
 	 * @param semantics The semantics for which to replace the NaNs.
-	 * @param value     The value to replace NaNs with.
+	 * @param value The value to replace NaNs with.
 	 */
 	public abstract void replaceNaNs(int semantics, double value);
 
@@ -591,27 +595,32 @@ public abstract class Geometry implements Serializable {
 		 */
 		enumMedium,
 		/**
-		 * high acceleration, takes even more memory and may take
-		 * longest time to accelerate, but may work faster than the
-		 * other two.
-		 * (1024x1024x2 bit raster and a quad tree for segments)
-		 */
+		*high acceleration, takes even more memory and may take
+		*longest time to accelerate, but may work faster than the
+		*other two.
+		*(1024x1024x2 bit raster and a quad tree for segments)
+		*/
 		enumHot
 	}
 
 	Object writeReplace() throws ObjectStreamException {
 		Type gt = getType();
-		if (gt == Geometry.Type.Point) {
+		if (gt == Geometry.Type.Point)
+		{
 			PtSrlzr pt = new PtSrlzr();
-			pt.setGeometryByValue((Point) this);
+			pt.setGeometryByValue((Point)this);
 			return pt;
-		} else if (gt == Geometry.Type.Envelope) {
+		}
+		else if (gt == Geometry.Type.Envelope)
+		{
 			EnvSrlzr e = new EnvSrlzr();
-			e.setGeometryByValue((Envelope) this);
+			e.setGeometryByValue((Envelope)this);
 			return e;
-		} else if (gt == Geometry.Type.Line) {
+		}
+		else if (gt == Geometry.Type.Line)
+		{
 			LnSrlzr ln = new LnSrlzr();
-			ln.setGeometryByValue((Line) this);
+			ln.setGeometryByValue((Line)this);
 			return ln;
 		}
 
@@ -637,7 +646,6 @@ public abstract class Geometry implements Serializable {
 	 * Returns count of geometry vertices: 1 for Point, 4 for Envelope,
 	 * get_point_count for MultiVertexGeometry types, 2 for segment types Returns 0
 	 * if geometry is empty.
-	 *
 	 * @param geom The geometry to get the vertex count for.
 	 * @return The vertex count.
 	 */

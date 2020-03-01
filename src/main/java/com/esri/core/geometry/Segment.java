@@ -43,7 +43,6 @@ public abstract class Segment extends Geometry implements Serializable {
 	double[] m_attributes;
 
 	// Header Definitions
-
 	/**
 	 * Returns XY coordinates of the start point.
 	 */
@@ -94,8 +93,9 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Sets the coordinates of the start point in this segment.
-	 *
-	 * @param srcPoint The new start point of this segment.
+	 * 
+	 * @param srcPoint
+	 *            The new start point of this segment.
 	 */
 	public void setStart(Point srcPoint) {
 		_set(0, srcPoint);
@@ -104,10 +104,12 @@ public abstract class Segment extends Geometry implements Serializable {
 	/**
 	 * Returns value of the start vertex attribute's ordinate. Throws if the
 	 * Point is empty.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param ordinate  The attribute's ordinate. For example, the y coordinate of the
-	 *                  NORMAL has ordinate of 1.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param ordinate
+	 *            The attribute's ordinate. For example, the y coordinate of the
+	 *            NORMAL has ordinate of 1.
 	 * @return Ordinate value as double.
 	 */
 	public double getStartAttributeAsDbl(int semantics, int ordinate) {
@@ -117,10 +119,12 @@ public abstract class Segment extends Geometry implements Serializable {
 	/**
 	 * Returns the value of the start vertex attribute's ordinate. The ordinate
 	 * is always 0 because integer attributes always have one component.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param ordinate  The attribute's ordinate. For example, the y coordinate of the
-	 *                  NORMAL has ordinate of 1.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param ordinate
+	 *            The attribute's ordinate. For example, the y coordinate of the
+	 *            NORMAL has ordinate of 1.
 	 * @return Ordinate value truncated to 32 bit integer.
 	 */
 	public int getStartAttributeAsInt(int semantics, int ordinate) {
@@ -129,11 +133,13 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Sets the value of the start vertex attribute.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param value     is the array to write values to. The attribute type and the
-	 *                  number of elements must match the persistence type, as well as
-	 *                  the number of components of the attribute.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param value
+	 *            is the array to write values to. The attribute type and the
+	 *            number of elements must match the persistence type, as well as
+	 *            the number of components of the attribute.
 	 */
 	public void setStartAttribute(int semantics, int ordinate, double value) {
 		_setAttribute(0, semantics, ordinate, value);
@@ -145,7 +151,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns the X coordinate of starting point.
-	 *
+	 * 
 	 * @return The X coordinate of starting point.
 	 */
 	public double getStartX() {
@@ -154,7 +160,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns the Y coordinate of starting point.
-	 *
+	 * 
 	 * @return The Y coordinate of starting point.
 	 */
 	public double getStartY() {
@@ -163,7 +169,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns the X coordinate of ending point.
-	 *
+	 * 
 	 * @return The X coordinate of ending point.
 	 */
 	public double getEndX() {
@@ -172,7 +178,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns the Y coordinate of ending point.
-	 *
+	 * 
 	 * @return The Y coordinate of ending point.
 	 */
 	public double getEndY() {
@@ -181,7 +187,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns XY coordinates of the end point.
-	 *
+	 * 
 	 * @return The XY coordinates of the end point.
 	 */
 	public Point2D getEndXY() {
@@ -195,8 +201,9 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Sets the XY coordinates of the end point.
-	 *
-	 * @param pt The end point of the segment.
+	 * 
+	 * @param pt
+	 *            The end point of the segment.
 	 */
 	public void setEndXY(Point2D pt) {
 		_setXY(1, pt);
@@ -208,7 +215,7 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns XYZ coordinates of the end point. Z if 0 if Z is missing.
-	 *
+	 * 
 	 * @return The XYZ coordinates of the end point.
 	 */
 	public Point3D getEndXYZ() {
@@ -228,8 +235,9 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Returns coordinates of the end point in this segment.
-	 *
-	 * @param dstPoint The end point of this segment.
+	 * 
+	 * @param dstPoint
+	 *            The end point of this segment.
 	 */
 	public void queryEnd(Point dstPoint) {
 		_get(1, dstPoint);
@@ -237,8 +245,9 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Sets the coordinates of the end point in a Point class.
-	 *
-	 * @param srcPoint The new end point of this segment.
+	 * 
+	 * @param srcPoint
+	 *            The new end point of this segment.
 	 */
 	public void setEnd(Point srcPoint) {
 		_set(1, srcPoint);
@@ -247,10 +256,12 @@ public abstract class Segment extends Geometry implements Serializable {
 	/**
 	 * Returns value of the end vertex attribute's ordinate. Throws if the Point
 	 * is empty.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param ordinate  The attribute's ordinate. For example, the y coordinate of the
-	 *                  NORMAL has ordinate of 1.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param ordinate
+	 *            The attribute's ordinate. For example, the y coordinate of the
+	 *            NORMAL has ordinate of 1.
 	 * @return Ordinate value as double.
 	 */
 	public double getEndAttributeAsDbl(int semantics, int ordinate) {
@@ -260,10 +271,12 @@ public abstract class Segment extends Geometry implements Serializable {
 	/**
 	 * Returns the value of the end vertex attribute's ordinate. The ordinate is
 	 * always 0 because integer attributes always have one component.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param ordinate  The attribute's ordinate. For example, the y coordinate of the
-	 *                  NORMAL has ordinate of 1.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param ordinate
+	 *            The attribute's ordinate. For example, the y coordinate of the
+	 *            NORMAL has ordinate of 1.
 	 * @return The ordinate value truncated to 32 bit integer.
 	 */
 	public int getEndAttributeAsInt(int semantics, int ordinate) {
@@ -272,12 +285,15 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	/**
 	 * Sets the value of end vertex attribute.
-	 *
-	 * @param semantics The attribute semantics.
-	 * @param ordinate  The attribute's ordinate.
-	 * @param value     Is the array to write values to. The attribute type and the
-	 *                  number of elements must match the persistence type, as well as
-	 *                  the number of components of the attribute.
+	 * 
+	 * @param semantics
+	 *            The attribute semantics.
+	 * @param ordinate
+	 *            The attribute's ordinate.
+	 * @param value
+	 *            Is the array to write values to. The attribute type and the
+	 *            number of elements must match the persistence type, as well as
+	 *            the number of components of the attribute.
 	 */
 	public void setEndAttribute(int semantics, int ordinate, double value) {
 		_setAttribute(1, semantics, ordinate, value);
@@ -312,20 +328,25 @@ public abstract class Segment extends Geometry implements Serializable {
 	 * <p>
 	 * Note: This is not a topological operation. It needs to be paired with the
 	 * Segment.Overlap call.
-	 *
-	 * @param other              The segment to calculate intersection with.
-	 * @param intersectionPoints The intersection points. Can be NULL.
-	 * @param paramThis          The value of the parameter in the intersection points for this
-	 *                           Segment (between 0 and 1). Can be NULL.
-	 * @param paramOther         The value of the parameter in the intersection points for the
-	 *                           other Segment (between 0 and 1). Can be NULL.
-	 * @param tolerance          The tolerance value for the intersection calculation. Can be
-	 *                           0.
+	 * 
+	 * @param other
+	 *            The segment to calculate intersection with.
+	 * @param intersectionPoints
+	 *            The intersection points. Can be NULL.
+	 * @param paramThis
+	 *            The value of the parameter in the intersection points for this
+	 *            Segment (between 0 and 1). Can be NULL.
+	 * @param paramOther
+	 *            The value of the parameter in the intersection points for the
+	 *            other Segment (between 0 and 1). Can be NULL.
+	 * @param tolerance
+	 *            The tolerance value for the intersection calculation. Can be
+	 *            0.
 	 * @return The number of intersection points, 0 when no intersection points
-	 * exist.
+	 *         exist.
 	 */
 	int intersect(Segment other, Point2D[] intersectionPoints,
-	              double[] paramThis, double[] paramOther, double tolerance) {
+			double[] paramThis, double[] paramOther, double tolerance) {
 		return _intersect(other, intersectionPoints, paramThis, paramOther,
 				tolerance);
 	}
@@ -356,7 +377,6 @@ public abstract class Segment extends Geometry implements Serializable {
 	// Header Definitions
 
 	// Cpp definitions
-
 	/**
 	 * Creates a segment with start and end points (0,0).
 	 */
@@ -380,7 +400,7 @@ public abstract class Segment extends Geometry implements Serializable {
 	}
 
 	static void _attributeCopy(double[] src, int srcStart, double[] dst,
-	                           int dstStart, int count) {
+			int dstStart, int count) {
 		if (count > 0)
 			System.arraycopy(src, srcStart, dst, dstStart, count);
 	}
@@ -427,15 +447,15 @@ public abstract class Segment extends Geometry implements Serializable {
 		_touch();
 		boolean bHasZ = hasAttribute(Semantics.Z);
 		if (!bHasZ && !VertexDescription.isDefaultValue(Semantics.Z, pt.z)) {// add
-			// Z
-			// only
-			// if
-			// pt.z
-			// is
-			// not
-			// a
-			// default
-			// value.
+																				// Z
+																				// only
+																				// if
+																				// pt.z
+																				// is
+																				// not
+																				// a
+																				// default
+																				// value.
 			addAttribute(Semantics.Z);
 			bHasZ = true;
 		}
@@ -459,41 +479,45 @@ public abstract class Segment extends Geometry implements Serializable {
 			m_description = newDescription;
 			return;
 		}
-
+		
 		int[] mapping = VertexDescriptionDesignerImpl.mapAttributes(newDescription, m_description);
-
+		
 		double[] newAttributes = new double[(newDescription.getTotalComponentCount() - 2) * 2];
-
+		
 		int old_offset0 = _getEndPointOffset(m_description, 0);
 		int old_offset1 = _getEndPointOffset(m_description, 1);
 
 		int new_offset0 = _getEndPointOffset(newDescription, 0);
 		int new_offset1 = _getEndPointOffset(newDescription, 1);
-
+		
 		int j = 0;
 		for (int i = 1, n = newDescription.getAttributeCount(); i < n; i++) {
 			int semantics = newDescription.getSemantics(i);
 			int nords = VertexDescription.getComponentCount(semantics);
-			if (mapping[i] == -1) {
+			if (mapping[i] == -1)
+			{
 				double d = VertexDescription.getDefaultValue(semantics);
-				for (int ord = 0; ord < nords; ord++) {
+				for (int ord = 0; ord < nords; ord++)
+				{
 					newAttributes[new_offset0 + j] = d;
 					newAttributes[new_offset1 + j] = d;
 					j++;
 				}
-			} else {
+			}
+			else {
 				int m = mapping[i];
 				int offset = m_description._getPointAttributeOffset(m) - 2;
-				for (int ord = 0; ord < nords; ord++) {
+				for (int ord = 0; ord < nords; ord++)
+				{
 					newAttributes[new_offset0 + j] = m_attributes[old_offset0 + offset];
 					newAttributes[new_offset1 + j] = m_attributes[old_offset1 + offset];
 					j++;
 					offset++;
 				}
 			}
-
+				 
 		}
-
+		
 		m_attributes = newAttributes;
 		m_description = newDescription;
 	}
@@ -503,9 +527,6 @@ public abstract class Segment extends Geometry implements Serializable {
 			throw new GeometryException("empty geometry");// ._setToDefault();
 
 		outPoint.assignVertexDescription(m_description);
-
-		if (outPoint.isEmptyImpl())
-			outPoint._setToDefault();
 
 		for (int attributeIndex = 0; attributeIndex < m_description
 				.getAttributeCount(); attributeIndex++) {
@@ -590,7 +611,8 @@ public abstract class Segment extends Geometry implements Serializable {
 					m_yEnd = value;
 				else
 					m_xEnd = value;
-			} else if (ordinate != 0)
+			}
+			else if (ordinate != 0)
 				m_yStart = value;
 			else
 				m_xStart = value;
@@ -664,16 +686,30 @@ public abstract class Segment extends Geometry implements Serializable {
 				|| m_yStart != other.m_yStart || m_yEnd != other.m_yEnd)
 			return false;
 		for (int i = 0; i < (m_description.getTotalComponentCount() - 2) * 2; i++)
-			if (m_attributes[i] != other.m_attributes[i])
+			if (!NumberUtils.isEqualNonIEEE(m_attributes[i], other.m_attributes[i]))
 				return false;
 
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		int hash = m_description.hashCode();
+		hash = NumberUtils.hash(hash, m_xStart);
+		hash = NumberUtils.hash(hash, m_yStart);
+		hash = NumberUtils.hash(hash, m_xEnd);
+		hash = NumberUtils.hash(hash, m_yEnd);
+		for (int i = 0; i < (m_description.getTotalComponentCount() - 2) * 2; i++) {
+			hash = NumberUtils.hash(hash, m_attributes[i]);
+		}
+
+		return hash;
+	}
+	
 	/**
 	 * Returns true, when this segment is a closed curve (start point is equal
 	 * to end point exactly).
-	 * <p>
+	 * 
 	 * Note, this will return true for lines, that are degenerate to a point
 	 * too.
 	 */
@@ -694,8 +730,8 @@ public abstract class Segment extends Geometry implements Serializable {
 
 		for (int i = 1, n = m_description.getAttributeCount(); i < n; i++) {
 			int semantics = m_description.getSemantics(i);// VertexDescription.Semantics
-			// semantics =
-			// m_description.getSemantics(i);
+															// semantics =
+															// m_description.getSemantics(i);
 			for (int iord = 0, nord = VertexDescription
 					.getComponentCount(semantics); iord < nord; iord++) {
 				double v1 = _getAttributeAsDbl(0, semantics, iord);
@@ -707,34 +743,34 @@ public abstract class Segment extends Geometry implements Serializable {
 	}
 
 	int _isIntersecting(Segment other, double tolerance,
-	                    boolean bExcludeExactEndpoints) {
+			boolean bExcludeExactEndpoints) {
 		int gtThis = getType().value();
 		int gtOther = other.getType().value();
 		switch (gtThis) {
-			case Geometry.GeometryType.Line:
-				if (gtOther == Geometry.GeometryType.Line)
-					return Line._isIntersectingLineLine((Line) this, (Line) other,
-							tolerance, bExcludeExactEndpoints);
-				else
-					throw GeometryException.GeometryInternalError();
-			default:
+		case Geometry.GeometryType.Line:
+			if (gtOther == Geometry.GeometryType.Line)
+				return Line._isIntersectingLineLine((Line) this, (Line) other,
+						tolerance, bExcludeExactEndpoints);
+			else
 				throw GeometryException.GeometryInternalError();
+		default:
+			throw GeometryException.GeometryInternalError();
 		}
 	}
 
 	int _intersect(Segment other, Point2D[] intersectionPoints,
-	               double[] paramThis, double[] paramOther, double tolerance) {
+			double[] paramThis, double[] paramOther, double tolerance) {
 		int gtThis = getType().value();
 		int gtOther = other.getType().value();
 		switch (gtThis) {
-			case Geometry.GeometryType.Line:
-				if (gtOther == Geometry.GeometryType.Line)
-					return Line._intersectLineLine((Line) this, (Line) other,
-							intersectionPoints, paramThis, paramOther, tolerance);
-				else
-					throw GeometryException.GeometryInternalError();
-			default:
+		case Geometry.GeometryType.Line:
+			if (gtOther == Geometry.GeometryType.Line)
+				return Line._intersectLineLine((Line) this, (Line) other,
+						intersectionPoints, paramThis, paramOther, tolerance);
+			else
 				throw GeometryException.GeometryInternalError();
+		default:
+			throw GeometryException.GeometryInternalError();
 		}
 	}
 
@@ -762,58 +798,67 @@ public abstract class Segment extends Geometry implements Serializable {
 	/**
 	 * Returns the coordinate of the point on this segment for the given
 	 * parameter value (segments are parametric curves).
-	 *
-	 * @param t   the parameter coordinate along the segment from 0.0 to 1.0.
+	 * 
+	 * @param t
+	 *            the parameter coordinate along the segment from 0.0 to 1.0.
 	 *            Value of 0 returns the start point, 1 returns end point.
-	 * @param dst the coordinate where result will be placed.
+	 * @param dst
+	 *            the coordinate where result will be placed.
 	 */
 	public abstract void getCoord2D(double t, Point2D dst);
 
 	/**
 	 * Finds a closest coordinate on this segment.
-	 *
-	 * @param inputPoint   The 2D point to find the closest coordinate on this segment.
-	 * @param bExtrapolate TRUE if the segment is extrapolated at the end points along
-	 *                     the end point tangents. Otherwise the result is limited to
-	 *                     values between 0 and 1.
+	 * 
+	 * @param inputPoint
+	 *            The 2D point to find the closest coordinate on this segment.
+	 * @param bExtrapolate
+	 *            TRUE if the segment is extrapolated at the end points along
+	 *            the end point tangents. Otherwise the result is limited to
+	 *            values between 0 and 1.
 	 * @return The parametric coordinate t on the segment (0 corresponds to the
-	 * start point, 1 corresponds to the end point). Use getCoord2D to
-	 * obtain the 2D coordinate on the segment from t. To find the
-	 * distance, call (inputPoint.sub(seg.getCoord2D(t))).length();
+	 *         start point, 1 corresponds to the end point). Use getCoord2D to
+	 *         obtain the 2D coordinate on the segment from t. To find the
+	 *         distance, call (inputPoint.sub(seg.getCoord2D(t))).length();
 	 */
 	public abstract double getClosestCoordinate(Point2D inputPoint,
-	                                            boolean bExtrapolate);
+			boolean bExtrapolate);
 
 	/**
 	 * Splits this segment into Y monotonic parts and places them into the input
 	 * array.
-	 *
-	 * @param monotonicSegments The in/out array of SegmentBuffer structures that will be
-	 *                          filled with the monotonic parts. The monotonicSegments array
-	 *                          must contain at least 3 elements.
+	 * 
+	 * @param monotonicSegments
+	 *            The in/out array of SegmentBuffer structures that will be
+	 *            filled with the monotonic parts. The monotonicSegments array
+	 *            must contain at least 3 elements.
 	 * @return The number of monotonic parts if the split had happened. Returns
-	 * 0 if the segment is already monotonic.
+	 *         0 if the segment is already monotonic.
 	 */
 	abstract int getYMonotonicParts(SegmentBuffer[] monotonicSegments);
 
 	/**
 	 * Calculates intersection points of this segment with an infinite line,
 	 * parallel to one of the axes.
-	 *
-	 * @param bAxisX          TRUE if the function works with the line parallel to the axis
-	 *                        X.
-	 * @param ordinate        The ordinate value of the line (x for axis Y, y for axis X).
-	 * @param resultOrdinates The value of ordinate in the intersection points One ordinate
-	 *                        is equal to the ordinate parameter. This parameter can be
-	 *                        NULL.
-	 * @param parameters      The value of the parameter in the intersection points (between
-	 *                        0 and 1). This parameter can be NULL.
+	 * 
+	 * @param bAxisX
+	 *            TRUE if the function works with the line parallel to the axis
+	 *            X.
+	 * @param ordinate
+	 *            The ordinate value of the line (x for axis Y, y for axis X).
+	 * @param resultOrdinates
+	 *            The value of ordinate in the intersection points One ordinate
+	 *            is equal to the ordinate parameter. This parameter can be
+	 *            NULL.
+	 * @param parameters
+	 *            The value of the parameter in the intersection points (between
+	 *            0 and 1). This parameter can be NULL.
 	 * @return The number of intersection points, 0 when no intersection points
-	 * exist, -1 when the segment coincides with the line (infinite
-	 * number of intersection points).
+	 *         exist, -1 when the segment coincides with the line (infinite
+	 *         number of intersection points).
 	 */
 	public abstract int intersectionWithAxis2D(boolean bAxisX, double ordinate,
-	                                           double[] resultOrdinates, double[] parameters);
+			double[] resultOrdinates, double[] parameters);
 
 	void _reverseImpl() {
 	}
@@ -836,13 +881,9 @@ public abstract class Segment extends Geometry implements Serializable {
 
 	abstract boolean _isDegenerate(double tolerance);
 
-	double _calculateSubLength(double t) {
-		return tToLength(t);
-	}
-
-	double _calculateSubLength(double t1, double t2) {
-		return tToLength(t2) - tToLength(t1);
-	}
+	double _calculateSubLength(double t) { return tToLength(t); }
+	
+	double _calculateSubLength(double t1, double t2) { return tToLength(t2) - tToLength(t1); }
 
 	abstract void _copyToImpl(Segment dst);
 
@@ -864,23 +905,25 @@ public abstract class Segment extends Geometry implements Serializable {
 	 * interpolation of attribute is given by the attribute interpolation type.
 	 */
 	public abstract double getAttributeAsDbl(double t, int semantics,
-	                                         int ordinate);
+			int ordinate);
 
 	abstract boolean _isIntersectingPoint(Point2D pt, double tolerance,
-	                                      boolean bExcludeExactEndpoints);
+			boolean bExcludeExactEndpoints);
 
 	/**
 	 * Calculates intersection point of this segment with an infinite line,
 	 * parallel to axis X. This segment must be to be y-monotonic (or
 	 * horizontal).
-	 *
-	 * @param y         The y coordinate of the line.
-	 * @param xParallel For segments, that are horizontal, and have y coordinate, this
-	 *                  value is returned.
+	 * 
+	 * @param y
+	 *            The y coordinate of the line.
+	 * @param xParallel
+	 *            For segments, that are horizontal, and have y coordinate, this
+	 *            value is returned.
 	 * @return X coordinate of the intersection, or NaN, if no intersection.
 	 */
 	abstract double intersectionOfYMonotonicWithAxisX(double y, double xParallel);
-
+  
 	/**
 	 * Converts curves parameter t to the curve length. Can be expensive for curves.
 	 */
@@ -889,7 +932,8 @@ public abstract class Segment extends Geometry implements Serializable {
 	abstract double lengthToT(double len);
 
 	public double distance(/* const */Segment otherSegment,
-	                                  boolean bSegmentsKnownDisjoint) {
+			boolean bSegmentsKnownDisjoint)
+	{
 		// if the segments are not known to be disjoint, and
 		// the segments are found to touch in any way, then return 0.0
 		if (!bSegmentsKnownDisjoint
@@ -932,11 +976,11 @@ public abstract class Segment extends Geometry implements Serializable {
 			minDistance = distance;
 
 		return minDistance;
-	}
+	}    
 
-	public Geometry getBoundary() {
-		return Boundary.calculate(this, null);
-	}
+    public Geometry getBoundary() {
+        return Boundary.calculate(this, null);
+    }
 
 
 }

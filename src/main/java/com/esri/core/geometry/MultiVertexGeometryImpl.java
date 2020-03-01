@@ -30,11 +30,12 @@ import com.esri.core.geometry.VertexDescription.Semantics;
 
 /**
  * This class is a base for geometries with many vertices.
- * <p>
+ * 
  * The vertex attributes are stored in separate arrays of corresponding type.
  * There are as many arrays as there are attributes in the vertex. It uses lazy
  * allocation for the vertex attributes. This means, the actual AttributeStream
  * is allocated only when the users asks for it, or sets a non-default value.
+ * 
  */
 abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 
@@ -43,12 +44,11 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		final int Unknown = -1; // not know if simple or not
 		final int Not = 0; // not simple
 		final int Weak = 1; // weak simple (no self intersections, ring
-		// orientation is correct, but ring order is not)
+							// orientation is correct, but ring order is not)
 		final int Strong = 2; // same as weak simple + OGC ring order.
 	}
 
 	// TODO Remove?
-
 	/**
 	 * \internal CHildren implement this method to copy additional information
 	 */
@@ -63,57 +63,39 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	protected abstract void _verifyStreamsImpl();
 
 	public interface DirtyFlags {
-		public static final int DirtyIsKnownSimple = 1; // !<0 when IsWeakSimple
-		// flag is valid
-		public static final int IsWeakSimple = 2; // !<when DirtyIsKnownSimple
-		// is 0, this flag indicates
-		// whether the geometry is
-		// weak simple or not
-		public static final int IsStrongSimple = 4;
-		public static final int DirtyOGCFlags = 8; // !<OGCFlags are set by
-		// Simplify or WKB/WKT
-		// import.
-
-		public static final int DirtyVerifiedStreams = 32; // < at least one
-		// stream is
-		// unverified
-		public static final int DirtyExactIntervals = 64; // < exact envelope is
-		// dirty
-		public static final int DirtyLooseIntervals = 128;
-		public static final int DirtyIntervals = DirtyExactIntervals
-				| DirtyLooseIntervals; // <
-		// loose
-		// and
-		// dirty
-		// envelopes
-		// are
-		// loose
-		public static final int DirtyIsEnvelope = 256; // < the geometry is not
-		// known to be an
-		// envelope
-		public static final int DirtyLength2D = 512; // < the geometry length
-		// needs update
-		// update
-		public static final int DirtyRingAreas2D = 1024; // <
-		// m_cachedRingAreas2D
-		// need update
-		public static final int DirtyCoordinates = DirtyIsKnownSimple
+		/**0 when IsWeakSimple flag is valid*/
+		int DirtyIsKnownSimple = 1;
+		/**when DirtyIsKnownSimple is 0, this flag indicates whether the geometry is weak simple or not*/
+		int IsWeakSimple = 2; 
+		int IsStrongSimple = 4;
+		/**OGCFlags are set by Simplify or WKB/WKT import.*/		
+		int DirtyOGCFlags = 8; 
+		/** At least one stream is unverified*/
+		int DirtyVerifiedStreams = 32;
+		/** exact envelope is dirty*/
+		int DirtyExactIntervals = 64;
+		/** loose envelope is dirty*/
+		int DirtyLooseIntervals = 128;
+		/** loose and dirty envelopes are dirty */
+		int DirtyIntervals = DirtyExactIntervals
+				| DirtyLooseIntervals;
+		/**the geometry is not known to be an envelope*/		
+		int DirtyIsEnvelope = 256;
+		/** The geometry length needs update*/		
+		int DirtyLength2D = 512; 
+		/** m_cachedRingAreas2D need update*/		
+		int DirtyRingAreas2D = 1024; 
+		int DirtyCoordinates = DirtyIsKnownSimple
 				| DirtyIntervals | DirtyIsEnvelope | DirtyLength2D
 				| DirtyRingAreas2D | DirtyOGCFlags;
-		public static final int DirtyAllInternal = 0xFFFF; // there has been no
-		// change to the
-		// streams from
-		// outside.
-		public static final int DirtyAll = 0xFFFFFF; // there has been a change
-		// to one of attribute
-		// streams from the
-		// outside.
-
+		int DirtyAllInternal = 0xFFFF;
+		/** There has been a change to one of attribute streams from the outside.*/
+		int DirtyAll = 0xFFFFFF; 
 	}
 
 	/**
 	 * Returns the total vertex count in this Geometry.
-	 *
+	 * 
 	 * @return total vertex count in this Geometry.
 	 */
 	@Override
@@ -165,14 +147,10 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	Envelope m_envelope; // the BBOX for all attributes
 	protected int m_pointCount;
 	protected int m_reservedPointCount;// the number of vertices reserved and
-	// initialized to default value.
+										// initialized to default value.
 	protected int m_flagsMask;
 	protected double m_simpleTolerance;
 
-	// HEADER DEFINED
-
-	// Cpp
-	// Checked vs. Jan 11, 2011
 	public MultiVertexGeometryImpl() {
 		m_flagsMask = DirtyFlags.DirtyAllInternal;
 		m_pointCount = 0;
@@ -186,15 +164,10 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 			// TODO
 			throw new GeometryException("index out of bounds");
 
-		// _ASSERT(!IsEmpty());
-		// _ASSERT(m_vertexAttributes != null);
-
 		_verifyAllStreams();
 
 		Point outPoint = dst;
 		outPoint.assignVertexDescription(m_description);
-		if (outPoint.isEmpty())
-			outPoint._setToDefault();
 
 		for (int attributeIndex = 0; attributeIndex < m_description
 				.getAttributeCount(); attributeIndex++) {
@@ -219,11 +192,11 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		Point point = src;
 
 		if (src.isEmpty())// can not assign an empty point to a multipoint
-			// vertex
+							// vertex
 			throw new IllegalArgumentException();
 
 		_verifyAllStreams();// verify all allocated streams are of necessary
-		// size.
+							// size.
 		VertexDescription vdin = point.getDescription();
 		for (int attributeIndex = 0; attributeIndex < vdin.getAttributeCount(); attributeIndex++) {
 			int semantics = vdin._getSemanticsImpl(attributeIndex);
@@ -337,7 +310,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		int attributeIndex = m_description.getAttributeIndex(semantics);
 		// TODO check if statement
 		if (attributeIndex >= 0)// && m_vertexAttributes[attributeIndex] !=
-		// null) {
+								// null) {
 		{
 			return m_vertexAttributes[attributeIndex].readAsDbl(offset * ncomps
 					+ ordinate);
@@ -354,7 +327,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	// Checked vs. Jan 11, 2011
 	@Override
 	public void setAttribute(int semantics, int offset, int ordinate,
-	                         double value) {
+			double value) {
 		if (offset < 0 || offset >= m_pointCount)
 			throw new IndexOutOfBoundsException();
 
@@ -407,7 +380,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 
 		if ((stream != null)
 				&& VertexDescription.getPersistence(semantics) != stream
-				.getPersistence())// input stream has wrong persistence
+						.getPersistence())// input stream has wrong persistence
 			throw new IllegalArgumentException();
 
 		// Do not check for the stream size here to allow several streams to be
@@ -425,13 +398,13 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	@Override
 	protected void _assignVertexDescriptionImpl(VertexDescription newDescription) {
 		AttributeStreamBase[] newAttributes = null;
-
+		
 		if (m_vertexAttributes != null) {
 			int[] mapping = VertexDescriptionDesignerImpl.mapAttributes(
 					newDescription, m_description);
-
+			
 			newAttributes = new AttributeStreamBase[newDescription
-					.getAttributeCount()];
+			                    					.getAttributeCount()];
 
 			for (int i = 0, n = newDescription.getAttributeCount(); i < n; i++) {
 				if (mapping[i] != -1) {
@@ -440,16 +413,17 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 				}
 
 			}
-		} else {
+		}
+		else {
 			//if there are no streams we do not create them
 		}
-
+		
 		m_description = newDescription;
 		m_vertexAttributes = newAttributes; // late assignment to try to stay
 		m_reservedPointCount = -1;// we need to recreate the new attribute then
 		notifyModified(DirtyFlags.DirtyAll);
 	}
-
+	
 	// Checked vs. Jan 11, 2011
 	protected void _updateEnvelope(Envelope2D env) {
 		_updateAllDirtyIntervals(true);
@@ -470,7 +444,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	} // note: overload for polylines/polygons with curves
 
 	// Checked vs. Jan 11, 2011
-
 	/**
 	 * \internal Calculates loose envelope. Returns True if the calculation
 	 * renders exact envelope.
@@ -593,7 +566,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	// Checked vs. Jan 11, 2011
-
 	/**
 	 * Sets the envelope of the Geometry. The Envelope description must match
 	 * that of the Geometry.
@@ -613,10 +585,10 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		MultiVertexGeometryImpl dst = (MultiVertexGeometryImpl) dstGeom;
 		if (dst.getType() != getType())
 			throw new IllegalArgumentException();
-
+		
 		_copyToUnsafe(dst);
 	}
-
+	
 	//Does not check geometry type. Used to copy Polygon to Polyline
 	void _copyToUnsafe(MultiVertexGeometryImpl dst) {
 		_verifyAllStreams();
@@ -628,8 +600,11 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 			cloneAttributes = new AttributeStreamBase[nattrib];
 			for (int i = 0; i < nattrib; i++) {
 				if (m_vertexAttributes[i] != null) {
-					int ncomps = VertexDescription.getComponentCount(m_description._getSemanticsImpl(i));
-					cloneAttributes[i] = m_vertexAttributes[i].restrictedClone(getPointCount() * ncomps);
+					int ncomps = VertexDescription
+							.getComponentCount(m_description
+									._getSemanticsImpl(i));
+					cloneAttributes[i] = m_vertexAttributes[i]
+							.restrictedClone(getPointCount() * ncomps);
 				}
 			}
 		}
@@ -674,7 +649,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	// Checked vs. Jan 11, 2011
-
 	/**
 	 * Notifies the Geometry of changes made to the vertices so that it could
 	 * reset cached structures.
@@ -691,10 +665,10 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	// Checked vs. Jan 11, 2011
-
 	/**
-	 * @param bExact True, when the exact envelope need to be calculated and false
-	 *               for the loose one.
+	 * @param bExact
+	 *            True, when the exact envelope need to be calculated and false
+	 *            for the loose one.
 	 */
 	protected void _updateAllDirtyIntervals(boolean bExact) {
 		_verifyAllStreams();
@@ -721,14 +695,14 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 					interval.setEmpty();
 					for (int i = 0; i < m_pointCount; i++) {
 						double value = stream.readAsDbl(i * ncomps + iord);// some
-						// optimization
-						// is
-						// possible
-						// if
-						// non-virtual
-						// method
-						// is
-						// used
+																			// optimization
+																			// is
+																			// possible
+																			// if
+																			// non-virtual
+																			// method
+																			// is
+																			// used
 						interval.merge(value);
 					}
 					m_envelope.setInterval(semantics, iord, interval);
@@ -740,7 +714,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	// Checked vs. Jan 11, 2011
-
 	/**
 	 * \internal Updates x, y intervals.
 	 */
@@ -765,7 +738,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	// Checked vs. Jan 11, 2011 lots of changes
-
 	/**
 	 * \internal Verifies all streams (calls _VerifyStream for every attribute).
 	 */
@@ -776,8 +748,8 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		// _ASSERT(_HasDirtyFlag(enum_value1(DirtyFlags,
 		// DirtyVerifiedStreams)));
 		if (m_reservedPointCount < m_pointCount) // an optimization to skip this
-		// expensive loop when
-		// adding point by point
+													// expensive loop when
+													// adding point by point
 		{
 			if (m_vertexAttributes == null)
 				m_vertexAttributes = new AttributeStreamBase[m_description
@@ -794,7 +766,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 					if (size < m_pointCount) {
 						size = (m_reservedPointCount > m_pointCount + 5) ? (m_pointCount * 5 + 3) / 4
 								: m_pointCount;// reserve 25% more than user
-						// asks
+												// asks
 						m_vertexAttributes[attributeIndex].resize(size * ncomp,
 								VertexDescription.getDefaultValue(semantics));
 					}
@@ -828,7 +800,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 
 	// Checked vs. Jan 11, 2011
 	int queryCoordinates(Point2D[] dst, int dstSize, int beginIndex,
-	                     int endIndex) {
+			int endIndex) {
 		int endIndexC = endIndex < 0 ? m_pointCount : endIndex;
 		endIndexC = Math.min(endIndexC, beginIndex + dstSize);
 
@@ -855,7 +827,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 
 	// Checked vs. Jan 11, 2011
 	int QueryCoordinates(Point3D[] dst, int dstSize, int beginIndex,
-	                     int endIndex) {
+			int endIndex) {
 		int endIndexC = endIndex < 0 ? m_pointCount : endIndex;
 		endIndexC = Math.min(endIndexC, beginIndex + dstSize);
 
@@ -947,7 +919,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	}
 
 	void _interpolateTwoVertices(int vertex1, int vertex2, double f,
-	                             Point outPoint) {
+			Point outPoint) {
 		if (vertex1 < 0 || vertex1 >= m_pointCount)
 			throw new GeometryException("index out of bounds.");
 		if (vertex2 < 0 || vertex2 >= m_pointCount)
@@ -959,9 +931,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		_verifyAllStreams();
 
 		outPoint.assignVertexDescription(m_description);
-		if (outPoint.isEmpty())
-			outPoint._setToDefault();
-
 		for (int attributeIndex = 0; attributeIndex < m_description
 				.getAttributeCount(); attributeIndex++) {
 			int semantics = m_description._getSemanticsImpl(attributeIndex);
@@ -971,7 +940,7 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 						* vertex1 + icomp);
 				double v2 = m_vertexAttributes[attributeIndex].readAsDbl(ncomp
 						* vertex2 + icomp);
-				outPoint.setAttribute(semantics, icomp, MathUtils.lerp(v1, v2, f));
+				outPoint.setAttribute(semantics, icomp, MathUtils.lerp(v1,  v2,  f));
 			}
 		}
 	}
@@ -992,8 +961,6 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 
 		Point outPoint = new Point();
 		outPoint.assignVertexDescription(m_description);
-		if (outPoint.isEmpty())
-			outPoint._setToDefault();
 
 		for (int attributeIndex = 0; attributeIndex < m_description
 				.getAttributeCount(); attributeIndex++) {
@@ -1016,11 +983,11 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 		Point point = src;
 
 		if (src.isEmpty())// can not assign an empty point to a multipoint
-			// vertex
+							// vertex
 			throw new IllegalArgumentException();
 
 		_verifyAllStreams();// verify all allocated streams are of necessary
-		// size.
+							// size.
 		VertexDescription vdin = point.getDescription();
 		for (int attributeIndex = 0; attributeIndex < vdin.getAttributeCount(); attributeIndex++) {
 			int semantics = vdin.getSemantics(attributeIndex);
@@ -1067,41 +1034,42 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 			dst[i] = getXYZ(i);
 		}
 	}
-
-	@Override
-	public void replaceNaNs(int semantics, double value) {
-		addAttribute(semantics);
-		if (isEmpty())
-			return;
-
-		boolean modified = false;
-		int ncomps = VertexDescription.getComponentCount(semantics);
-		for (int i = 0; i < ncomps; i++) {
-			AttributeStreamBase streamBase = getAttributeStreamRef(semantics);
-			if (streamBase instanceof AttributeStreamOfDbl) {
-				AttributeStreamOfDbl dblStream = (AttributeStreamOfDbl) streamBase;
-				for (int ivert = 0, n = m_pointCount * ncomps; ivert < n; ivert++) {
-					double v = dblStream.read(ivert);
-					if (Double.isNaN(v)) {
-						dblStream.write(ivert, value);
-						modified = true;
-					}
-				}
-			} else {
-				for (int ivert = 0, n = m_pointCount * ncomps; ivert < n; ivert++) {
-					double v = streamBase.readAsDbl(ivert);
-					if (Double.isNaN(v)) {
-						streamBase.writeAsDbl(ivert, value);
-						modified = true;
-					}
-				}
-			}
-		}
-
-		if (modified) {
-			notifyModified(DirtyFlags.DirtyCoordinates);
-		}
-	}
+	
+    @Override
+    public void replaceNaNs(int semantics, double value) {
+    	addAttribute(semantics);
+    	if (isEmpty())
+    		return;
+    	
+    	boolean modified = false;
+    	int ncomps = VertexDescription.getComponentCount(semantics);
+    	for (int i = 0; i < ncomps; i++) {
+    		AttributeStreamBase streamBase = getAttributeStreamRef(semantics);
+    		if (streamBase instanceof AttributeStreamOfDbl)	{
+    			AttributeStreamOfDbl dblStream = (AttributeStreamOfDbl)streamBase;
+    			for (int ivert = 0, n = m_pointCount * ncomps; ivert < n; ivert++) {
+    				double v = dblStream.read(ivert);
+    				if (Double.isNaN(v)) {
+    					dblStream.write(ivert, value);
+    					modified = true;
+    				}
+    			}
+    		}
+    		else {
+    			for (int ivert = 0, n = m_pointCount * ncomps; ivert < n; ivert++) {
+    				double v = streamBase.readAsDbl(ivert);
+    				if (Double.isNaN(v)) {
+    					streamBase.writeAsDbl(ivert, value);
+    					modified = true;
+    				}
+    			}
+    		}
+    	}
+    	
+    	if (modified) {
+    		notifyModified(DirtyFlags.DirtyCoordinates);
+    	}
+    }
 
 	public abstract boolean _buildRasterizedGeometryAccelerator(
 			double toleranceXY, GeometryAccelerationDegree accelDegree);
@@ -1112,5 +1080,5 @@ abstract class MultiVertexGeometryImpl extends MultiVertexGeometry {
 	@Override
 	public String toString() {
 		return "MultiVertexGeometryImpl";
-	}
+	}	
 }

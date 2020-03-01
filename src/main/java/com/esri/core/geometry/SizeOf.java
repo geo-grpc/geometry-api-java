@@ -53,7 +53,7 @@ public final class SizeOf {
 
 	static final int SIZE_OF_MULTI_POINT_IMPL = 56;
 
-	static final int SIZE_OF_POINT = 24;
+	static final int SIZE_OF_POINT = 40;
 
 	static final int SIZE_OF_POLYGON = 24;
 
@@ -73,13 +73,29 @@ public final class SizeOf {
 
 	public static final int SIZE_OF_OGC_POLYGON = 24;
 
-	static final int SIZE_OF_MAPGEOMETRY = 24;
+	public static final int SIZE_OF_MAPGEOMETRY = 24;
 
-	static long sizeOfByteArray(int length) {
+	public static final int SIZE_OF_RASTERIZED_GEOMETRY_2D_IMPL = 112;
+
+	public static final int SIZE_OF_SCAN_CALLBACK_IMPL = 32;
+
+	public static final int SIZE_OF_TRANSFORMATION_2D = 64;
+
+	public static final int SIZE_OF_SIMPLE_RASTERIZER = 64;
+
+	public static final int SIZE_OF_EDGE = 48;
+
+	public static final int SIZE_OF_QUAD_TREE_IMPL = 48;
+
+	public static final int SIZE_OF_DATA = 24;
+
+	public static final int SIZE_OF_STRIDED_INDEX_TYPE_COLLECTION = 48;
+
+	public static long sizeOfByteArray(int length) {
 		return Unsafe.ARRAY_BYTE_BASE_OFFSET + (((long) Unsafe.ARRAY_BYTE_INDEX_SCALE) * length);
 	}
 
-	static long sizeOfShortArray(int length) {
+	public static long sizeOfShortArray(int length) {
 		return Unsafe.ARRAY_SHORT_BASE_OFFSET + (((long) Unsafe.ARRAY_SHORT_INDEX_SCALE) * length);
 	}
 
@@ -87,20 +103,25 @@ public final class SizeOf {
 		return Unsafe.ARRAY_CHAR_BASE_OFFSET + (((long) Unsafe.ARRAY_CHAR_INDEX_SCALE) * length);
 	}
 
-	static long sizeOfIntArray(int length) {
+	public static long sizeOfIntArray(int length) {
 		return Unsafe.ARRAY_INT_BASE_OFFSET + (((long) Unsafe.ARRAY_INT_INDEX_SCALE) * length);
 	}
 
-	static long sizeOfLongArray(int length) {
+	public static long sizeOfLongArray(int length) {
 		return Unsafe.ARRAY_LONG_BASE_OFFSET + (((long) Unsafe.ARRAY_LONG_INDEX_SCALE) * length);
 	}
 
-	static long sizeOfFloatArray(int length) {
+	public static long sizeOfFloatArray(int length) {
 		return Unsafe.ARRAY_FLOAT_BASE_OFFSET + (((long) Unsafe.ARRAY_FLOAT_INDEX_SCALE) * length);
 	}
 
-	static long sizeOfDoubleArray(int length) {
+	public static long sizeOfDoubleArray(int length) {
 		return Unsafe.ARRAY_DOUBLE_BASE_OFFSET + (((long) Unsafe.ARRAY_DOUBLE_INDEX_SCALE) * length);
+	}
+
+	public static long sizeOfObjectArray(int length)
+	{
+		return Unsafe.ARRAY_OBJECT_BASE_OFFSET + (((long) Unsafe.ARRAY_OBJECT_INDEX_SCALE) * length);
 	}
 
 	private SizeOf() {

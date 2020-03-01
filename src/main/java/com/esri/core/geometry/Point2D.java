@@ -30,11 +30,13 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 
 /**
+ * 
  * Basic 2D point class. Contains only two double fields.
+ * 
  */
-public final class Point2D implements Serializable {
+public final class Point2D implements Serializable{
 	private static final long serialVersionUID = 1L;
-
+	
 	public double x;
 	public double y;
 
@@ -49,7 +51,7 @@ public final class Point2D implements Serializable {
 	public Point2D(Point2D other) {
 		setCoords(other);
 	}
-
+	
 	public static Point2D construct(double x, double y) {
 		return new Point2D(x, y);
 	}
@@ -67,8 +69,8 @@ public final class Point2D implements Serializable {
 	public boolean isEqual(Point2D other) {
 		return x == other.x && y == other.y;
 	}
-
-	public boolean isEqual(double x_, double y_) {
+	
+	public boolean isEqual(double x_, double y_) { 
 		return x == x_ && y == y_;
 	}
 
@@ -79,7 +81,7 @@ public final class Point2D implements Serializable {
 	public boolean equals(Point2D other) {
 		return x == other.x && y == other.y;
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		if (other == this)
@@ -87,12 +89,18 @@ public final class Point2D implements Serializable {
 
 		if (!(other instanceof Point2D))
 			return false;
-
-		Point2D v = (Point2D) other;
-
+		
+		Point2D v = (Point2D)other;
+		
 		return x == v.x && y == v.y;
 	}
 
+	@Override
+	public int hashCode() {
+		return NumberUtils.hash(NumberUtils.hash(x), y);
+	}
+
+	
 	public void sub(Point2D other) {
 		x -= other.x;
 		y -= other.y;
@@ -128,12 +136,11 @@ public final class Point2D implements Serializable {
 	}
 
 	public void interpolate(Point2D p1, Point2D p2, double alpha) {
-		MathUtils.lerp(p1, p2, alpha, this);
+		MathUtils.lerp(p1,  p2, alpha, this);
 	}
-
+	
 	/**
 	 * Calculates this = this * f + shift
-	 *
 	 * @param f
 	 * @param shift
 	 */
@@ -144,7 +151,6 @@ public final class Point2D implements Serializable {
 
 	/**
 	 * Calculates this = other * f + shift
-	 *
 	 * @param f
 	 * @param other
 	 * @param shift
@@ -171,7 +177,6 @@ public final class Point2D implements Serializable {
 		return y < other.y ? -1 : (y > other.y ? 1 : (x < other.x ? -1
 				: (x > other.x ? 1 : 0)));
 	}
-
 	/**
 	 * Compares two vertices lexicographically by x.
 	 */
@@ -227,8 +232,8 @@ public final class Point2D implements Serializable {
 	}
 
 	public void rotateDirect(double Cos, double Sin) // corresponds to the
-	// Transformation2D.SetRotate(cos,
-	// sin).Transform(pt)
+												// Transformation2D.SetRotate(cos,
+												// sin).Transform(pt)
 	{
 		double xx = x * Cos - y * Sin;
 		double yy = x * Sin + y * Cos;
@@ -300,29 +305,27 @@ public final class Point2D implements Serializable {
 				return 1; // x > 0 && y <= 0
 			else
 				return 4; // y < 0 && x > 0. Should be x >= 0 && y < 0. The x ==
-			// 0 case is processed later.
+							// 0 case is processed later.
 		} else {
 			if (y > 0)
 				return 2; // x <= 0 && y > 0
 			else
 				return x == 0 ? 4 : 3; // 3: x < 0 && y <= 0. The case x == 0 &&
-			// y <= 0 is attribute to the case 4.
-			// The point x==0 and y==0 is a bug, but
-			// will be assigned to 4.
+										// y <= 0 is attribute to the case 4.
+										// The point x==0 and y==0 is a bug, but
+										// will be assigned to 4.
 		}
 	}
 
 	/**
-	 * Calculates which quarter of XY plane the vector lies in. First quarter is
-	 * between vectors (1,0) and (0, 1), second between (0, 1) and (-1, 0), etc.
-	 * The quarters are numbered counterclockwise.
-	 * Angle intervals corresponding to quarters: 1 : [0 : 90); 2 : [90 : 180);
-	 * 3 : [180 : 270); 4 : [270 : 360)
-	 */
-	public int getQuarter() {
-		return _getQuarter();
-	}
-
+	* Calculates which quarter of XY plane the vector lies in. First quarter is
+	* between vectors (1,0) and (0, 1), second between (0, 1) and (-1, 0), etc.
+	* The quarters are numbered counterclockwise.
+	* Angle intervals corresponding to quarters: 1 : [0 : 90); 2 : [90 : 180);
+	* 3 : [180 : 270); 4 : [270 : 360)
+	*/
+	public int getQuarter() { return _getQuarter(); }
+	
 	// Assume vector v1 and v2 have same origin. The function compares the
 	// vectors by angle from the x axis to the vector in the counter clockwise
 	// direction.
@@ -350,19 +353,18 @@ public final class Point2D implements Serializable {
 	/**
 	 * Assume vector v1 and v2 have same origin. The function compares the
 	 * vectors by angle in the counter clockwise direction from the axis X.
-	 * <p>
+	 * 
 	 * For example, V1 makes 30 degree angle counterclockwise from horizontal x axis
-	 * V2, makes 270, V3 makes 90, then
+	 * V2, makes 270, V3 makes 90, then 
 	 * compareVectors(V1, V2) == -1.
 	 * compareVectors(V1, V3) == -1.
 	 * compareVectors(V2, V3) == 1.
-	 *
 	 * @return Returns 1 if v1 is less than v2, 0 if equal, and 1 if greater.
 	 */
 	public static int compareVectors(Point2D v1, Point2D v2) {
 		return _compareVectors(v1, v2);
 	}
-
+	
 	static class CompareVectors implements Comparator<Point2D> {
 		@Override
 		public int compare(Point2D v1, Point2D v2) {
@@ -399,20 +401,20 @@ public final class Point2D implements Serializable {
 			return NumberUtils.NaN();
 
 		switch (metric) {
-			case 0: // L-infinite
-				return Math.abs(x) >= Math.abs(y) ? Math.abs(x) : Math.abs(y);
+		case 0: // L-infinite
+			return Math.abs(x) >= Math.abs(y) ? Math.abs(x) : Math.abs(y);
 
-			case 1: // L1 or Manhattan metric
-				return Math.abs(x) + Math.abs(y);
+		case 1: // L1 or Manhattan metric
+			return Math.abs(x) + Math.abs(y);
 
-			case 2: // L2 or Euclidean metric
-				return Math.sqrt(x * x + y * y);
+		case 2: // L2 or Euclidean metric
+			return Math.sqrt(x * x + y * y);
 
-			default:
-				return Math
-						.pow(Math.pow(x, (double) metric)
-										+ Math.pow(y, (double) metric),
-								1.0 / (double) metric);
+		default:
+			return Math
+					.pow(Math.pow(x, (double) metric)
+							+ Math.pow(y, (double) metric),
+							1.0 / (double) metric);
 		}
 	}
 
@@ -439,7 +441,7 @@ public final class Point2D implements Serializable {
 	}
 
 	/**
-	 * Calculates the orientation of the triangle formed by p->q->r. Returns 1
+	 * Calculates the orientation of the triangle formed by p, q, r. Returns 1
 	 * for counter-clockwise, -1 for clockwise, and 0 for collinear. May use
 	 * high precision arithmetics for some special degenerate cases.
 	 */
@@ -498,7 +500,7 @@ public final class Point2D implements Serializable {
 
 		return det_mp.signum();
 	}
-
+	
 	private static int inCircleRobustMP_(Point2D p, Point2D q, Point2D r, Point2D s) {
 		BigDecimal sx_mp = new BigDecimal(s.x), sy_mp = new BigDecimal(s.y);
 
@@ -637,7 +639,7 @@ public final class Point2D implements Serializable {
 	}
 
 	private static Point2D calculateCenterFromThreePointsHelperMP_(Point2D from, Point2D mid_point, Point2D to) {
-		assert (!mid_point.isEqual(to) && !mid_point.isEqual(from) && !from.isEqual(to));
+		assert(!mid_point.isEqual(to) && !mid_point.isEqual(from) && !from.isEqual(to));
 		BigDecimal mx = new BigDecimal(mid_point.x);
 		mx = mx.subtract(new BigDecimal(from.x));
 		BigDecimal my = new BigDecimal(mid_point.y);
@@ -679,7 +681,7 @@ public final class Point2D implements Serializable {
 	}
 
 	private static Point2D calculateCenterFromThreePointsHelper_(Point2D from, Point2D mid_point, Point2D to) {
-		assert (!mid_point.isEqual(to) && !mid_point.isEqual(from) && !from.isEqual(to));
+		assert(!mid_point.isEqual(to) && !mid_point.isEqual(from) && !from.isEqual(to));
 		ECoordinate mx = new ECoordinate(mid_point.x);
 		mx.sub(from.x);
 		ECoordinate my = new ECoordinate(mid_point.y);
@@ -742,14 +744,6 @@ public final class Point2D implements Serializable {
 		return Point2D.construct(NumberUtils.NaN(), NumberUtils.NaN());
 	}
 
-	/**
-	 * Calculate the center of a circle, whose perimeter contains the points from, mid_point and to
-	 *
-	 * @param from
-	 * @param mid_point
-	 * @param to
-	 * @return
-	 */
 	static Point2D calculateCircleCenterFromThreePoints(Point2D from, Point2D mid_point, Point2D to) {
 		if (from.isEqual(to) || from.isEqual(mid_point) || to.isEqual(mid_point)) {
 			return new Point2D(NumberUtils.NaN(), NumberUtils.NaN());
@@ -762,52 +756,9 @@ public final class Point2D implements Serializable {
 			return pt;
 		}
 	}
-
-	@Override
-	public int hashCode() {
-		return NumberUtils.hash(NumberUtils.hash(x), y);
-	}
-
-	public double calculateTriangleArea2D(Point2D pt1, Point2D pt2) {
-		double a = Point2D.distance(pt1, pt2);
-		double b = Point2D.distance(pt1, this);
-		double c = Point2D.distance(pt2, this);
-		double temp;
-
-
-		if (a < b) {
-			// set a >= b
-			temp = b;
-			b = a;
-			a = temp;
-		}
-
-		if (c > a) {
-			// set a >= c
-			temp = c;
-			c = a;
-			a = temp;
-		}
-
-		if (c > b) {
-			temp = c;
-			c = b;
-			b = temp;
-		}
-
-		//		First sort a, b, c so that a ≥ b ≥ c ; this can be done at the cost of at most three comparisons.
-		//				If c-(a-b) < 0 then the data are not side-lengths of a real triangle
-		if (c - (a - b) < 0)
-			return 0.0;
-
-		//double result = 0.5 * Math.abs((x - pt2.x)*(pt1.y - y) - (x - pt1.x)*(pt2.y - y));
-		double result = Math.sqrt((a + (b + c)) * (c - (a - b)) * (c + (a - b)) * (a + (b - c))) / 4.0;
-		return result;
-
-	}
-
+	
 	double getAxis(int ordinate) {
-		assert (ordinate == 0 || ordinate == 1);
+		assert(ordinate == 0 || ordinate == 1);
 		return (ordinate == 0 ? x : y);
 	}
 }

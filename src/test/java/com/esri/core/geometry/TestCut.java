@@ -581,4 +581,20 @@ public class TestCut extends TestCase {
 
 		return poly;
 	}
+
+	@Test
+	public void testGithubIssue253() {
+		//https://github.com/Esri/geometry-api-java/issues/253
+		SpatialReference spatialReference = SpatialReference.create(3857);
+		Polyline poly1 = new Polyline();
+		poly1.startPath(610, 552);
+		poly1.lineTo(610, 552);
+		Polyline poly2 = new Polyline();
+		poly2.startPath(610, 552);
+		poly2.lineTo(610, 552);
+		GeometryCursor cursor = OperatorCut.local().execute(true, poly1, poly2, spatialReference, null);
+
+		Geometry res = cursor.next();
+		assertTrue(res == null);
+	}
 }

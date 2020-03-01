@@ -1,5 +1,30 @@
-package com.esri.core.geometry;
+/*
+ Copyright 1995-2018 Esri
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+ For additional information, contact:
+ Environmental Systems Research Institute, Inc.
+ Attn: Contracts Dept
+ 380 New York Street
+ Redlands, California, USA 92373
+
+ email: contracts@esri.com
+ */
+
+ package com.esri.core.geometry;
+
+import com.esri.core.geometry.Geometry.GeometryAccelerationDegree;
 import com.esri.core.geometry.ogc.OGCConcreteGeometryCollection;
 import com.esri.core.geometry.ogc.OGCGeometry;
 import com.esri.core.geometry.ogc.OGCLineString;
@@ -42,6 +67,14 @@ public class TestEstimateMemorySize {
 		assertEquals(getInstanceSize(OGCMultiPolygon.class), SizeOf.SIZE_OF_OGC_MULTI_POLYGON);
 		assertEquals(getInstanceSize(OGCPoint.class), SizeOf.SIZE_OF_OGC_POINT);
 		assertEquals(getInstanceSize(OGCPolygon.class), SizeOf.SIZE_OF_OGC_POLYGON);
+		assertEquals(getInstanceSize(RasterizedGeometry2DImpl.class), SizeOf.SIZE_OF_RASTERIZED_GEOMETRY_2D_IMPL);
+		assertEquals(getInstanceSize(RasterizedGeometry2DImpl.ScanCallbackImpl.class), SizeOf.SIZE_OF_SCAN_CALLBACK_IMPL);
+		assertEquals(getInstanceSize(Transformation2D.class), SizeOf.SIZE_OF_TRANSFORMATION_2D);
+		assertEquals(getInstanceSize(SimpleRasterizer.class), SizeOf.SIZE_OF_SIMPLE_RASTERIZER);
+		assertEquals(getInstanceSize(SimpleRasterizer.Edge.class), SizeOf.SIZE_OF_EDGE);
+		assertEquals(getInstanceSize(QuadTreeImpl.class), SizeOf.SIZE_OF_QUAD_TREE_IMPL);
+		assertEquals(getInstanceSize(QuadTreeImpl.Data.class), SizeOf.SIZE_OF_DATA);
+		assertEquals(getInstanceSize(StridedIndexTypeCollection.class), SizeOf.SIZE_OF_STRIDED_INDEX_TYPE_COLLECTION);
 	}
 
 	private static <T> long getInstanceSize(Class<T> clazz) {
@@ -54,28 +87,58 @@ public class TestEstimateMemorySize {
 	}
 
 	@Test
+	public void testEmptyPoint() {
+		testGeometry(parseWkt("POINT EMPTY"));
+	}
+
+	@Test
 	public void testMultiPoint() {
 		testGeometry(parseWkt("MULTIPOINT (0 0, 1 1, 2 3)"));
 	}
 
 	@Test
-	public void testLineString() {
+	public void testEmptyMultiPoint() {
+		testGeometry(parseWkt("MULTIPOINT EMPTY"));
+	}
+
+	@Test
+	public void testAcceleratedGeometry() {
 		testGeometry(parseWkt("LINESTRING (0 1, 2 3, 4 5)"));
 	}
 
 	@Test
+	public void testEmptyLineString() {
+		testGeometry(parseWkt("LINESTRING EMPTY"));
+	}
+
+	@Test
 	public void testMultiLineString() {
-		testGeometry(parseWkt("MULTILINESTRING ((0 1, 2 3, 4 5), (1 1, 2 2))"));
+		testAcceleratedGeometry(parseWkt("MULTILINESTRING ((0 1, 2 3, 4 5), (1 1, 2 2))"));
+	}
+
+	@Test
+	public void testEmptyMultiLineString() {
+		testGeometry(parseWkt("MULTILINESTRING EMPTY"));
 	}
 
 	@Test
 	public void testPolygon() {
-		testGeometry(parseWkt("POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"));
+		testAcceleratedGeometry(parseWkt("POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"));
+	}
+
+	@Test
+	public void testEmptyPolygon() {
+		testGeometry(parseWkt("POLYGON EMPTY"));
 	}
 
 	@Test
 	public void testMultiPolygon() {
-		testGeometry(parseWkt("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)), ((15 5, 40 10, 10 20, 5 10, 15 5)))"));
+		testAcceleratedGeometry(parseWkt("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)), ((15 5, 40 10, 10 20, 5 10, 15 5)))"));
+	}
+
+	@Test
+	public void testEmptyMultiPolygon() {
+		testGeometry(parseWkt("MULTIPOLYGON EMPTY"));
 	}
 
 	@Test
@@ -83,8 +146,43 @@ public class TestEstimateMemorySize {
 		testGeometry(parseWkt("GEOMETRYCOLLECTION (POINT(4 6), LINESTRING(4 6,7 10))"));
 	}
 
+	@Test
+	public void testEmptyGeometryCollection() {
+		testGeometry(parseWkt("GEOMETRYCOLLECTION EMPTY"));
+	}
+
 	private void testGeometry(OGCGeometry geometry) {
 		assertTrue(geometry.estimateMemorySize() > 0);
+	}
+
+	private void testAcceleratedGeometry(OGCGeometry geometry) {
+		long initialSize = geometry.estimateMemorySize();
+		assertTrue(initialSize > 0);
+
+		Envelope envelope = new Envelope();
+		geometry.getEsriGeometry().queryEnvelope(envelope);
+
+		long withEnvelopeSize = geometry.estimateMemorySize();
+		assertTrue(withEnvelopeSize > initialSize);
+
+		accelerate(geometry, GeometryAccelerationDegree.enumMild);
+		long mildAcceleratedSize = geometry.estimateMemorySize();
+		assertTrue(mildAcceleratedSize > withEnvelopeSize);
+
+		accelerate(geometry, GeometryAccelerationDegree.enumMedium);
+		long mediumAcceleratedSize = geometry.estimateMemorySize();
+		assertTrue(mediumAcceleratedSize > mildAcceleratedSize);
+
+		accelerate(geometry, GeometryAccelerationDegree.enumHot);
+		long hotAcceleratedSize = geometry.estimateMemorySize();
+		assertTrue(hotAcceleratedSize > mediumAcceleratedSize);
+	}
+
+	private void accelerate(OGCGeometry geometry, GeometryAccelerationDegree accelerationDegree)
+	{
+		Operator relateOperator = OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Relate);
+		boolean accelerated = relateOperator.accelerateGeometry(geometry.getEsriGeometry(), geometry.getEsriSpatialReference(), accelerationDegree);
+		assertTrue(accelerated);
 	}
 
 	private static OGCGeometry parseWkt(String wkt) {

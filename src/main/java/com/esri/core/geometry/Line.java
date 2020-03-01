@@ -33,6 +33,7 @@ import static com.esri.core.geometry.SizeOf.SIZE_OF_LINE;
 
 /**
  * A straight line between a pair of points.
+ * 
  */
 public final class Line extends Segment implements Serializable {
 
@@ -42,7 +43,8 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_LINE + estimateMemorySize(m_attributes);
 	}
 
@@ -83,7 +85,6 @@ public final class Line extends Segment implements Serializable {
 	// HEADER DEF
 
 	// Cpp
-
 	/**
 	 * Creates a line segment.
 	 */
@@ -192,13 +193,13 @@ public final class Line extends Segment implements Serializable {
 	double getCoordX_(double t) {
 		// Must match query_coord_2D and vice verse
 		// Also match get_attribute_as_dbl
-		return MathUtils.lerp(m_xStart, m_xEnd, t);
+		return MathUtils.lerp(m_xStart,  m_xEnd, t);
 	}
 
 	double getCoordY_(double t) {
 		// Must match query_coord_2D and vice verse
 		// Also match get_attribute_as_dbl
-		return MathUtils.lerp(m_yStart, m_yEnd, t);
+		return MathUtils.lerp(m_yStart,  m_yEnd, t);
 	}
 
 	@Override
@@ -254,19 +255,19 @@ public final class Line extends Segment implements Serializable {
 
 		int interpolation = VertexDescription.getInterpolation(semantics);
 		switch (interpolation) {
-			case VertexDescription.Interpolation.NONE:
-				if (t < 0.5)
-					return getStartAttributeAsDbl(semantics, ordinate);
-				else
-					return getEndAttributeAsDbl(semantics, ordinate);
-			case VertexDescription.Interpolation.LINEAR: {
-				double s = getStartAttributeAsDbl(semantics, ordinate);
-				double e = getEndAttributeAsDbl(semantics, ordinate);
-				return MathUtils.lerp(s, e, t);
-			}
-			case VertexDescription.Interpolation.ANGULAR: {
-				throw new GeometryException("not implemented");
-			}
+		case VertexDescription.Interpolation.NONE:
+			if (t < 0.5)
+				return getStartAttributeAsDbl(semantics, ordinate);
+			else
+				return getEndAttributeAsDbl(semantics, ordinate);
+		case VertexDescription.Interpolation.LINEAR: {
+			double s = getStartAttributeAsDbl(semantics, ordinate);
+			double e = getEndAttributeAsDbl(semantics, ordinate);
+			return MathUtils.lerp(s,  e,  t);
+		}
+		case VertexDescription.Interpolation.ANGULAR: {
+			throw new GeometryException("not implemented");
+		}
 		}
 
 		throw GeometryException.GeometryInternalError();
@@ -294,7 +295,7 @@ public final class Line extends Segment implements Serializable {
 
 	@Override
 	public int intersectionWithAxis2D(boolean b_axis_x, double ordinate,
-	                                  double[] result_ordinates, double[] parameters) {
+			double[] result_ordinates, double[] parameters) {
 		if (b_axis_x) {
 			double a = (m_yEnd - m_yStart);
 
@@ -343,8 +344,8 @@ public final class Line extends Segment implements Serializable {
 	// an envelopeDistance can be -1.0 if the corresponding endpoint is properly
 	// inside clipEnv2D.
 	int intersectionWithEnvelope2D(Envelope2D clipEnv2D,
-	                               boolean includeEnvBoundary, double[] segParams,
-	                               double[] envelopeDistances) {
+			boolean includeEnvBoundary, double[] segParams,
+			double[] envelopeDistances) {
 		Point2D p1 = getStartXY();
 		Point2D p2 = getEndXY();
 
@@ -376,16 +377,16 @@ public final class Line extends Segment implements Serializable {
 
 	@Override
 	boolean _isIntersectingPoint(Point2D pt, double tolerance,
-	                             boolean bExcludeExactEndpoints) {
+			boolean bExcludeExactEndpoints) {
 		return _intersection(pt, tolerance, bExcludeExactEndpoints) >= 0;// must
-		// use
-		// same
-		// method
-		// that
-		// the
-		// intersection
-		// routine
-		// uses.
+																			// use
+																			// same
+																			// method
+																			// that
+																			// the
+																			// intersection
+																			// routine
+																			// uses.
 	}
 
 	/**
@@ -436,7 +437,7 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	double _intersection(Point2D pt, double tolerance,
-	                     boolean bExcludeExactEndPoints) {
+			boolean bExcludeExactEndPoints) {
 		Point2D v = new Point2D();
 		Point2D start = new Point2D();
 
@@ -477,12 +478,12 @@ public final class Line extends Segment implements Serializable {
 			double projection = relativePoint.dotProduct(v);
 			double projectionError = 8 * relativePoint._dotProductAbs(v)
 					* NumberUtils.doubleEps();// See Error Estimation Rules In
-			// Borg.docx
+												// Borg.docx
 			v.leftPerpendicular();// get left normal to v
 			double distance = relativePoint.dotProduct(v);
 			double distanceError = 8 * relativePoint._dotProductAbs(v)
 					* NumberUtils.doubleEps();// See Error Estimation Rules In
-			// Borg.docx
+												// Borg.docx
 
 			double perror = Math.max(tolerance, projectionError);
 			if (projection < -perror || projection > len + perror)
@@ -497,32 +498,32 @@ public final class Line extends Segment implements Serializable {
 				if (Point2D.distance(ptOnLine, pt) <= tolerance) {
 					if (t < 0.5) {
 						if (Point2D.distance(ptOnLine, start) <= tolerance)// the
-							// projected
-							// point
-							// is
-							// close
-							// to
-							// the
-							// start
-							// point.
-							// Need
-							// to
-							// return
-							// 0.
+																			// projected
+																			// point
+																			// is
+																			// close
+																			// to
+																			// the
+																			// start
+																			// point.
+																			// Need
+																			// to
+																			// return
+																			// 0.
 							return 0;
 					} else if (Point2D.distance(ptOnLine, end2D) <= tolerance)// the
-						// projected
-						// point
-						// is
-						// close
-						// to
-						// the
-						// end
-						// point.
-						// Need
-						// to
-						// return
-						// 1.0.
+																				// projected
+																				// point
+																				// is
+																				// close
+																				// to
+																				// the
+																				// end
+																				// point.
+																				// Need
+																				// to
+																				// return
+																				// 1.0.
 						return 1.0;
 
 					return t;
@@ -544,7 +545,12 @@ public final class Line extends Segment implements Serializable {
 		if (other.getClass() != getClass())
 			return false;
 
-		return _equalsImpl((Segment) other);
+		return _equalsImpl((Segment)other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	boolean equals(Line other) {
@@ -585,12 +591,12 @@ public final class Line extends Segment implements Serializable {
 		v.y = m_yEnd - m_yStart;
 		if (!_projectionIntersectHelper(other, v, false))
 			return false; // Both other.Start and other.End projections on
-		// "this" lie to the right of the this.End
+							// "this" lie to the right of the this.End
 
 		v.negate();
 		if (!_projectionIntersectHelper(other, v, true))
 			return false; // Both other.Start and other.End projections on
-		// "this" lie to the left of the this.End
+							// "this" lie to the left of the this.End
 
 		return true;
 	}
@@ -601,13 +607,13 @@ public final class Line extends Segment implements Serializable {
 		int s12 = line1._side(line2.m_xEnd, line2.m_yEnd);
 		if (s11 < 0 && s12 < 0 || s11 > 0 && s12 > 0)
 			return false;// no intersection. The line2 lies to one side of an
-		// infinite line passing through line1
+							// infinite line passing through line1
 
 		int s21 = line2._side(line1.m_xStart, line1.m_yStart);
 		int s22 = line2._side(line1.m_xEnd, line1.m_yEnd);
 		if (s21 < 0 && s22 < 0 || s21 > 0 && s22 > 0)
 			return false;// no intersection.The line1 lies to one side of an
-		// infinite line passing through line2
+							// infinite line passing through line2
 
 		double len1 = line1.calculateLength2D();
 		double len2 = line2.calculateLength2D();
@@ -684,7 +690,7 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	static int _isIntersectingLineLine(Line line1, Line line2,
-	                                   double tolerance, boolean bExcludeExactEndpoints) {
+			double tolerance, boolean bExcludeExactEndpoints) {
 		// _ASSERT(line1 != line2);
 		// Check for the endpoints.
 		// The bExcludeExactEndpoints is True, means we care only about overlaps
@@ -708,7 +714,7 @@ public final class Line extends Segment implements Serializable {
 			counter++;
 			if (counter == 2)
 				return 2; // counter == 2 means both endpoints coincide (Lines
-			// overlap).
+							// overlap).
 			if (!bExcludeExactEndpoints)
 				return 1;
 		}
@@ -729,7 +735,7 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	int _intersectLineLineExact(Line line1, Line line2,
-	                            Point2D[] intersectionPoints, double[] param1, double[] param2) {
+			Point2D[] intersectionPoints, double[] param1, double[] param2) {
 		int counter = 0;
 		if (line1.m_xStart == line2.m_xStart
 				&& line1.m_yStart == line2.m_yStart) {
@@ -831,8 +837,8 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	static int _intersectLineLine(Line line1, Line line2,
-	                              Point2D[] intersectionPoints, double[] param1, double[] param2,
-	                              double tolerance) {
+			Point2D[] intersectionPoints, double[] param1, double[] param2,
+			double tolerance) {
 		// _ASSERT(!param1 && !param2 || param1);
 		int counter = 0;
 		// Test the end points for exact coincidence.
@@ -867,14 +873,14 @@ public final class Line extends Segment implements Serializable {
 
 		if (counter != 2 && !NumberUtils.isNaN(t21)) {
 			if (!(t11 == 0 && t21 == 0) && !(t12 == 0 && t21 == 1.0))// the "if"
-			// makes
-			// sure
-			// this
-			// has
-			// not
-			// been
-			// already
-			// calculated
+																		// makes
+																		// sure
+																		// this
+																		// has
+																		// not
+																		// been
+																		// already
+																		// calculated
 			{
 				if (param1 != null)// if (param1)
 					param1[counter] = 0;
@@ -890,15 +896,15 @@ public final class Line extends Segment implements Serializable {
 
 		if (counter != 2 && !NumberUtils.isNaN(t22)) {
 			if (!(t11 == 1.0 && t22 == 0) && !(t12 == 1.0 && t22 == 1.0))// the
-			// "if"
-			// makes
-			// sure
-			// this
-			// has
-			// not
-			// been
-			// already
-			// calculated
+																			// "if"
+																			// makes
+																			// sure
+																			// this
+																			// has
+																			// not
+																			// been
+																			// already
+																			// calculated
 			{
 				if (param1 != null)// if (param1)
 					param1[counter] = 1.0;
@@ -914,22 +920,22 @@ public final class Line extends Segment implements Serializable {
 
 		if (counter > 0) {
 			if (counter == 2 && param1 != null && param1[0] > param1[1]) {// make
-				// sure
-				// the
-				// intersection
-				// events
-				// are
-				// sorted
-				// along
-				// the
-				// line1
-				// can't
-				// swap
-				// doulbes
-				// in
-				// java
-				// NumberUtils::Swap(param1[0],
-				// param1[1]);
+																			// sure
+																			// the
+																			// intersection
+																			// events
+																			// are
+																			// sorted
+																			// along
+																			// the
+																			// line1
+																			// can't
+																			// swap
+																			// doulbes
+																			// in
+																			// java
+																			// NumberUtils::Swap(param1[0],
+																			// param1[1]);
 				double zeroParam1 = param1[0];
 				param1[0] = param1[1];
 				param1[1] = zeroParam1;
@@ -939,7 +945,7 @@ public final class Line extends Segment implements Serializable {
 					double zeroParam2 = param2[0];
 					param2[0] = param2[1];
 					param2[1] = zeroParam2;// NumberUtils::Swap(ARRAYELEMENT(param2,
-					// 0), ARRAYELEMENT(param2, 1));
+											// 0), ARRAYELEMENT(param2, 1));
 				}
 
 				if (intersectionPoints != null)// if (intersectionPoints)
@@ -975,25 +981,25 @@ public final class Line extends Segment implements Serializable {
 
 		return 1;
 	}
-
-	@Override
-	public void replaceNaNs(int semantics, double value) {
-		addAttribute(semantics);
-		if (isEmpty())
-			return;
-
-		int ncomps = VertexDescription.getComponentCount(semantics);
-		for (int i = 0; i < ncomps; i++) {
-			double v = _getAttributeAsDbl(0, semantics, i);
-			if (Double.isNaN(v))
-				_setAttribute(0, semantics, 0, value);
-
-			v = _getAttributeAsDbl(1, semantics, i);
-			if (Double.isNaN(v))
-				_setAttribute(1, semantics, 0, value);
-		}
-	}
-
+	
+    @Override
+    public void replaceNaNs(int semantics, double value) {
+    	addAttribute(semantics);
+    	if (isEmpty())
+    		return;
+    	
+    	int ncomps = VertexDescription.getComponentCount(semantics);
+    	for (int i = 0; i < ncomps; i++) {
+    		double v = _getAttributeAsDbl(0, semantics, i);
+    		if (Double.isNaN(v))
+    			_setAttribute(0, semantics, 0, value);
+    		
+    		v = _getAttributeAsDbl(1, semantics, i);
+    		if (Double.isNaN(v))
+    			_setAttribute(1, semantics, 0, value);
+    	}
+    }
+	
 
 	@Override
 	int getYMonotonicParts(SegmentBuffer[] monotonicSegments) {
@@ -1007,12 +1013,12 @@ public final class Line extends Segment implements Serializable {
 	}
 
 	/**
-	 * The output of this method can be only used for debugging. It is subject to change without notice.
+	 * The output of this method can be only used for debugging. It is subject to change without notice. 
 	 */
 	@Override
 	public String toString() {
-		String s = "Line: [" + m_xStart + ", " + m_yStart + ", " + m_xEnd + ", " + m_yEnd + "]";
+		String s = "Line: [" + m_xStart + ", " + m_yStart + ", " + m_xEnd + ", " + m_yEnd +"]"; 
 		return s;
 	}
-
+	
 }

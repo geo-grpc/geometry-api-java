@@ -5,7 +5,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+       http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -204,13 +204,13 @@ final class IntervalTreeImpl {
 	private boolean m_b_constructing;
 	private boolean m_b_construction_ended;
 
-	/* m_tertiary_nodes
-	 * 0: m_discriminant_index_1
-	 * 1: m_secondary
-	 * 2: m_lptr
-	 * 3: m_rptr
-	 * 4: m_pptr
-	 */
+      /* m_tertiary_nodes
+      * 0: m_discriminant_index_1
+      * 1: m_secondary
+      * 2: m_lptr
+      * 3: m_rptr
+      * 4: m_pptr
+      */
 
 	private void querySortedEndPointIndices_(AttributeStreamOfInt32 end_indices) {
 		int size = (!m_b_envelopes_ref ? m_intervals.size() : m_envelopes_ref.size());
@@ -716,32 +716,32 @@ final class IntervalTreeImpl {
 
 			while (b_searching) {
 				switch (m_function_stack[m_function_index]) {
-					case State.pIn:
-						b_searching = pIn_();
-						break;
-					case State.pL:
-						b_searching = pL_();
-						break;
-					case State.pR:
-						b_searching = pR_();
-						break;
-					case State.pT:
-						b_searching = pT_();
-						break;
-					case State.right:
-						b_searching = right_();
-						break;
-					case State.left:
-						b_searching = left_();
-						break;
-					case State.all:
-						b_searching = all_();
-						break;
-					case State.initialize:
-						b_searching = initialize_();
-						break;
-					default:
-						throw GeometryException.GeometryInternalError();
+				case State.pIn:
+					b_searching = pIn_();
+					break;
+				case State.pL:
+					b_searching = pL_();
+					break;
+				case State.pR:
+					b_searching = pR_();
+					break;
+				case State.pT:
+					b_searching = pT_();
+					break;
+				case State.right:
+					b_searching = right_();
+					break;
+				case State.left:
+					b_searching = left_();
+					break;
+				case State.all:
+					b_searching = all_();
+					break;
+				case State.initialize:
+					b_searching = initialize_();
+					break;
+				default:
+					throw GeometryException.GeometryInternalError();
 				}
 			}
 

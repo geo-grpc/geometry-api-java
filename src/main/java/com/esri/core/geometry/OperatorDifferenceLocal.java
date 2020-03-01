@@ -28,15 +28,15 @@ class OperatorDifferenceLocal extends OperatorDifference {
 
 	@Override
 	public GeometryCursor execute(GeometryCursor inputGeometries,
-	                              GeometryCursor subtractor, SpatialReference sr,
-	                              ProgressTracker progressTracker) {
+			GeometryCursor subtractor, SpatialReference sr,
+			ProgressTracker progressTracker) {
 		return new OperatorDifferenceCursor(inputGeometries, subtractor, sr,
 				progressTracker);
 	}
 
 	@Override
 	public Geometry execute(Geometry inputGeometry, Geometry subtractor,
-	                        SpatialReference sr, ProgressTracker progressTracker) {
+			SpatialReference sr, ProgressTracker progressTracker) {
 		SimpleGeometryCursor inputGeomCurs = new SimpleGeometryCursor(
 				inputGeometry);
 		SimpleGeometryCursor subractorCurs = new SimpleGeometryCursor(
@@ -48,7 +48,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry difference(Geometry geometry_a, Geometry geometry_b,
-	                           SpatialReference spatial_reference, ProgressTracker progress_tracker) {
+			SpatialReference spatial_reference, ProgressTracker progress_tracker) {
 		if (geometry_a.isEmpty() || geometry_b.isEmpty())
 			return geometry_a;
 
@@ -74,16 +74,12 @@ class OperatorDifferenceLocal extends OperatorDifference {
 		Envelope2D env_a_inflated = new Envelope2D();
 		env_a_inflated.setCoords(env_a);
 		env_a_inflated.inflate(tolerance_cluster, tolerance_cluster); // inflate
-		// by
-		// cluster
-		// tolerance
+																		// by
+																		// cluster
+																		// tolerance
 
 		if (!env_a_inflated.isIntersecting(env_b))
 			return geometry_a;
-
-		if (dimension_a == 1 && dimension_b == 2)
-			return polylineMinusArea_(geometry_a, geometry_b, type_b,
-					spatial_reference, progress_tracker);
 
 		if (type_a == Geometry.GeometryType.Point) {
 			Geometry geometry_b_;
@@ -95,37 +91,37 @@ class OperatorDifferenceLocal extends OperatorDifference {
 				geometry_b_ = geometry_b;
 			}
 			switch (type_b) {
-				case Geometry.GeometryType.Polygon:
-					return pointMinusPolygon_((Point) (geometry_a),
-							(Polygon) (geometry_b_), tolerance, progress_tracker);
-				case Geometry.GeometryType.Polyline:
-					return pointMinusPolyline_((Point) (geometry_a),
-							(Polyline) (geometry_b_), tolerance, progress_tracker);
-				case Geometry.GeometryType.MultiPoint:
-					return pointMinusMultiPoint_((Point) (geometry_a),
-							(MultiPoint) (geometry_b_), tolerance, progress_tracker);
-				case Geometry.GeometryType.Envelope:
-					return pointMinusEnvelope_((Point) (geometry_a),
-							(Envelope) (geometry_b_), tolerance, progress_tracker);
-				case Geometry.GeometryType.Point:
-					return pointMinusPoint_((Point) (geometry_a),
-							(Point) (geometry_b_), tolerance, progress_tracker);
-				default:
-					throw new IllegalArgumentException();
+			case Geometry.GeometryType.Polygon:
+				return pointMinusPolygon_((Point) (geometry_a),
+						(Polygon) (geometry_b_), tolerance, progress_tracker);
+			case Geometry.GeometryType.Polyline:
+				return pointMinusPolyline_((Point) (geometry_a),
+						(Polyline) (geometry_b_), tolerance, progress_tracker);
+			case Geometry.GeometryType.MultiPoint:
+				return pointMinusMultiPoint_((Point) (geometry_a),
+						(MultiPoint) (geometry_b_), tolerance, progress_tracker);
+			case Geometry.GeometryType.Envelope:
+				return pointMinusEnvelope_((Point) (geometry_a),
+						(Envelope) (geometry_b_), tolerance, progress_tracker);
+			case Geometry.GeometryType.Point:
+				return pointMinusPoint_((Point) (geometry_a),
+						(Point) (geometry_b_), tolerance, progress_tracker);
+			default:
+				throw new IllegalArgumentException();
 			}
 		} else if (type_a == Geometry.GeometryType.MultiPoint) {
 			switch (type_b) {
-				case Geometry.GeometryType.Polygon:
-					return multiPointMinusPolygon_((MultiPoint) (geometry_a),
-							(Polygon) (geometry_b), tolerance, progress_tracker);
-				case Geometry.GeometryType.Envelope:
-					return multiPointMinusEnvelope_((MultiPoint) (geometry_a),
-							(Envelope) (geometry_b), tolerance, progress_tracker);
-				case Geometry.GeometryType.Point:
-					return multiPointMinusPoint_((MultiPoint) (geometry_a),
-							(Point) (geometry_b), tolerance, progress_tracker);
-				default:
-					break;
+			case Geometry.GeometryType.Polygon:
+				return multiPointMinusPolygon_((MultiPoint) (geometry_a),
+						(Polygon) (geometry_b), tolerance, progress_tracker);
+			case Geometry.GeometryType.Envelope:
+				return multiPointMinusEnvelope_((MultiPoint) (geometry_a),
+						(Envelope) (geometry_b), tolerance, progress_tracker);
+			case Geometry.GeometryType.Point:
+				return multiPointMinusPoint_((MultiPoint) (geometry_a),
+						(Point) (geometry_b), tolerance, progress_tracker);
+			default:
+				break;
 			}
 		}
 		return TopologicalOperations.difference(geometry_a, geometry_b,
@@ -134,7 +130,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 
 	// these are special implementations, all others delegate to the topo-graph.
 	static Geometry pointMinusPolygon_(Point point, Polygon polygon,
-	                                   double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		PolygonUtils.PiPResult result = PolygonUtils.isPointInPolygon2D(
 				polygon, point, tolerance);
 
@@ -145,7 +141,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry pointMinusPolyline_(Point point, Polyline polyline,
-	                                    double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		Point2D pt = point.getXY();
 		SegmentIterator seg_iter = polyline.querySegmentIterator();
 
@@ -183,7 +179,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry pointMinusMultiPoint_(Point point, MultiPoint multi_point,
-	                                      double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		MultiPointImpl multipointImpl = (MultiPointImpl) (multi_point
 				._getImpl());
 		AttributeStreamOfDbl position = (AttributeStreamOfDbl) multipointImpl
@@ -206,7 +202,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry pointMinusEnvelope_(Point point, Envelope envelope,
-	                                    double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		Envelope2D env = new Envelope2D();
 		envelope.queryEnvelope2D(env);
 		env.inflate(tolerance, tolerance);
@@ -220,7 +216,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry pointMinusPoint_(Point point_a, Point point_b,
-	                                 double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		double tolerance_cluster = tolerance * Math.sqrt(2.0) * 1.00001;
 		double tolerance_cluster_sq = tolerance_cluster * tolerance_cluster;
 
@@ -234,7 +230,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry multiPointMinusPolygon_(MultiPoint multi_point,
-	                                        Polygon polygon, double tolerance, ProgressTracker progress_tracker) {
+			Polygon polygon, double tolerance, ProgressTracker progress_tracker) {
 		Envelope2D env = new Envelope2D();
 		polygon.queryEnvelope2D(env);
 		env.inflate(tolerance, tolerance);
@@ -278,8 +274,8 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry multiPointMinusEnvelope_(MultiPoint multi_point,
-	                                         Envelope envelope, double tolerance,
-	                                         ProgressTracker progress_tracker) {
+			Envelope envelope, double tolerance,
+			ProgressTracker progress_tracker) {
 		Envelope2D env = new Envelope2D();
 		envelope.queryEnvelope2D(env);
 		env.inflate(tolerance, tolerance);
@@ -317,7 +313,7 @@ class OperatorDifferenceLocal extends OperatorDifference {
 	}
 
 	static Geometry multiPointMinusPoint_(MultiPoint multi_point, Point point,
-	                                      double tolerance, ProgressTracker progress_tracker) {
+			double tolerance, ProgressTracker progress_tracker) {
 		MultiPointImpl multipointImpl = (MultiPointImpl) (multi_point
 				._getImpl());
 		AttributeStreamOfDbl position = (AttributeStreamOfDbl) (multipointImpl
@@ -357,36 +353,5 @@ class OperatorDifferenceLocal extends OperatorDifference {
 
 		return new_multipoint;
 	}
-
-	static Geometry polylineMinusArea_(Geometry geometry, Geometry area,
-	                                   int area_type, SpatialReference sr, ProgressTracker progress_tracker) {
-		// construct the complement of the Polygon (or Envelope)
-		Envelope envelope = new Envelope();
-		geometry.queryEnvelope(envelope);
-		Envelope2D env_2D = new Envelope2D();
-		area.queryEnvelope2D(env_2D);
-		envelope.merge(env_2D);
-		double dw = 0.1 * envelope.getWidth();
-		double dh = 0.1 * envelope.getHeight();
-		envelope.inflate(dw, dh);
-
-		Polygon complement = new Polygon();
-		complement.addEnvelope(envelope, false);
-
-		MultiPathImpl complementImpl = (MultiPathImpl) (complement._getImpl());
-
-		if (area_type == Geometry.GeometryType.Polygon) {
-			MultiPathImpl polygonImpl = (MultiPathImpl) (area._getImpl());
-			complementImpl.add(polygonImpl, true);
-		} else
-			complementImpl.addEnvelope((Envelope) (area), true);
-
-		OperatorFactoryLocal projEnv = OperatorFactoryLocal.getInstance();
-		OperatorIntersection operatorIntersection = (OperatorIntersection) projEnv
-				.getOperator(Operator.Type.Intersection);
-		Geometry difference = operatorIntersection.execute(geometry,
-				complement, sr, progress_tracker);
-		return difference;
-	}
-
 }
+

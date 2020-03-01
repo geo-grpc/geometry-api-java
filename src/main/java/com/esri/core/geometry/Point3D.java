@@ -28,11 +28,13 @@ package com.esri.core.geometry;
 import java.io.Serializable;
 
 /**
+ * 
  * Basic 3D point class.
+ * 
  */
 public final class Point3D implements Serializable {
 	private static final long serialVersionUID = 1L;
-
+	
 	public double x;
 	public double y;
 	public double z;
@@ -47,7 +49,7 @@ public final class Point3D implements Serializable {
 	public Point3D(double x, double y, double z) {
 		setCoords(x, y, z);
 	}
-
+	
 	public static Point3D construct(double x, double y, double z) {
 		Point3D pt = new Point3D();
 		pt.setCoords(x, y, z);
@@ -63,7 +65,7 @@ public final class Point3D implements Serializable {
 	public void setCoords(Point3D other) {
 		setCoords(other.x, other.y, other.z);
 	}
-
+	
 	public void setZero() {
 		x = 0.0;
 		y = 0.0;
@@ -95,7 +97,8 @@ public final class Point3D implements Serializable {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
-	public void sub(Point3D other) {
+	public void sub(Point3D other)
+	{
 		x -= other.x;
 		y -= other.y;
 		z -= other.z;
@@ -129,4 +132,31 @@ public final class Point3D implements Serializable {
 		return NumberUtils.isNaN(x) || NumberUtils.isNaN(y) || NumberUtils.isNaN(z);
 	}
 
+	public boolean equals(Point3D other) {
+		//note that for nan value this returns false.
+		//this is by design for this class.
+		return x == other.x && y == other.y && z == other.z;
+	}
+	
+	@Override
+	public boolean equals(Object other_) {
+		if (other_ == this)
+			return true;
+
+		if (!(other_ instanceof Point3D))
+			return false;
+		
+		Point3D other = (Point3D)other_;
+		//note that for nan value this returns false.
+		//this is by design for this class.
+		return x == other.x && y == other.y && z == other.z;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = NumberUtils.hash(x);
+		hash = NumberUtils.hash(hash, y);
+		hash = NumberUtils.hash(hash, z);
+		return hash;
+	}
 }

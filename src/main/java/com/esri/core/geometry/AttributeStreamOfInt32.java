@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,17 +27,24 @@ package com.esri.core.geometry;
 
 import com.esri.core.geometry.VertexDescription.Persistence;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 import static com.esri.core.geometry.SizeOf.SIZE_OF_ATTRIBUTE_STREAM_OF_INT32;
 import static com.esri.core.geometry.SizeOf.sizeOfIntArray;
 
-final class AttributeStreamOfInt32 extends AttributeStreamBase {
-	private int[] m_buffer = null;
+final class AttributeStreamOfInt32 extends AttributeStreamBase implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	transient private int[] m_buffer = null;
 	private int m_size;
 
-	public void reserve(int reserve) {
+	public void reserve(int reserve)
+	{
 		if (reserve <= 0)
 			return;
 		if (m_buffer == null)
@@ -98,7 +105,8 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	/**
 	 * Reads a value from the buffer at given offset.
 	 *
-	 * @param offset is the element number in the stream.
+	 * @param offset
+	 *            is the element number in the stream.
 	 */
 	public int read(int offset) {
 		return m_buffer[offset];
@@ -111,8 +119,10 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	/**
 	 * Overwrites given element with new value.
 	 *
-	 * @param offset is the element number in the stream.
-	 * @param value  is the value to write.
+	 * @param offset
+	 *            is the element number in the stream.
+	 * @param value
+	 *            is the value to write.
 	 */
 	public void write(int offset, int value) {
 		if (m_bReadonly) {
@@ -131,8 +141,10 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	/**
 	 * Adds a new value at the end of the stream.
 	 *
-	 * @param offset is the element number in the stream.
-	 * @param value  is the value to write.
+	 * @param offset
+	 *            is the element number in the stream.
+	 * @param value
+	 *            is the value to write.
 	 */
 	public void add(int v) {
 		resize(m_size + 1);
@@ -156,7 +168,8 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	}
 
 	@Override
-	public long estimateMemorySize() {
+	public long estimateMemorySize()
+	{
 		return SIZE_OF_ATTRIBUTE_STREAM_OF_INT32 + sizeOfIntArray(m_buffer.length);
 	}
 
@@ -188,7 +201,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 		if (newSize <= m_size) {
 			if ((newSize * 5) / 4 < m_buffer.length) {// decrease when the 25%
-				// margin is exceeded
+														// margin is exceeded
 				int[] newBuffer = new int[newSize];
 				System.arraycopy(m_buffer, 0, newBuffer, 0, newSize);
 				m_buffer = newBuffer;
@@ -226,7 +239,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 					"invalid call. Attribute Stream is locked and cannot be resized.");
 		if (newSize <= m_size) {
 			if ((newSize * 5) / 4 < m_buffer.length) {// decrease when the 25%
-				// margin is exceeded
+														// margin is exceeded
 				int[] newBuffer = new int[newSize];
 				System.arraycopy(m_buffer, 0, newBuffer, 0, newSize);
 				m_buffer = newBuffer;
@@ -346,7 +359,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void addRange(AttributeStreamBase src, int start, int count,
-	                     boolean bForward, int stride) {
+			boolean bForward, int stride) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -376,7 +389,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void insertRange(int start, AttributeStreamBase src, int srcStart,
-	                        int count, boolean bForward, int stride, int validSize) {
+			int count, boolean bForward, int stride, int validSize) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -426,7 +439,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void insertAttributes(int start, Point pt, int semantics,
-	                             int validSize) {
+			int validSize) {
 		if (m_bReadonly)
 			throw new GeometryException("invalid_call");
 
@@ -455,7 +468,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void readRange(int srcStart, int count, ByteBuffer dst,
-	                      int dstOffset, boolean bForward) {
+			int dstOffset, boolean bForward) {
 		if (srcStart < 0 || count < 0 || dstOffset < 0
 				|| size() < count + srcStart)
 			throw new IllegalArgumentException();
@@ -514,7 +527,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void writeRange(int startElement, int count,
-	                       AttributeStreamBase _src, int srcStart, boolean bForward, int stride) {
+			AttributeStreamBase _src, int srcStart, boolean bForward, int stride) {
 		if (startElement < 0 || count < 0 || srcStart < 0)
 			throw new IllegalArgumentException();
 
@@ -522,8 +535,8 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 			throw new IllegalArgumentException();
 
 		AttributeStreamOfInt32 src = (AttributeStreamOfInt32) _src; // the input
-		// type must
-		// match
+																	// type must
+																	// match
 
 		if (src.size() < (int) (srcStart + count))
 			throw new IllegalArgumentException();
@@ -572,7 +585,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	}
 
 	private void _selfWriteRangeImpl(int toElement, int count, int fromElement,
-	                                 boolean bForward, int stride) {
+			boolean bForward, int stride) {
 
 		// writing from to this stream.
 		if (bForward) {
@@ -587,7 +600,6 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 		// reverse what we written
 		int j = toElement;
 		int offset = toElement + count - stride;
-		int dj = stride;
 		for (int i = 0, n = count / 2; i < n; i++) {
 			for (int k = 0; k < stride; k++) {
 				int v = m_buffer[j + k];
@@ -601,7 +613,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	@Override
 	public void writeRange(int startElement, int count, ByteBuffer src,
-	                       int offsetBytes, boolean bForward) {
+			int offsetBytes, boolean bForward) {
 		if (startElement < 0 || count < 0 || offsetBytes < 0)
 			throw new IllegalArgumentException();
 
@@ -631,9 +643,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	static public abstract class IntComparator {
 		public abstract int compare(int v1, int v2);
-	}
-
-	;
+	};
 
 	static class RandomSeed {
 		public int random;
@@ -671,7 +681,7 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 	}
 
 	void quicksort(int leftIn, int rightIn, IntComparator compare,
-	               RandomSeed seed) {
+			RandomSeed seed) {
 		if (leftIn >= rightIn)
 			return;
 
@@ -722,5 +732,50 @@ final class AttributeStreamOfInt32 extends AttributeStreamBase {
 
 	public void sort(int start, int end) {
 		Arrays.sort(m_buffer, start, end);
+	}
+
+	private void writeObject(java.io.ObjectOutputStream stream)
+			throws IOException {
+		stream.defaultWriteObject();
+		IntBuffer intBuf = null;
+		byte[] bytes = null;
+		for (int i = 0; i < m_size;) {
+			int n = Math.min(32, m_size - i);
+			if (bytes == null) {
+				bytes = new byte[n * 4]; //32 elements at a time
+				ByteBuffer buf = ByteBuffer.wrap(bytes);
+				intBuf = buf.asIntBuffer();
+			}
+			intBuf.rewind();
+			intBuf.put(m_buffer, i, n);
+			stream.write(bytes, 0, n * 4);
+			i += n;
+		}
+	}
+
+	private void readObject(java.io.ObjectInputStream stream)
+			throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		m_buffer = new int[m_size];
+		IntBuffer intBuf = null;
+		byte[] bytes = null;
+		for (int i = 0; i < m_size;) {
+			int n = Math.min(32, m_size - i);
+			if (bytes == null) {
+				bytes = new byte[n * 4]; //32 elements at a time
+				ByteBuffer buf = ByteBuffer.wrap(bytes);
+				intBuf = buf.asIntBuffer();
+			}
+			stream.read(bytes, 0, n * 4);
+			intBuf.rewind();
+			intBuf.get(m_buffer, i, n);
+			i += n;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void readObjectNoData() throws ObjectStreamException {
+		m_buffer = new int[2];
+		m_size = 0;
 	}
 }

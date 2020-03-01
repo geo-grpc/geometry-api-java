@@ -80,7 +80,8 @@ public abstract class Operator {
 		Boundary,
 		RandomPoints,
 		EnclosingCircle,
-		GeodeticInverse
+		GeodeticInverse,
+		Centroid2D
 	}
 
 	public abstract Type getType();
@@ -93,13 +94,15 @@ public abstract class Operator {
 	 * a different one. If the accelerator is built for the given parameters,
 	 * the method returns immediately.
 	 *
-	 * @param geometry         The geometry to be accelerated
-	 * @param spatialReference The spatial reference of that geometry
-	 * @param accelDegree      The acceleration degree for geometry.
+	 * @param geometry
+	 *            The geometry to be accelerated
+	 * @param spatialReference
+	 *            The spatial reference of that geometry
+	 * @param accelDegree The acceleration degree for geometry.
 	 */
 	public boolean accelerateGeometry(Geometry geometry,
-	                                  SpatialReference spatialReference,
-	                                  GeometryAccelerationDegree accelDegree) {
+			SpatialReference spatialReference,
+			GeometryAccelerationDegree accelDegree) {
 		// Override at specific Operator level
 		return false;
 	}
@@ -109,7 +112,7 @@ public abstract class Operator {
 	 *
 	 * @param geometry
 	 * @return true for geometries that can be accelerated, false for geometries
-	 * that cannot
+	 *         that cannot
 	 */
 	public boolean canAccelerateGeometry(Geometry geometry) {
 		// Override at specific Operator level
@@ -118,15 +121,15 @@ public abstract class Operator {
 
 	/**
 	 * Removes accelerators from given geometry.
-	 *
 	 * @param geometry The geometry instance to remove accelerators from.
 	 */
 	public static void deaccelerateGeometry(Geometry geometry) {
 		Geometry.Type gt = geometry.getType();
-		if (Geometry.isMultiVertex(gt.value())) {
+		if (Geometry.isMultiVertex(gt.value()))
+		{
 			GeometryAccelerators accel = ((MultiVertexGeometryImpl) geometry
 					._getImpl())._getAccelerators();
-			if (accel != null) {
+			if (accel != null){
 				accel._setRasterizedGeometry(null);
 				accel._setQuadTree(null);
 			}

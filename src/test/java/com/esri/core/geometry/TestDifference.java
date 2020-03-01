@@ -1,5 +1,5 @@
 /*
- Copyright 1995-2017 Esri
+ Copyright 1995-2018 Esri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@
 
 package com.esri.core.geometry;
 
+
 import junit.framework.TestCase;
+
 import org.junit.Test;
 
 public class TestDifference extends TestCase {
@@ -174,7 +176,7 @@ public class TestDifference extends TestCase {
 			Point point_1 = new Point();
 			Point point_2 = new Point();
 			point_1.setXY(0, 0);
-			point_2.setXY(0.0000000009, 0.0000000009);
+			point_2.setXY(0.000000009, 0.000000009);
 			Point differenced = (Point) (difference.execute(point_1, point_2,
 					SpatialReference.create(4326), null));
 			assertTrue(differenced.isEmpty());
@@ -225,7 +227,7 @@ public class TestDifference extends TestCase {
 			Point point_2 = new Point();
 			multi_point_1.add(0, 0);
 			multi_point_1.add(1, 1);
-			point_2.setXY(0.0000000009, 0.0000000009);
+			point_2.setXY(0.000000009, 0.000000009);
 			MultiPoint differenced_1 = (MultiPoint) (difference
 					.execute(multi_point_1, point_2,
 							SpatialReference.create(4326), null));
@@ -499,6 +501,14 @@ public class TestDifference extends TestCase {
 		}
 
 		assertEquals(5, pointCountDiffPolyline);
+	}
+	
+	@Test
+	public static void testDifferencePolylineAlongPolygonBoundary() {
+		Polyline polyline = (Polyline)GeometryEngine.geometryFromWkt("LINESTRING(0 0, 0 5, -2 5)", 0, Geometry.Type.Unknown);
+		Polygon polygon = (Polygon)GeometryEngine.geometryFromWkt("POLYGON((0 0, 5 0, 5 5, 0 5, 0 0))", 0, Geometry.Type.Unknown);
+		Geometry result = OperatorDifference.local().execute(polyline,  polygon, null,  null);
+		assertEquals(GeometryEngine.geometryToJson(null, result), "{\"paths\":[[[0,5],[-2,5]]]}");
 	}
 
 	public static Polygon makePolygon1() {

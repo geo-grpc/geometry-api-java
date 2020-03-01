@@ -27,6 +27,8 @@ package com.esri.core.geometry;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import com.esri.core.geometry.ogc.OGCGeometry;
+
 public class TestBuffer extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
@@ -39,22 +41,13 @@ public class TestBuffer extends TestCase {
 	}
 
 	@Test
-	public void testBufferPolytonWKT() {
-		String wkt = "MULTIPOLYGON (((-98.42049 46.08456, -98.42052 46.08682, -98.40509 46.08681, -98.40511 46.08456, -98.42049 46.08456)))";
-		SpatialReference sr = SpatialReference.create(4326);
-		com.esri.core.geometry.Geometry geom = com.esri.core.geometry.OperatorImportFromWkt.local().execute(0, com.esri.core.geometry.Geometry.Type.Unknown, wkt, null);
-		com.esri.core.geometry.Geometry buffered = com.esri.core.geometry.OperatorBuffer.local().execute(geom, sr, 2.0, null);
-		String exportedGeom = com.esri.core.geometry.OperatorExportToWkt.local().execute(0, buffered, null);
-		int position = exportedGeom.indexOf('(');
-		assertEquals("MULTIPOLYGON", exportedGeom.substring(0, position - 1));
-	}
-
-	@Test
 	public void testBufferPoint() {
 		SpatialReference sr = SpatialReference.create(4326);
 		Point inputGeom = new Point(12, 120);
-		OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
-		OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+		OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Buffer);
+		OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Simplify);
 		Geometry result = buffer.execute(inputGeom, sr, 40.0, null);
 		assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
 		Polygon poly = (Polygon) result;
@@ -186,8 +179,10 @@ public class TestBuffer extends TestCase {
 	public void testBufferLine() {
 		SpatialReference sr = SpatialReference.create(4326);
 		Line inputGeom = new Line(12, 120, 20, 120);
-		OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Buffer);
-		OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.Simplify);
+		OperatorBuffer buffer = (OperatorBuffer) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Buffer);
+		OperatorSimplify simplify = (OperatorSimplify) OperatorFactoryLocal
+				.getInstance().getOperator(Operator.Type.Simplify);
 		Geometry result = buffer.execute(inputGeom, sr, 40.0, null);
 		assertTrue(result.getType().value() == Geometry.GeometryType.Polygon);
 		Polygon poly = (Polygon) (result);
@@ -300,10 +295,10 @@ public class TestBuffer extends TestCase {
 
 		{
 			inputGeom = new Polyline();
-			inputGeom.startPath(1.762614, 0.607368);
-			inputGeom.lineTo(1.762414, 0.606655);
-			inputGeom.lineTo(1.763006, 0.607034);
-			inputGeom.lineTo(1.762548, 0.607135);
+			inputGeom.startPath(1.762614,0.607368);
+			inputGeom.lineTo(1.762414,0.606655);
+			inputGeom.lineTo(1.763006,0.607034);
+			inputGeom.lineTo(1.762548,0.607135);
 
 			Geometry result = buffer.execute(inputGeom, sr, 0.005, null);
 			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
@@ -396,4 +391,27 @@ public class TestBuffer extends TestCase {
 			assertTrue(simplify.isSimpleAsFeature(result, sr, null));
 		}
 	}
+	
+	@Test
+	public static void testTinyBufferOfPoint() {
+		{
+			Geometry result1 = OperatorBuffer.local().execute(new Point(0, 0), SpatialReference.create(4326), 1e-9, null);
+			assertTrue(result1 != null);
+			assertTrue(result1.isEmpty());
+			Geometry geom1 = OperatorImportFromWkt.local().execute(0, Geometry.Type.Unknown, "POLYGON ((177.0 64.0, 177.0000000001 64.0, 177.0000000001 64.0000000001, 177.0 64.0000000001, 177.0 64.0))", null);
+			Geometry result2 = OperatorBuffer.local().execute(geom1, SpatialReference.create(4326), 0.01, null);
+			assertTrue(result2 != null);
+			assertTrue(result2.isEmpty());
+			
+		}
+		
+		{
+			OGCGeometry p = OGCGeometry.fromText(
+					"POLYGON ((177.0 64.0, 177.0000000001 64.0, 177.0000000001 64.0000000001, 177.0 64.0000000001, 177.0 64.0))");
+			OGCGeometry buffered = p.buffer(0.01);
+			assertTrue(buffered != null);
+		}
+		
+		
+	}		
 }

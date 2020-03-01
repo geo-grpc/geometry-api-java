@@ -24,10 +24,12 @@
 
 package com.esri.core.geometry;
 
+import static com.esri.core.geometry.SizeOf.SIZE_OF_TRANSFORMATION_2D;
+
 /**
  * The affine transformation class for 2D.
- * <p>
- * Vector is a row:
+ * 
+ * Vector is a row: 
  * <code>
  * <br>           |m11 m12 0|
  * <br>| x y 1| * |m21 m22 0| = |m11 * x + m21 * y + m31   m12 * x + m22 * y + m32   1|
@@ -83,8 +85,9 @@ public final class Transformation2D {
 
 	/**
 	 * Creates a 2D affine transformation with a specified scale.
-	 *
-	 * @param scale The scale to use for the transformation.
+	 * 
+	 * @param scale
+	 *            The scale to use for the transformation.
 	 */
 	public Transformation2D(double scale) {
 		setScale(scale);
@@ -150,11 +153,14 @@ public final class Transformation2D {
 
 	/**
 	 * Transforms an array of points.
-	 *
-	 * @param pointsIn  The points to be transformed.
-	 * @param count     The number of points to transform.
-	 * @param pointsOut The transformed points are returned using this array. It
-	 *                  should have the same or greater size as the input array.
+	 * 
+	 * @param pointsIn
+	 *            The points to be transformed.
+	 * @param count
+	 *            The number of points to transform.
+	 * @param pointsOut
+	 *            The transformed points are returned using this array. It
+	 *            should have the same or greater size as the input array.
 	 */
 	public void transform(Point[] pointsIn, int count, Point[] pointsOut) {
 		Point2D res = new Point2D();
@@ -169,13 +175,16 @@ public final class Transformation2D {
 	/**
 	 * Transforms an array of points stored in an array of doubles as
 	 * interleaved XY coordinates.
-	 *
-	 * @param pointsXYInterleaved The array of points with interleaved X, Y values to be
-	 *                            transformed.
-	 * @param start               The start point index to transform from (the actual element
-	 *                            index is 2 * start).
-	 * @param count               The number of points to transform (the actual element count is
-	 *                            2 * count).
+	 * 
+	 * @param pointsXYInterleaved
+	 *            The array of points with interleaved X, Y values to be
+	 *            transformed.
+	 * @param start
+	 *            The start point index to transform from (the actual element
+	 *            index is 2 * start).
+	 * @param count
+	 *            The number of points to transform (the actual element count is
+	 *            2 * count).
 	 */
 	public void transform(double[] pointsXYInterleaved, int start, int count) {
 		int n = Math.min(pointsXYInterleaved.length, (start + count) * 2) / 2;
@@ -191,8 +200,9 @@ public final class Transformation2D {
 	 * Multiplies this matrix on the right with the "right" matrix. Stores the
 	 * result into this matrix and returns a reference to it. <br>
 	 * Equivalent to this *= right.
-	 *
-	 * @param right The matrix to be multiplied with.
+	 * 
+	 * @param right
+	 *            The matrix to be multiplied with.
 	 */
 	public void multiply(Transformation2D right) {
 		multiply(this, right, this);
@@ -202,8 +212,9 @@ public final class Transformation2D {
 	 * Multiplies this matrix on the left with the "left" matrix. Stores the
 	 * result into this matrix and returns a reference to it. <br>
 	 * Equivalent to this = left * this.
-	 *
-	 * @param left The matrix to be multiplied with.
+	 * 
+	 * @param left
+	 *            The matrix to be multiplied with.
 	 */
 	public void mulLeft(Transformation2D left) {
 		multiply(left, this, this);
@@ -213,13 +224,16 @@ public final class Transformation2D {
 	 * Performs multiplication of matrices a and b and places the result into
 	 * this matrix. The a, b, and result could point to same objects. <br>
 	 * Equivalent to result = a * b.
-	 *
-	 * @param a      The 2D transformation to be multiplied.
-	 * @param b      The 2D transformation to be multiplied.
-	 * @param result The 2D transformation created by multiplication of matrices.
+	 * 
+	 * @param a
+	 *            The 2D transformation to be multiplied.
+	 * @param b
+	 *            The 2D transformation to be multiplied.
+	 * @param result
+	 *            The 2D transformation created by multiplication of matrices.
 	 */
 	public static void multiply(Transformation2D a, Transformation2D b,
-	                            Transformation2D result) {
+			Transformation2D result) {
 		double xx, xy, xd, yx, yy, yd;
 
 		xx = a.xx * b.xx + a.yx * b.xy;
@@ -239,7 +253,7 @@ public final class Transformation2D {
 
 	/**
 	 * Returns a copy of the Transformation2D object.
-	 *
+	 * 
 	 * @return A copy of this object.
 	 */
 	public Transformation2D copy() {
@@ -256,9 +270,10 @@ public final class Transformation2D {
 	/**
 	 * Writes the matrix coefficients in the order XX, XY, XD, YX, YY, YD into
 	 * the given array.
-	 *
-	 * @param coefs The array into which the coefficients are returned. Should be
-	 *              of size 6 elements.
+	 * 
+	 * @param coefs
+	 *            The array into which the coefficients are returned. Should be
+	 *            of size 6 elements.
 	 */
 	public void getCoefficients(double[] coefs) {
 		if (coefs.length < 6)
@@ -275,8 +290,9 @@ public final class Transformation2D {
 
 	/**
 	 * Transforms envelope
-	 *
-	 * @param env The envelope that is to be transformed
+	 * 
+	 * @param env
+	 *            The envelope that is to be transformed
 	 */
 	void transform(Envelope2D env) {
 
@@ -318,7 +334,7 @@ public final class Transformation2D {
 	/**
 	 * Initializes an orhtonormal transformation from the Src and Dest
 	 * rectangles.
-	 * <p>
+	 * 
 	 * The result transformation proportionally fits the Src into the Dest. The
 	 * center of the Src will be in the center of the Dest.
 	 */
@@ -349,13 +365,13 @@ public final class Transformation2D {
 	 * value. Tangent vector must have unity length
 	 */
 	void initializeFromCurveParameters(Point2D Position, Point2D Tangent,
-	                                   double Offset) {
+			double Offset) {
 		// TODO
 	}
 
 	/**
 	 * Transforms size.
-	 * <p>
+	 * 
 	 * Creates an AABB with width of SizeSrc.x and height of SizeSrc.y.
 	 * Transforms that AABB and gets a quadrangle in new coordinate system. The
 	 * result x contains the length of the quadrangle edge, which were parallel
@@ -371,8 +387,9 @@ public final class Transformation2D {
 
 	/**
 	 * Transforms a tolerance value.
-	 *
-	 * @param tolerance The tolerance value.
+	 * 
+	 * @param tolerance
+	 *            The tolerance value.
 	 */
 	public double transform(double tolerance) {
 		// the function should be implemented as follows: find encompassing
@@ -400,7 +417,7 @@ public final class Transformation2D {
 	// Performs linear part of the transformation only. Same as if xd, yd would
 	// be zeroed.
 	void transformWithoutShift(Point2D[] pointsIn, int from, int count,
-	                           Point2D[] pointsOut) {
+			Point2D[] pointsOut) {
 		for (int i = from, n = from + count; i < n; i++) {
 			Point2D p = pointsIn[i];
 			double new_x = xx * p.x + xy * p.y;
@@ -438,8 +455,9 @@ public final class Transformation2D {
 	/**
 	 * Returns TRUE if this matrix is an identity matrix within the given
 	 * tolerance.
-	 *
-	 * @param tol The tolerance value.
+	 * 
+	 * @param tol
+	 *            The tolerance value.
 	 */
 	public boolean isIdentity(double tol) {
 		Point2D pt = Point2D.construct(0., 1.);
@@ -469,7 +487,7 @@ public final class Transformation2D {
 
 	/**
 	 * Returns TRUE if this transformation is a uniform transformation.
-	 * <p>
+	 * 
 	 * The uniform transformation is a transformation, which transforms a square
 	 * to a square.
 	 */
@@ -491,8 +509,9 @@ public final class Transformation2D {
 	/**
 	 * Returns TRUE if this transformation is a shift transformation within the
 	 * given tolerance.
-	 *
-	 * @param tol The tolerance value.
+	 * 
+	 * @param tol
+	 *            The tolerance value.
 	 */
 	public boolean isShift(double tol) {
 		Point2D pt = transformWithoutShift(Point2D.construct(0.0, 1.0));
@@ -509,8 +528,9 @@ public final class Transformation2D {
 	 * Returns TRUE if this is an orthonormal transformation with the given
 	 * tolerance. The orthonormal: Rotation or rotoinversion and shift
 	 * (preserves lengths of vectors and angles between vectors).
-	 *
-	 * @param tol The tolerance value.
+	 * 
+	 * @param tol
+	 *            The tolerance value.
 	 */
 	public boolean isOrthonormal(double tol) {
 		Transformation2D r = new Transformation2D();
@@ -527,8 +547,9 @@ public final class Transformation2D {
 	/**
 	 * Returns TRUE if this matrix is degenerated (does not have an inverse)
 	 * within the given tolerance.
-	 *
-	 * @param tol The tolerance value.
+	 * 
+	 * @param tol
+	 *            The tolerance value.
 	 */
 	public boolean isDegenerate(double tol) {
 		return Math.abs(xx * yy - yx * xy) <= 2 * tol
@@ -538,8 +559,9 @@ public final class Transformation2D {
 	/**
 	 * Returns TRUE, if this transformation does not have rotation and shear
 	 * within the given tolerance.
-	 *
-	 * @param tol The tolerance value.
+	 * 
+	 * @param tol
+	 *            The tolerance value.
 	 */
 	public boolean isScaleAndShift(double tol) {
 		return xy * xy + yx * yx < (xx * xx + yy * yy) * tol;
@@ -547,9 +569,11 @@ public final class Transformation2D {
 
 	/**
 	 * Set this transformation to be a shift.
-	 *
-	 * @param x The X coordinate to shift to.
-	 * @param y The Y coordinate to shift to.
+	 * 
+	 * @param x
+	 *            The X coordinate to shift to.
+	 * @param y
+	 *            The Y coordinate to shift to.
 	 */
 	public void setShift(double x, double y) {
 		xx = 1;
@@ -562,9 +586,11 @@ public final class Transformation2D {
 
 	/**
 	 * Set this transformation to be a scale.
-	 *
-	 * @param x The X coordinate to scale to.
-	 * @param y The Y coordinate to scale to.
+	 * 
+	 * @param x
+	 *            The X coordinate to scale to.
+	 * @param y
+	 *            The Y coordinate to scale to.
 	 */
 	public void setScale(double x, double y) {
 		xx = x;
@@ -577,8 +603,9 @@ public final class Transformation2D {
 
 	/**
 	 * Set transformation to be a uniform scale.
-	 *
-	 * @param _scale The scale of the transformation.
+	 * 
+	 * @param _scale
+	 *            The scale of the transformation.
 	 */
 	public void setScale(double _scale) {
 		setScale(_scale, _scale);
@@ -587,9 +614,11 @@ public final class Transformation2D {
 	/**
 	 * Sets the transformation to be a flip around the X axis. Flips the X
 	 * coordinates so that the x0 becomes x1 and vice verse.
-	 *
-	 * @param x0 The X coordinate to flip.
-	 * @param x1 The X coordinate to flip to.
+	 * 
+	 * @param x0
+	 *            The X coordinate to flip.
+	 * @param x1
+	 *            The X coordinate to flip to.
 	 */
 	public void setFlipX(double x0, double x1) {
 		xx = -1;
@@ -603,9 +632,11 @@ public final class Transformation2D {
 	/**
 	 * Sets the transformation to be a flip around the Y axis. Flips the Y
 	 * coordinates so that the y0 becomes y1 and vice verse.
-	 *
-	 * @param y0 The Y coordinate to flip.
-	 * @param y1 The Y coordinate to flip to.
+	 * 
+	 * @param y0
+	 *            The Y coordinate to flip.
+	 * @param y1
+	 *            The Y coordinate to flip to.
 	 */
 	public void setFlipY(double y0, double y1) {
 		xx = 1;
@@ -618,9 +649,11 @@ public final class Transformation2D {
 
 	/**
 	 * Set transformation to a shear.
-	 *
-	 * @param proportionX The proportion of shearing in x direction.
-	 * @param proportionY The proportion of shearing in y direction.
+	 * 
+	 * @param proportionX
+	 *            The proportion of shearing in x direction.
+	 * @param proportionY
+	 *            The proportion of shearing in y direction.
 	 */
 	public void setShear(double proportionX, double proportionY) {
 		xx = 1;
@@ -633,13 +666,14 @@ public final class Transformation2D {
 
 	/**
 	 * Sets this transformation to be a rotation around point (0, 0).
-	 * <p>
+	 * 
 	 * When the axis Y is directed up and X is directed to the right, the
 	 * positive angle corresponds to the anti-clockwise rotation. When the axis
 	 * Y is directed down and X is directed to the right, the positive angle
 	 * corresponds to the clockwise rotation.
-	 *
-	 * @param angle_in_Radians The rotation angle in radian.
+	 * 
+	 * @param angle_in_Radians
+	 *            The rotation angle in radian.
 	 */
 	public void setRotate(double angle_in_Radians) {
 		setRotate(Math.cos(angle_in_Radians), Math.sin(angle_in_Radians));
@@ -661,14 +695,16 @@ public final class Transformation2D {
 
 	/**
 	 * Sets this transformation to be a rotation around point rotationCenter.
-	 * <p>
+	 * 
 	 * When the axis Y is directed up and X is directed to the right, the
 	 * positive angle corresponds to the anti-clockwise rotation. When the axis
 	 * Y is directed down and X is directed to the right, the positive angle
 	 * corresponds to the clockwise rotation.
-	 *
-	 * @param angle_in_Radians The rotation angle in radian.
-	 * @param rotationCenter   The center point of the rotation.
+	 * 
+	 * @param angle_in_Radians
+	 *            The rotation angle in radian.
+	 * @param rotationCenter
+	 *            The center point of the rotation.
 	 */
 	void setRotate(double angle_in_Radians, Point2D rotationCenter) {
 		setRotate(Math.cos(angle_in_Radians), Math.sin(angle_in_Radians),
@@ -677,14 +713,16 @@ public final class Transformation2D {
 
 	/**
 	 * Sets rotation for this transformation.
-	 * <p>
+	 * 
 	 * When the axis Y is directed up and X is directed to the right, the
 	 * positive angle corresponds to the anti-clockwise rotation. When the axis
 	 * Y is directed down and X is directed to the right, the positive angle
 	 * corresponds to the clockwise rotation.
-	 *
-	 * @param cosA The rotation angle.
-	 * @param sinA The rotation angle.
+	 * 
+	 * @param cosA
+	 *            The rotation angle.
+	 * @param sinA
+	 *            The rotation angle.
 	 */
 
 	public void setRotate(double cosA, double sinA) {
@@ -698,15 +736,18 @@ public final class Transformation2D {
 
 	/**
 	 * Sets this transformation to be a rotation around point rotationCenter.
-	 * <p>
+	 * 
 	 * When the axis Y is directed up and X is directed to the right, the
 	 * positive angle corresponds to the anti-clockwise rotation. When the axis
 	 * Y is directed down and X is directed to the right, the positive angle
 	 * corresponds to the clockwise rotation.
-	 *
-	 * @param cosA           The cos of the rotation angle.
-	 * @param sinA           The sin of the rotation angle.
-	 * @param rotationCenter The center point of the rotation.
+	 * 
+	 * @param cosA
+	 *            The cos of the rotation angle.
+	 * @param sinA
+	 *            The sin of the rotation angle.
+	 * @param rotationCenter
+	 *            The center point of the rotation.
 	 */
 	void setRotate(double cosA, double sinA, Point2D rotationCenter) {
 		setShift(-rotationCenter.x, -rotationCenter.y);
@@ -718,9 +759,11 @@ public final class Transformation2D {
 
 	/**
 	 * Shifts the transformation.
-	 *
-	 * @param x The shift factor in X direction.
-	 * @param y The shift factor in Y direction.
+	 * 
+	 * @param x
+	 *            The shift factor in X direction.
+	 * @param y
+	 *            The shift factor in Y direction.
 	 */
 	public void shift(double x, double y) {
 		xd += x;
@@ -729,9 +772,11 @@ public final class Transformation2D {
 
 	/**
 	 * Scales the transformation.
-	 *
-	 * @param x The scale factor in X direction.
-	 * @param y The scale factor in Y direction.
+	 * 
+	 * @param x
+	 *            The scale factor in X direction.
+	 * @param y
+	 *            The scale factor in Y direction.
 	 */
 	public void scale(double x, double y) {
 		xx *= x;
@@ -744,9 +789,11 @@ public final class Transformation2D {
 
 	/**
 	 * Flips the transformation around the X axis.
-	 *
-	 * @param x0 The X coordinate to flip.
-	 * @param x1 The X coordinate to flip to.
+	 * 
+	 * @param x0
+	 *            The X coordinate to flip.
+	 * @param x1
+	 *            The X coordinate to flip to.
 	 */
 	public void flipX(double x0, double x1) {
 		xx = -xx;
@@ -756,9 +803,11 @@ public final class Transformation2D {
 
 	/**
 	 * Flips the transformation around the Y axis.
-	 *
-	 * @param y0 The Y coordinate to flip.
-	 * @param y1 The Y coordinate to flip to.
+	 * 
+	 * @param y0
+	 *            The Y coordinate to flip.
+	 * @param y1
+	 *            The Y coordinate to flip to.
 	 */
 	public void flipY(double y0, double y1) {
 		yx = -yx;
@@ -768,9 +817,11 @@ public final class Transformation2D {
 
 	/**
 	 * Shears the transformation.
-	 *
-	 * @param proportionX The proportion of shearing in x direction.
-	 * @param proportionY The proportion of shearing in y direction.
+	 * 
+	 * @param proportionX
+	 *            The proportion of shearing in x direction.
+	 * @param proportionY
+	 *            The proportion of shearing in y direction.
 	 */
 	public void shear(double proportionX, double proportionY) {
 		Transformation2D temp = new Transformation2D();
@@ -780,8 +831,9 @@ public final class Transformation2D {
 
 	/**
 	 * Rotates the transformation.
-	 *
-	 * @param angle_in_Radians The rotation angle in radian.
+	 * 
+	 * @param angle_in_Radians
+	 *            The rotation angle in radian.
 	 */
 	public void rotate(double angle_in_Radians) {
 		Transformation2D temp = new Transformation2D();
@@ -791,9 +843,11 @@ public final class Transformation2D {
 
 	/**
 	 * Rotates the transformation.
-	 *
-	 * @param cos The cos angle of the rotation.
-	 * @param sin The sin angle of the rotation.
+	 * 
+	 * @param cos
+	 *            The cos angle of the rotation.
+	 * @param sin
+	 *            The sin angle of the rotation.
 	 */
 	public void rotate(double cos, double sin) {
 		Transformation2D temp = new Transformation2D();
@@ -803,10 +857,13 @@ public final class Transformation2D {
 
 	/**
 	 * Rotates the transformation aroung a center point.
-	 *
-	 * @param cos            The cos angle of the rotation.
-	 * @param sin            sin angle of the rotation.
-	 * @param rotationCenter The center point of the rotation.
+	 * 
+	 * @param cos
+	 *            The cos angle of the rotation.
+	 * @param sin
+	 *            sin angle of the rotation.
+	 * @param rotationCenter
+	 *            The center point of the rotation.
 	 */
 	public void rotate(double cos, double sin, Point2D rotationCenter) {
 		Transformation2D temp = new Transformation2D();
@@ -817,8 +874,9 @@ public final class Transformation2D {
 	/**
 	 * Produces inverse matrix for this matrix and puts result into the inverse
 	 * parameter.
-	 *
-	 * @param inverse The result inverse matrix.
+	 * 
+	 * @param inverse
+	 *            The result inverse matrix.
 	 */
 	public void inverse(Transformation2D inverse) {
 		double det = xx * yy - xy * yx;
@@ -840,6 +898,7 @@ public final class Transformation2D {
 
 	/**
 	 * Inverses the matrix.
+	 * 
 	 */
 	public void inverse() {
 		inverse(this);
@@ -848,13 +907,15 @@ public final class Transformation2D {
 	/**
 	 * Extracts scaling part of the transformation. this == scale *
 	 * rotateNshearNshift.
-	 *
-	 * @param scale              The destination matrix where the scale part is copied.
-	 * @param rotateNshearNshift The destination matrix where the part excluding rotation is
-	 *                           copied.
+	 * 
+	 * @param scale
+	 *            The destination matrix where the scale part is copied.
+	 * @param rotateNshearNshift
+	 *            The destination matrix where the part excluding rotation is
+	 *            copied.
 	 */
 	public void extractScaleTransform(Transformation2D scale,
-	                                  Transformation2D rotateNshearNshift) {
+			Transformation2D rotateNshearNshift) {
 
 		scale.setScale(Math.sqrt(xx * xx + xy * xy),
 				Math.sqrt(yx * yx + yy * yy));
@@ -862,4 +923,8 @@ public final class Transformation2D {
 		rotateNshearNshift.multiply(this);
 	}
 
+	public long estimateMemorySize()
+	{
+		return SIZE_OF_TRANSFORMATION_2D;
+	}
 }

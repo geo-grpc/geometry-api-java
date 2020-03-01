@@ -38,6 +38,7 @@ import com.esri.core.geometry.NumberUtils;
 import com.esri.core.geometry.OGCStructure;
 import com.esri.core.geometry.Operator;
 import com.esri.core.geometry.OperatorBuffer;
+import com.esri.core.geometry.OperatorCentroid2D;
 import com.esri.core.geometry.OperatorConvexHull;
 import com.esri.core.geometry.OperatorExportToGeoJson;
 import com.esri.core.geometry.OperatorExportToWkb;
@@ -51,6 +52,7 @@ import com.esri.core.geometry.OperatorSimplify;
 import com.esri.core.geometry.OperatorSimplifyOGC;
 import com.esri.core.geometry.OperatorUnion;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Point2D;
 import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.Polyline;
 import com.esri.core.geometry.SimpleGeometryCursor;
@@ -58,12 +60,12 @@ import com.esri.core.geometry.SpatialReference;
 import com.esri.core.geometry.VertexDescription;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * OGC Simple Feature Access specification v.1.2.1
+ * 
  */
 public abstract class OGCGeometry {
 	public int dimension() {
@@ -130,15 +132,16 @@ public abstract class OGCGeometry {
 		OperatorExportToGeoJson op = (OperatorExportToGeoJson) OperatorFactoryLocal.getInstance().getOperator(Operator.Type.ExportToGeoJson);
 		return op.execute(export_flags, esriSR, getEsriGeometry());
 	}
-
+	
 	/**
+	 * 
 	 * @return Convert to REST JSON.
 	 */
 	public String asJson() {
 		return GeometryEngine.geometryToJson(esriSR, getEsriGeometry());
 	}
 
-
+	
 	public boolean isEmpty() {
 		return getEsriGeometry().isEmpty();
 	}
@@ -172,14 +175,14 @@ public abstract class OGCGeometry {
 	 * such as self intersection or self tangency. See the
 	 * "Simple feature access - Part 1" document (OGC 06-103r4) for meaning of
 	 * "simple" for each geometry type.
-	 * <p>
+	 * 
 	 * The method has O(n log n) complexity when the input geometry is simple.
 	 * For non-simple geometries, it terminates immediately when the first issue
 	 * is encountered.
-	 *
+	 * 
 	 * @return True if geometry is simple and false otherwise.
-	 * <p>
-	 * Note: If isSimple is true, then isSimpleRelaxed is true too.
+	 * 
+	 * Note: If isSimple is true, then isSimpleRelaxed is true too. 
 	 */
 	public boolean isSimple() {
 		return OperatorSimplifyOGC.local().isSimpleOGC(getEsriGeometry(),
@@ -188,9 +191,9 @@ public abstract class OGCGeometry {
 
 	/**
 	 * Extension method - checks if geometry is simple for Geodatabase.
-	 *
+	 * 
 	 * @return Returns true if geometry is simple, false otherwise.
-	 * <p>
+	 * 
 	 * Note: If isSimpleRelaxed is true, then isSimple is either true or false. Geodatabase has more relaxed requirements for simple geometries than OGC.
 	 */
 	public boolean isSimpleRelaxed() {
@@ -206,12 +209,11 @@ public abstract class OGCGeometry {
 	public OGCGeometry MakeSimpleRelaxed(boolean forceProcessing) {
 		return makeSimpleRelaxed(forceProcessing);
 	}
-
 	/**
 	 * Makes a simple geometry for Geodatabase.
-	 *
+	 * 
 	 * @return Returns simplified geometry.
-	 * <p>
+	 * 
 	 * Note: isSimpleRelaxed should return true after this operation.
 	 */
 	public OGCGeometry makeSimpleRelaxed(boolean forceProcessing) {
@@ -221,13 +223,13 @@ public abstract class OGCGeometry {
 				op.execute(getEsriGeometry(), esriSR, forceProcessing, null),
 				esriSR);
 	}
-
+	
 	/**
 	 * Resolves topological issues in this geometry and makes it Simple according to OGC specification.
-	 *
+	 * 
 	 * @return Returns simplified geometry.
-	 * <p>
-	 * Note: isSimple and isSimpleRelaxed should return true after this operation.
+	 * 
+	 * Note: isSimple and isSimpleRelaxed should return true after this operation. 
 	 */
 	public OGCGeometry makeSimple() {
 		return simplifyBunch_(getEsriGeometryCursor());
@@ -251,11 +253,15 @@ public abstract class OGCGeometry {
 	 */
 	public boolean Equals(OGCGeometry another) {
 		if (this == another)
-			return true;
-
+			return !isEmpty();
+		
 		if (another == null)
 			return false;
-
+		
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return another.Equals(this);
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.equals(geom1, geom2,
@@ -266,8 +272,12 @@ public abstract class OGCGeometry {
 	public boolean equals(OGCGeometry another) {
 		return Equals(another);
 	}
-
+	
 	public boolean disjoint(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return another.disjoint(this);
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.disjoint(geom1, geom2,
@@ -279,6 +289,11 @@ public abstract class OGCGeometry {
 	}
 
 	public boolean touches(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			//TODO
+			throw new UnsupportedOperationException();
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.touches(geom1, geom2,
@@ -286,6 +301,11 @@ public abstract class OGCGeometry {
 	}
 
 	public boolean crosses(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			//TODO
+			throw new UnsupportedOperationException();
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.crosses(geom1, geom2,
@@ -293,13 +313,14 @@ public abstract class OGCGeometry {
 	}
 
 	public boolean within(OGCGeometry another) {
-		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
-		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
-		return com.esri.core.geometry.GeometryEngine.within(geom1, geom2,
-				getEsriSpatialReference());
+		return another.contains(this);
 	}
 
 	public boolean contains(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return new OGCConcreteGeometryCollection(this, esriSR).contains(another);
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.contains(geom1, geom2,
@@ -307,6 +328,11 @@ public abstract class OGCGeometry {
 	}
 
 	public boolean overlaps(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			// TODO
+			throw new UnsupportedOperationException();
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.overlaps(geom1, geom2,
@@ -314,6 +340,11 @@ public abstract class OGCGeometry {
 	}
 
 	public boolean relate(OGCGeometry another, String matrix) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			//TODO
+			throw new UnsupportedOperationException();
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.relate(geom1, geom2,
@@ -326,6 +357,14 @@ public abstract class OGCGeometry {
 
 	// analysis
 	public double distance(OGCGeometry another) {
+		if (this == another) {
+			return isEmpty() ? Double.NaN : 0;
+		}
+		
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return another.distance(this);
+		}
+
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return com.esri.core.geometry.GeometryEngine.distance(geom1, geom2,
@@ -345,33 +384,33 @@ public abstract class OGCGeometry {
 		// then produces OGCGeometry from the result.
 		// Can produce OGCConcreteGoemetryCollection
 		MultiPoint dstMultiPoint = null;
-		ArrayDeque<Geometry> dstPolylines = new ArrayDeque<>();
-		ArrayDeque<Geometry> dstPolygons = new ArrayDeque<>();
+		ArrayList<Geometry> dstPolylines = new ArrayList<Geometry>();
+		ArrayList<Geometry> dstPolygons = new ArrayList<Geometry>();
 		for (com.esri.core.geometry.Geometry g = gc.next(); g != null; g = gc
 				.next()) {
 			switch (g.getType()) {
-				case Point:
-					if (dstMultiPoint == null)
-						dstMultiPoint = new MultiPoint();
-					dstMultiPoint.add((Point) g);
-					break;
-				case MultiPoint:
-					if (dstMultiPoint == null)
-						dstMultiPoint = new MultiPoint();
-					dstMultiPoint.add((MultiPoint) g, 0, -1);
-					break;
-				case Polyline:
-					dstPolylines.add((Polyline) g.copy());
-					break;
-				case Polygon:
-					dstPolygons.add((Polygon) g.copy());
-					break;
-				default:
-					throw new UnsupportedOperationException();
+			case Point:
+				if (dstMultiPoint == null)
+					dstMultiPoint = new MultiPoint();
+				dstMultiPoint.add((Point) g);
+				break;
+			case MultiPoint:
+				if (dstMultiPoint == null)
+					dstMultiPoint = new MultiPoint();
+				dstMultiPoint.add((MultiPoint) g, 0, -1);
+				break;
+			case Polyline:
+				dstPolylines.add((Polyline) g.copy());
+				break;
+			case Polygon:
+				dstPolygons.add((Polygon) g.copy());
+				break;
+			default:
+				throw new UnsupportedOperationException();
 			}
 		}
 
-		ArrayDeque<Geometry> result = new ArrayDeque<>(3);
+		ArrayList<Geometry> result = new ArrayList<Geometry>(3);
 		if (dstMultiPoint != null) {
 			Geometry resMP = OperatorSimplifyOGC.local().execute(dstMultiPoint,
 					esriSR, true, null);
@@ -380,10 +419,12 @@ public abstract class OGCGeometry {
 
 		if (dstPolylines.size() > 0) {
 			if (dstPolylines.size() == 1) {
-				Geometry resMP = OperatorSimplifyOGC.local().execute(dstPolylines.pop(), esriSR, true, null);
+				Geometry resMP = OperatorSimplifyOGC.local().execute(
+						dstPolylines.get(0), esriSR, true, null);
 				result.add(resMP);
 			} else {
-				GeometryCursor res = OperatorUnion.local().execute(new SimpleGeometryCursor(dstPolylines), esriSR, null);
+				GeometryCursor res = OperatorUnion.local().execute(
+						new SimpleGeometryCursor(dstPolylines), esriSR, null);
 				Geometry resPolyline = res.next();
 				Geometry resMP = OperatorSimplifyOGC.local().execute(
 						resPolyline, esriSR, true, null);
@@ -393,10 +434,12 @@ public abstract class OGCGeometry {
 
 		if (dstPolygons.size() > 0) {
 			if (dstPolygons.size() == 1) {
-				Geometry resMP = OperatorSimplifyOGC.local().execute(dstPolygons.pop(), esriSR, true, null);
+				Geometry resMP = OperatorSimplifyOGC.local().execute(
+						dstPolygons.get(0), esriSR, true, null);
 				result.add(resMP);
 			} else {
-				GeometryCursor res = OperatorUnion.local().execute(new SimpleGeometryCursor(dstPolygons), esriSR, null);
+				GeometryCursor res = OperatorUnion.local().execute(
+						new SimpleGeometryCursor(dstPolygons), esriSR, null);
 				Geometry resPolygon = res.next();
 				Geometry resMP = OperatorSimplifyOGC.local().execute(
 						resPolygon, esriSR, true, null);
@@ -404,33 +447,47 @@ public abstract class OGCGeometry {
 			}
 		}
 
-		return OGCGeometry.createFromEsriCursor(new SimpleGeometryCursor(result), esriSR);
+		return OGCGeometry.createFromEsriCursor(
+				new SimpleGeometryCursor(result), esriSR);
 	}
 
 	public OGCGeometry buffer(double distance) {
 		OperatorBuffer op = (OperatorBuffer) OperatorFactoryLocal.getInstance()
 				.getOperator(Operator.Type.Buffer);
 		if (distance == 0) {// when distance is 0, return self (maybe we should
-			// create a copy instead).
+							// create a copy instead).
 			return this;
 		}
 
-		double d[] = {distance};
+		double d[] = { distance };
 		com.esri.core.geometry.GeometryCursor cursor = op.execute(
 				getEsriGeometryCursor(), getEsriSpatialReference(), d, true,
 				null);
 		return OGCGeometry.createFromEsriGeometry(cursor.next(), esriSR);
 	}
 
+	public OGCGeometry centroid() {
+		OperatorCentroid2D op = (OperatorCentroid2D) OperatorFactoryLocal.getInstance()
+				.getOperator(Operator.Type.Centroid2D);
+
+		Point2D centroid = op.execute(getEsriGeometry(), null);
+		if (centroid == null) {
+			return OGCGeometry.createFromEsriGeometry(new Point(), esriSR);
+		}
+		return OGCGeometry.createFromEsriGeometry(new Point(centroid), esriSR);
+	}
+
 	public OGCGeometry convexHull() {
-		com.esri.core.geometry.OperatorConvexHull op = (OperatorConvexHull) OperatorFactoryLocal
-				.getInstance().getOperator(Operator.Type.ConvexHull);
-		com.esri.core.geometry.GeometryCursor cursor = op.execute(
-				getEsriGeometryCursor(), true, null);
+		com.esri.core.geometry.GeometryCursor cursor = OperatorConvexHull.local().execute(
+				getEsriGeometryCursor(), false, null);
 		return OGCGeometry.createFromEsriCursor(cursor, esriSR);
 	}
 
 	public OGCGeometry intersection(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return (new OGCConcreteGeometryCollection(this, esriSR)).intersection(another);
+		}
+
 		com.esri.core.geometry.OperatorIntersection op = (OperatorIntersection) OperatorFactoryLocal
 				.getInstance().getOperator(Operator.Type.Intersection);
 		com.esri.core.geometry.GeometryCursor cursor = op.execute(
@@ -440,6 +497,18 @@ public abstract class OGCGeometry {
 	}
 
 	public OGCGeometry union(OGCGeometry another) {
+		String thisType = geometryType();
+		String anotherType = another.geometryType();
+		if (thisType != anotherType || thisType == OGCConcreteGeometryCollection.TYPE) {
+			//heterogeneous union.
+			//We make a geometry collection, then process to union parts and remove overlaps.
+			ArrayList<OGCGeometry> geoms = new ArrayList<OGCGeometry>();
+			geoms.add(this);
+			geoms.add(another);
+			OGCConcreteGeometryCollection geomCol = new OGCConcreteGeometryCollection(geoms, esriSR);
+			return geomCol.flattenAndRemoveOverlaps().reduceFromMulti();
+		}
+		
 		OperatorUnion op = (OperatorUnion) OperatorFactoryLocal.getInstance()
 				.getOperator(Operator.Type.Union);
 		GeometryCursorAppend ap = new GeometryCursorAppend(
@@ -450,6 +519,10 @@ public abstract class OGCGeometry {
 	}
 
 	public OGCGeometry difference(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			return (new OGCConcreteGeometryCollection(this, esriSR)).difference(another);
+		}
+		
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return createFromEsriGeometry(
@@ -458,6 +531,11 @@ public abstract class OGCGeometry {
 	}
 
 	public OGCGeometry symDifference(OGCGeometry another) {
+		if (another.geometryType() == OGCConcreteGeometryCollection.TYPE) {
+			// TODO
+			throw new UnsupportedOperationException();
+		}
+
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
 		return createFromEsriGeometry(
@@ -477,18 +555,18 @@ public abstract class OGCGeometry {
 
 	/**
 	 * Create an OGCGeometry instance from the GeometryCursor.
-	 *
+	 * 
 	 * @param gc
 	 * @param sr
 	 * @return Geometry instance created from the geometry cursor.
 	 */
 	public static OGCGeometry createFromEsriCursor(GeometryCursor gc,
-	                                               SpatialReference sr) {
+			SpatialReference sr) {
 		return createFromEsriCursor(gc, sr, false);
 	}
 
 	public static OGCGeometry createFromEsriCursor(GeometryCursor gc,
-	                                               SpatialReference sr, boolean skipEmpty) {
+			SpatialReference sr, boolean skipEmpty) {
 		ArrayList<OGCGeometry> geoms = new ArrayList<OGCGeometry>(10);
 		Geometry emptyGeom = null;
 		for (Geometry g = gc.next(); g != null; g = gc.next()) {
@@ -545,12 +623,12 @@ public abstract class OGCGeometry {
 	}
 
 	public static OGCGeometry createFromEsriGeometry(Geometry geom,
-	                                                 SpatialReference sr) {
+			SpatialReference sr) {
 		return createFromEsriGeometry(geom, sr, false);
 	}
 
 	public static OGCGeometry createFromEsriGeometry(Geometry geom,
-	                                                 SpatialReference sr, boolean multiType) {
+			SpatialReference sr, boolean multiType) {
 		if (geom == null)
 			return null;
 		Geometry.Type t = geom.getType();
@@ -592,7 +670,7 @@ public abstract class OGCGeometry {
 	}
 
 	public static OGCGeometry createFromOGCStructure(OGCStructure ogcStructure,
-	                                                 SpatialReference sr) {
+			SpatialReference sr) {
 		ArrayList<OGCConcreteGeometryCollection> collectionStack = new ArrayList<OGCConcreteGeometryCollection>(
 				0);
 		ArrayList<OGCStructure> structureStack = new ArrayList<OGCStructure>(0);
@@ -625,61 +703,61 @@ public abstract class OGCGeometry {
 			int type = lastStructure.m_structures.get(i).m_type;
 
 			switch (type) {
-				case 1:
-					g = new OGCPoint(
-							(Point) lastStructure.m_structures.get(i).m_geometry,
-							sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 2:
-					g = new OGCLineString(
-							(Polyline) lastStructure.m_structures.get(i).m_geometry,
-							0, sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 3:
-					g = new OGCPolygon(
-							(Polygon) lastStructure.m_structures.get(i).m_geometry,
-							0, sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 4:
-					g = new OGCMultiPoint(
-							(MultiPoint) lastStructure.m_structures.get(i).m_geometry,
-							sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 5:
-					g = new OGCMultiLineString(
-							(Polyline) lastStructure.m_structures.get(i).m_geometry,
-							sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 6:
-					g = new OGCMultiPolygon(
-							(Polygon) lastStructure.m_structures.get(i).m_geometry,
-							sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					break;
-				case 7:
-					geometries = new OGCGeometry[lastStructure.m_structures.get(i).m_structures
-							.size()];
-					g = new OGCConcreteGeometryCollection(
-							Arrays.asList(geometries), sr);
-					lastCollection.geometries.set(i, g);
-					indices.set(indices.size() - 1, i + 1);
-					structureStack.add(lastStructure.m_structures.get(i));
-					collectionStack.add((OGCConcreteGeometryCollection) g);
-					indices.add(0);
-					break;
-				default:
-					throw new UnsupportedOperationException();
+			case 1:
+				g = new OGCPoint(
+						(Point) lastStructure.m_structures.get(i).m_geometry,
+						sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 2:
+				g = new OGCLineString(
+						(Polyline) lastStructure.m_structures.get(i).m_geometry,
+						0, sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 3:
+				g = new OGCPolygon(
+						(Polygon) lastStructure.m_structures.get(i).m_geometry,
+						0, sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 4:
+				g = new OGCMultiPoint(
+						(MultiPoint) lastStructure.m_structures.get(i).m_geometry,
+						sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 5:
+				g = new OGCMultiLineString(
+						(Polyline) lastStructure.m_structures.get(i).m_geometry,
+						sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 6:
+				g = new OGCMultiPolygon(
+						(Polygon) lastStructure.m_structures.get(i).m_geometry,
+						sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				break;
+			case 7:
+				geometries = new OGCGeometry[lastStructure.m_structures.get(i).m_structures
+						.size()];
+				g = new OGCConcreteGeometryCollection(
+						Arrays.asList(geometries), sr);
+				lastCollection.geometries.set(i, g);
+				indices.set(indices.size() - 1, i + 1);
+				structureStack.add(lastStructure.m_structures.get(i));
+				collectionStack.add((OGCConcreteGeometryCollection) g);
+				indices.add(0);
+				break;
+			default:
+				throw new UnsupportedOperationException();
 			}
 		}
 
@@ -702,11 +780,22 @@ public abstract class OGCGeometry {
 	/**
 	 * Converts this Geometry to the OGCMulti* if it is not OGCMulti* or
 	 * OGCGeometryCollection already.
-	 *
+	 * 
 	 * @return OGCMulti* or OGCGeometryCollection instance.
 	 */
 	public abstract OGCGeometry convertToMulti();
 
+	/**
+	 * For the geometry collection types, when it has 1 or 0 elements, converts a MultiPolygon to Polygon, 
+	 * MultiPoint to Point, MultiLineString to a LineString, and
+	 * OGCConcretGeometryCollection to the reduced element it contains.
+	 * 
+	 * If OGCConcretGeometryCollection is empty, returns self.
+	 * 
+	 * @return A reduced geometry or this.
+	 */
+	public abstract OGCGeometry reduceFromMulti();
+	
 	@Override
 	public String toString() {
 		String snippet = asText();
@@ -716,9 +805,9 @@ public abstract class OGCGeometry {
 		return String
 				.format("%s: %s", this.getClass().getSimpleName(), snippet);
 	}
-
+	
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(Object other)	{
 		if (other == null)
 			return false;
 
@@ -727,39 +816,40 @@ public abstract class OGCGeometry {
 
 		if (other.getClass() != getClass())
 			return false;
-
-		OGCGeometry another = (OGCGeometry) other;
+		
+		OGCGeometry another = (OGCGeometry)other;
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		com.esri.core.geometry.Geometry geom2 = another.getEsriGeometry();
-
+		
 		if (geom1 == null) {
 			if (geom2 != null)
 				return false;
-		} else if (!geom1.equals(geom2)) {
+		}
+		else if (!geom1.equals(geom2)) {
 			return false;
 		}
-
+		
 		if (esriSR == another.esriSR) {
 			return true;
 		}
-
+			
 		if (esriSR != null && another.esriSR != null) {
 			return esriSR.equals(another.esriSR);
 		}
-
+			
 		return false;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		int hash = 1;
 		com.esri.core.geometry.Geometry geom1 = getEsriGeometry();
 		if (geom1 != null)
 			hash = geom1.hashCode();
-
+		
 		if (esriSR != null)
 			hash = NumberUtils.hashCombine(hash, esriSR.hashCode());
-
+		
 		return hash;
 	}
 }

@@ -53,31 +53,31 @@ final class EditShape {
 	private MultiPointImpl m_vertices; // Internals of m_vertices_mp
 	AttributeStreamOfDbl m_xy_stream; // The xy stream of the m_vertices.
 	VertexDescription m_vertex_description;// a shortcut to the vertex
-	// description.
+											// description.
 	boolean m_b_has_attributes; // a short cut to know if we have something in
-	// addition to x and y.
+								// addition to x and y.
 
 	ArrayList<Segment> m_segments;// may be NULL if all segments a Lines,
-	// otherwise contains NULLs for Line
-	// segments. Curves are not NULL.
+									// otherwise contains NULLs for Line
+									// segments. Curves are not NULL.
 	AttributeStreamOfDbl m_weights;// may be NULL if no weights are provided.
-	// NULL weights assumes weight value of 1.
+									// NULL weights assumes weight value of 1.
 	ArrayList<AttributeStreamOfInt32> m_indices;// user indices are here
 	// ****************End Vertex Data**************
 	StridedIndexTypeCollection m_path_index_list; // doubly connected list. Path
-	// index into the Path Data
-	// arrays, Prev path, next
-	// path.
+													// index into the Path Data
+													// arrays, Prev path, next
+													// path.
 	// ******************Path Data******************
 	AttributeStreamOfDbl m_path_areas;
 	AttributeStreamOfDbl m_path_lengths;
 	// Block_array<Envelope::SPtr>::SPtr m_path_envelopes;
 	ArrayList<AttributeStreamOfInt32> m_pathindices;// path user indices are
-	// here
+													// here
 	// *****************End Path Data***************
 	StridedIndexTypeCollection m_geometry_index_list;
 	ArrayList<AttributeStreamOfInt32> m_geometry_indices;// geometry user
-	// indices are here
+															// indices are here
 
 	// *********** Helpers for Bucket sort**************
 	static class EditShapeBucketSortHelper extends ClassicSort {
@@ -96,9 +96,7 @@ final class EditShape {
 		public double getValue(int index) {
 			return m_shape.getY(index);
 		}
-	}
-
-	;
+	};
 
 	BucketSort m_bucket_sort;
 
@@ -352,7 +350,7 @@ final class EditShape {
 		int newgeom = createGeometry(multi_path.getType(),
 				multi_path.getDescription());
 		if (multi_path.getType() == Geometry.Type.Polygon)
-			setFillRule(newgeom, ((Polygon) multi_path).getFillRule());
+			setFillRule(newgeom, ((Polygon)multi_path).getFillRule());
 
 		appendMultiPath_(newgeom, multi_path);
 		return newgeom;
@@ -435,7 +433,7 @@ final class EditShape {
 	}
 
 	void splitSegmentForward_(int origin_vertex,
-	                          SegmentIntersector intersector, int intersector_index) {
+			SegmentIntersector intersector, int intersector_index) {
 		int last_vertex = getNextVertex(origin_vertex);
 		if (last_vertex == -1)
 			throw GeometryException.GeometryInternalError();
@@ -712,7 +710,7 @@ final class EditShape {
 				}
 
 				assert (nvert == point_count);// Inconsistent content in the
-				// Edit_shape. Please, fix.
+												// Edit_shape. Please, fix.
 				assert (ipath == path_count);
 				mp_impl.setAttributeStreamRef(semantics, dst_stream);
 				parts.write(path_count, point_count);
@@ -720,7 +718,7 @@ final class EditShape {
 
 			mp_impl.setPathFlagsStreamRef(pathFlags);
 			mp_impl.setPathStreamRef(parts);
-			mp_impl.notifyModified(DirtyFlags.dirtyAll);
+			mp_impl.notifyModified(MultiVertexGeometryImpl.DirtyFlags.DirtyAll);
 		} else if (gt == Geometry.GeometryType.MultiPoint) {
 			MultiPointImpl mp_impl = (MultiPointImpl) geom._getImpl();
 			VertexDescription description = geom.getDescription();
@@ -753,7 +751,7 @@ final class EditShape {
 				mp_impl.setAttributeStreamRef(semantics, dst_stream);
 			}
 
-			mp_impl.notifyModified(DirtyFlags.dirtyAll);
+			mp_impl.notifyModified(MultiVertexGeometryImpl.DirtyFlags.DirtyAll);
 		} else {
 			assert (false);
 		}
@@ -792,7 +790,7 @@ final class EditShape {
 
 	// create a new empty geometry of the given type and attribute set.
 	int createGeometry(Geometry.Type geometry_type,
-	                   VertexDescription description) {
+			VertexDescription description) {
 		int newgeom = newGeometry_(geometry_type.value());
 		if (m_vertices == null) {
 			m_vertices_mp = new MultiPoint(description);
@@ -930,11 +928,11 @@ final class EditShape {
 
 			boolean b_polygon = getGeometryType(geometry) == Geometry.GeometryType.Polygon;
 
-			for (int path = getFirstPath(geometry); path != -1; ) {
+			for (int path = getFirstPath(geometry); path != -1;) {
 				// We go from the start to the half of the path first, then we
 				// go from the end to the half of the path.
 				int vertex_counter = 0;
-				for (int vertex = getFirstVertex(path); vertex_counter < getPathSize(path) / 2; ) {
+				for (int vertex = getFirstVertex(path); vertex_counter < getPathSize(path) / 2;) {
 					int next = getNextVertex(vertex);
 					if (next == -1)
 						break;
@@ -968,7 +966,7 @@ final class EditShape {
 
 				int first_vertex = getFirstVertex(path);
 				for (int vertex = isClosedPath(path) ? first_vertex
-						: getLastVertex(path); getPathSize(path) > 0; ) {
+						: getLastVertex(path); getPathSize(path) > 0;) {
 					int prev = getPrevVertex(vertex);
 					if (prev != -1) {
 						int vindex_prev = getVertexIndex(prev);
@@ -1000,7 +998,7 @@ final class EditShape {
 						}
 					} else {
 						removeVertex(vertex, true);// remove the last vertex in
-						// the path
+													// the path
 						if (res == 0)
 							res = -1;
 						break;
@@ -1028,7 +1026,7 @@ final class EditShape {
 
 			boolean b_polygon = getGeometryType(geometry) == Geometry.GeometryType.Polygon;
 
-			for (int path = getFirstPath(geometry); path != -1; ) {
+			for (int path = getFirstPath(geometry); path != -1;) {
 				int path_size = getPathSize(path);
 				if (b_polygon ? path_size < 3 : path_size < 2)
 					return true;
@@ -1119,10 +1117,10 @@ final class EditShape {
 
 				m_vertices._interpolateTwoVertices(vindex, vindex_next, f,
 						getHelperPoint_());// use this call mainly to
-				// interpolate the attributes. XYs
-				// are interpolated incorrectly for
-				// curves and are recalculated when
-				// segment is cut below.
+											// interpolate the attributes. XYs
+											// are interpolated incorrectly for
+											// curves and are recalculated when
+											// segment is cut below.
 				int inserted_vertex = insertVertex_(
 						getPathFromVertex(origin_vertex), next_vertex,
 						getHelperPoint_());
@@ -1133,19 +1131,19 @@ final class EditShape {
 					int vindex_prev = getVertexIndex(prev_vertex);
 					setSegmentToIndex_(vindex_prev, subseg);
 					setXY(inserted_vertex, subseg.getEndXY()); // fix XY
-					// coordinates
-					// to be
-					// parameter
-					// based
-					// (interpolate_two_vertices_)
+																// coordinates
+																// to be
+																// parameter
+																// based
+																// (interpolate_two_vertices_)
 					if (i == split_count - 1 || split_scalars[i + 1] == 1.0) {// last
-						// chance
-						// to
-						// set
-						// last
-						// split
-						// segment
-						// here:
+																				// chance
+																				// to
+																				// set
+																				// last
+																				// split
+																				// segment
+																				// here:
 						Segment subseg_end = seg.cut(t, 1.0);
 						setSegmentToIndex_(vindex_prev, subseg_end);
 					}
@@ -1159,7 +1157,7 @@ final class EditShape {
 	// interpolates the attributes for the specified path between from_vertex
 	// and to_vertex
 	void interpolateAttributesForClosedPath(int path, int from_vertex,
-	                                        int to_vertex) {
+			int to_vertex) {
 		assert (isClosedPath(path));
 
 		if (!m_b_has_attributes)
@@ -1896,8 +1894,8 @@ final class EditShape {
 		boolean m_b_skip_mulit_points;
 
 		private VertexIterator(EditShape parent, int geometry, int path,
-		                       int vertex, int first_vertex, int index,
-		                       boolean b_skip_mulit_points) {
+				int vertex, int first_vertex, int index,
+				boolean b_skip_mulit_points) {
 			m_parent = parent;
 			m_geometry = geometry;
 			m_path = path;
@@ -1921,7 +1919,7 @@ final class EditShape {
 					return m_vertex;
 
 				return moveToNextHelper_();// separate into another function for
-				// inlining
+											// inlining
 			}
 
 			return -1;
@@ -1944,7 +1942,7 @@ final class EditShape {
 
 				if (m_b_skip_mulit_points
 						&& !Geometry.isMultiPath(m_parent
-						.getGeometryType(m_geometry))) {
+								.getGeometryType(m_geometry))) {
 					continue;
 				}
 
@@ -1981,14 +1979,12 @@ final class EditShape {
 		}
 
 		public static VertexIterator create_(EditShape parent, int geometry,
-		                                     int path, int vertex, int first_vertex, int index,
-		                                     boolean b_skip_mulit_points) {
+				int path, int vertex, int first_vertex, int index,
+				boolean b_skip_mulit_points) {
 			return new VertexIterator(parent, geometry, path, vertex,
 					first_vertex, index, b_skip_mulit_points);
 		}
-	}
-
-	;
+	};
 
 	// Returns the vertex iterator that allows iteration through all vertices of
 	// all paths of all geometries.
@@ -2049,7 +2045,7 @@ final class EditShape {
 	}
 
 	void interpolateAttributesForClosedPath_(int semantics, int path,
-	                                         int from_vertex, int to_vertex, double sub_length, int ordinate) {
+			int from_vertex, int to_vertex, double sub_length, int ordinate) {
 		if (from_vertex == to_vertex)
 			return;
 
@@ -2087,7 +2083,7 @@ final class EditShape {
 	}
 
 	void splitSegment_(int origin_vertex, SegmentIntersector intersector,
-	                   int intersector_index, boolean b_forward) {
+			int intersector_index, boolean b_forward) {
 		if (b_forward) {
 			splitSegmentForward_(origin_vertex, intersector, intersector_index);
 		} else {
