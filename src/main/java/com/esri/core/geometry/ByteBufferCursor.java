@@ -31,27 +31,27 @@ import java.util.Iterator;
  */
 public abstract class ByteBufferCursor implements Iterator<ByteBuffer> {
 
-    /**
-     * Moves the cursor to the next ByteBuffer. Returns null when reached the
-     * end.
-     */
-    public abstract ByteBuffer next();
+	/**
+	 * Moves the cursor to the next ByteBuffer. Returns null when reached the
+	 * end.
+	 */
+	public abstract ByteBuffer next();
 
-    /**
-     * Returns the ID of the current ByteBuffer. The ID is propagated across the
-     * operations (when possible).
-     * <p>
-     * Returns an ID associated with the current Geometry. The ID is passed
-     * along and is returned by some operators to preserve relationship between
-     * the input and output geometry classes. It is not always possible to
-     * preserve an ID during an operation.
-     */
-    public abstract long getByteBufferID();
+	/**
+	 * Returns the ID of the current ByteBuffer. The ID is propagated across the
+	 * operations (when possible).
+	 * <p>
+	 * Returns an ID associated with the current Geometry. The ID is passed
+	 * along and is returned by some operators to preserve relationship between
+	 * the input and output geometry classes. It is not always possible to
+	 * preserve an ID during an operation.
+	 */
+	public abstract long getByteBufferID();
 
-    public abstract SimpleStateEnum getSimpleState();
+	public abstract SimpleStateEnum getSimpleState();
 
-    public abstract String getFeatureID();
+	public abstract String getFeatureID();
 
-    public abstract boolean hasNext();
+	public abstract boolean hasNext();
 
 }

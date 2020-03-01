@@ -30,14 +30,14 @@ import com.esri.core.geometry.Operator.Type;
  * Relational operation Equals.
  */
 public abstract class OperatorEquals extends OperatorSimpleRelation {
-    @Override
-    public Type getType() {
-        return Type.Equals;
-    }
+	@Override
+	public Type getType() {
+		return Type.Equals;
+	}
 
-    public static OperatorEquals local() {
-        return (OperatorEquals) OperatorFactoryLocal.getInstance().getOperator(
-                Type.Equals);
-    }
+	public static OperatorEquals local() {
+		return (OperatorEquals) OperatorFactoryLocal.getInstance().getOperator(
+				Type.Equals);
+	}
 
 }

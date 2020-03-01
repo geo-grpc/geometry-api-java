@@ -24,39 +24,39 @@
 package com.esri.core.geometry;
 
 class OperatorSimplifyCursorOGC extends GeometryCursor {
-    SpatialReference m_spatialReference;
-    ProgressTracker m_progressTracker;
-    boolean m_bForceSimplify;
+	SpatialReference m_spatialReference;
+	ProgressTracker m_progressTracker;
+	boolean m_bForceSimplify;
 
-    OperatorSimplifyCursorOGC(GeometryCursor geoms,
-                              SpatialReference spatialRef, boolean bForceSimplify,
-                              ProgressTracker progressTracker) {
-        if (geoms == null)
-            throw new IllegalArgumentException();
+	OperatorSimplifyCursorOGC(GeometryCursor geoms,
+	                          SpatialReference spatialRef, boolean bForceSimplify,
+	                          ProgressTracker progressTracker) {
+		if (geoms == null)
+			throw new IllegalArgumentException();
 
-        m_progressTracker = progressTracker;
-        m_bForceSimplify = bForceSimplify;
+		m_progressTracker = progressTracker;
+		m_bForceSimplify = bForceSimplify;
 
-        m_inputGeoms = geoms;
+		m_inputGeoms = geoms;
 
-        m_spatialReference = spatialRef;
-    }
+		m_spatialReference = spatialRef;
+	}
 
-    @Override
-    public Geometry next() {
-        if (hasNext()) {
-            if ((m_progressTracker != null) && !(m_progressTracker.progress(-1, -1)))
-                throw new RuntimeException("user_canceled");
-            return simplify(m_inputGeoms.next());
-        }
-        return null;
-    }
+	@Override
+	public Geometry next() {
+		if (hasNext()) {
+			if ((m_progressTracker != null) && !(m_progressTracker.progress(-1, -1)))
+				throw new RuntimeException("user_canceled");
+			return simplify(m_inputGeoms.next());
+		}
+		return null;
+	}
 
-    Geometry simplify(Geometry geometry) {
-        if (geometry == null)
-            throw new IllegalArgumentException();
+	Geometry simplify(Geometry geometry) {
+		if (geometry == null)
+			throw new IllegalArgumentException();
 
-        return OperatorSimplifyLocalHelper.simplifyOGC(geometry,
-                m_spatialReference, m_bForceSimplify, m_progressTracker);
-    }
+		return OperatorSimplifyLocalHelper.simplifyOGC(geometry,
+				m_spatialReference, m_bForceSimplify, m_progressTracker);
+	}
 }

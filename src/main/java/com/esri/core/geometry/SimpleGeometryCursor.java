@@ -32,70 +32,74 @@ import java.util.stream.Collectors;
  */
 public class SimpleGeometryCursor extends GeometryCursor {
 
-    private long m_index = -1;
-    private String m_currentFeatureId = "";
-    private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
-    private MapGeometryCursor m_mapGeometryCursor = null;
-    private ArrayDeque<Geometry> m_geometryDeque = null;
+	private long m_index = -1;
+	private String m_currentFeatureId = "";
+	private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
+	private MapGeometryCursor m_mapGeometryCursor = null;
+	private ArrayDeque<Geometry> m_geometryDeque = null;
 
-    private long m_current_id = -1;
+	private long m_current_id = -1;
 
-    public SimpleGeometryCursor(Geometry geom) {
-        m_geometryDeque = new ArrayDeque<>(1);
-        m_geometryDeque.add(geom);
-    }
+	public SimpleGeometryCursor(Geometry geom) {
+		m_geometryDeque = new ArrayDeque<>(1);
+		m_geometryDeque.add(geom);
+	}
 
-    public SimpleGeometryCursor(Geometry[] geoms) {
-        m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
-    }
+	public SimpleGeometryCursor(Geometry[] geoms) {
+		m_geometryDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
+	}
 
-    @Deprecated
-    public SimpleGeometryCursor(List<Geometry> geoms) {
-        m_geometryDeque = new ArrayDeque<>(geoms);
-    }
+	@Deprecated
+	public SimpleGeometryCursor(List<Geometry> geoms) {
+		m_geometryDeque = new ArrayDeque<>(geoms);
+	}
 
-    public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
-        m_geometryDeque = geoms;
-    }
+	public SimpleGeometryCursor(ArrayDeque<Geometry> geoms) {
+		m_geometryDeque = geoms;
+	}
 
-    public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor) {
-        m_mapGeometryCursor = mapGeometryCursor;
-    }
+	public SimpleGeometryCursor(MapGeometryCursor mapGeometryCursor) {
+		m_mapGeometryCursor = mapGeometryCursor;
+	}
 
-    @Override
-    public boolean hasNext() {
-        return (m_geometryDeque != null && m_geometryDeque.size() > 0) || (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext());
-    }
+	@Override
+	public boolean hasNext() {
+		return (m_geometryDeque != null && m_geometryDeque.size() > 0) || (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext());
+	}
 
-    @Override
-    public long getGeometryID() {
-        return m_current_id;
-    }
+	@Override
+	public long getGeometryID() {
+		return m_current_id;
+	}
 
-    @Override
-    public SimpleStateEnum getSimpleState() { return m_simpleState; }
+	@Override
+	public SimpleStateEnum getSimpleState() {
+		return m_simpleState;
+	}
 
-    @Override
-    public String getFeatureID() { return m_currentFeatureId; }
+	@Override
+	public String getFeatureID() {
+		return m_currentFeatureId;
+	}
 
-    @Override
-    public Geometry next() {
-        m_index++;
-        Geometry geometry = null;
-        if (m_geometryDeque != null && !m_geometryDeque.isEmpty()) {
-            geometry = m_geometryDeque.pop();
+	@Override
+	public Geometry next() {
+		m_index++;
+		Geometry geometry = null;
+		if (m_geometryDeque != null && !m_geometryDeque.isEmpty()) {
+			geometry = m_geometryDeque.pop();
 
-            // TODO get id off of geometry if exists
-            m_current_id = m_index;
-            m_simpleState = geometry.getSimpleState();
-        } else if (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext()) {
-            geometry = m_mapGeometryCursor.next().m_geometry;
+			// TODO get id off of geometry if exists
+			m_current_id = m_index;
+			m_simpleState = geometry.getSimpleState();
+		} else if (m_mapGeometryCursor != null && m_mapGeometryCursor.hasNext()) {
+			geometry = m_mapGeometryCursor.next().m_geometry;
 
-            // TODO get id off of geometry if exists
-            m_current_id = m_mapGeometryCursor.getGeometryID();
-            m_simpleState = m_mapGeometryCursor.getSimpleState();
-        }
+			// TODO get id off of geometry if exists
+			m_current_id = m_mapGeometryCursor.getGeometryID();
+			m_simpleState = m_mapGeometryCursor.getSimpleState();
+		}
 
-        return geometry;
-    }
+		return geometry;
+	}
 }

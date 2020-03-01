@@ -25,11 +25,11 @@
 package com.esri.core.geometry;
 
 class OperatorTouchesLocal extends OperatorTouches {
-    @Override
-    public boolean execute(Geometry inputGeom1, Geometry inputGeom2,
-                           SpatialReference sr, ProgressTracker progressTracker) {
-        return RelationalOperations.relate(inputGeom1, inputGeom2, sr,
-                RelationalOperations.Relation.touches, progressTracker);
-    }
+	@Override
+	public boolean execute(Geometry inputGeom1, Geometry inputGeom2,
+	                       SpatialReference sr, ProgressTracker progressTracker) {
+		return RelationalOperations.relate(inputGeom1, inputGeom2, sr,
+				RelationalOperations.Relation.touches, progressTracker);
+	}
 
 }

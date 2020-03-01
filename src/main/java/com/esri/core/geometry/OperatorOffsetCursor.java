@@ -25,45 +25,45 @@ package com.esri.core.geometry;
 
 // TODO test this, never been public before
 public class OperatorOffsetCursor extends GeometryCursor {
-    SpatialReferenceImpl m_spatialReference;
-    ProgressTracker m_progressTracker;
-    double m_distance;
-    double m_miterLimit;
-    OperatorOffset.JoinType m_joins;
-    double m_flattenError;
+	SpatialReferenceImpl m_spatialReference;
+	ProgressTracker m_progressTracker;
+	double m_distance;
+	double m_miterLimit;
+	OperatorOffset.JoinType m_joins;
+	double m_flattenError;
 
-    OperatorOffsetCursor(GeometryCursor inputGeometries,
-                         SpatialReference sr,
-                         double distance, OperatorOffset.JoinType joins,
-                         double bevelRatio,
-                         double flattenError,
-                         ProgressTracker progressTracker) {
-        m_inputGeoms = inputGeometries;
-        m_spatialReference = (SpatialReferenceImpl) sr;
-        m_distance = distance;
-        m_joins = joins;
-        m_miterLimit = bevelRatio;
-        m_flattenError = flattenError;
-        m_progressTracker = progressTracker;
-    }
+	OperatorOffsetCursor(GeometryCursor inputGeometries,
+	                     SpatialReference sr,
+	                     double distance, OperatorOffset.JoinType joins,
+	                     double bevelRatio,
+	                     double flattenError,
+	                     ProgressTracker progressTracker) {
+		m_inputGeoms = inputGeometries;
+		m_spatialReference = (SpatialReferenceImpl) sr;
+		m_distance = distance;
+		m_joins = joins;
+		m_miterLimit = bevelRatio;
+		m_flattenError = flattenError;
+		m_progressTracker = progressTracker;
+	}
 
-    @Override
-    public Geometry next() {
-        if (hasNext())
-            return Offset(m_inputGeoms.next());
+	@Override
+	public Geometry next() {
+		if (hasNext())
+			return Offset(m_inputGeoms.next());
 
-        return null;
-    }
+		return null;
+	}
 
-    Geometry Offset(Geometry geom) {
-        double tolerance;
-        if (m_flattenError <= 0)
-            tolerance = InternalUtils.calculateToleranceFromGeometry(
-                    m_spatialReference, geom, false);
-        else
-            tolerance = m_flattenError;
-        return ConstructOffset.execute(geom, m_distance, m_joins, m_miterLimit,
-                tolerance, m_progressTracker);
-    }
+	Geometry Offset(Geometry geom) {
+		double tolerance;
+		if (m_flattenError <= 0)
+			tolerance = InternalUtils.calculateToleranceFromGeometry(
+					m_spatialReference, geom, false);
+		else
+			tolerance = m_flattenError;
+		return ConstructOffset.execute(geom, m_distance, m_joins, m_miterLimit,
+				tolerance, m_progressTracker);
+	}
 
 }

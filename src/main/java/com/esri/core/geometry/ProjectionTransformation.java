@@ -28,31 +28,36 @@ import org.proj4.PJ;
 
 //This is a stub
 public class ProjectionTransformation {
-    SpatialReference m_fromSpatialReference;
-    SpatialReference m_toSpatialReference;
-    // TODO maybe cache the PJ objects?
+	SpatialReference m_fromSpatialReference;
+	SpatialReference m_toSpatialReference;
+	// TODO maybe cache the PJ objects?
 
-    public ProjectionTransformation(SpatialReference fromSpatialReference, SpatialReference toSpatialReference) {
-        m_fromSpatialReference = fromSpatialReference;
-        m_toSpatialReference = toSpatialReference;
-    }
+	public ProjectionTransformation(SpatialReference fromSpatialReference, SpatialReference toSpatialReference) {
+		m_fromSpatialReference = fromSpatialReference;
+		m_toSpatialReference = toSpatialReference;
+	}
 
-    public ProjectionTransformation getReverse() {
-        return new ProjectionTransformation(m_toSpatialReference, m_fromSpatialReference);
-    }
+	public ProjectionTransformation getReverse() {
+		return new ProjectionTransformation(m_toSpatialReference, m_fromSpatialReference);
+	}
 
-    PJ getFromProj() {
-        return ((SpatialReferenceImpl)m_fromSpatialReference).getPJ();
-    }
+	PJ getFromProj() {
+		return ((SpatialReferenceImpl) m_fromSpatialReference).getPJ();
+	}
 
-    public SpatialReference getFrom() { return m_fromSpatialReference; }
-    public SpatialReference getTo() { return m_toSpatialReference; }
+	public SpatialReference getFrom() {
+		return m_fromSpatialReference;
+	}
 
-    PJ getToProj() {
-        return ((SpatialReferenceImpl)m_toSpatialReference).getPJ();
-    }
+	public SpatialReference getTo() {
+		return m_toSpatialReference;
+	}
 
-    public static ProjectionTransformation getEqualArea(Geometry geometry, SpatialReference spatialReference) {
-        return new ProjectionTransformation(spatialReference, SpatialReference.createEqualArea(geometry, spatialReference));
-    }
+	PJ getToProj() {
+		return ((SpatialReferenceImpl) m_toSpatialReference).getPJ();
+	}
+
+	public static ProjectionTransformation getEqualArea(Geometry geometry, SpatialReference spatialReference) {
+		return new ProjectionTransformation(spatialReference, SpatialReference.createEqualArea(geometry, spatialReference));
+	}
 }

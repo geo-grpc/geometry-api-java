@@ -34,34 +34,34 @@ import static com.esri.core.geometry.SizeOf.SIZE_OF_POLYGON;
  */
 public class Polygon extends MultiPath implements Serializable {
 	private static final long serialVersionUID = 2L;// TODO:remove as we use
-													// writeReplace and
-													// GeometrySerializer
+	// writeReplace and
+	// GeometrySerializer
 
-    /**
-     * Creates a polygon.
-     */
-    public Polygon() {
-        m_impl = new MultiPathImpl(true);
-    }
+	/**
+	 * Creates a polygon.
+	 */
+	public Polygon() {
+		m_impl = new MultiPathImpl(true);
+	}
 
-    public Polygon(VertexDescription vd) {
-        m_impl = new MultiPathImpl(true, vd);
-    }
+	public Polygon(VertexDescription vd) {
+		m_impl = new MultiPathImpl(true, vd);
+	}
 
-    @Override
-    public Geometry createInstance() {
-        return new Polygon(getDescription());
-    }
+	@Override
+	public Geometry createInstance() {
+		return new Polygon(getDescription());
+	}
 
-    @Override
-    public int getDimension() {
-        return 2;
-    }
+	@Override
+	public int getDimension() {
+		return 2;
+	}
 
-    @Override
-    public Geometry.Type getType() {
-        return Type.Polygon;
-    }
+	@Override
+	public Geometry.Type getType() {
+		return Type.Polygon;
+	}
 
 	@Override
 	public long estimateMemorySize() {
@@ -70,78 +70,77 @@ public class Polygon extends MultiPath implements Serializable {
 
 	/**
 	 * Calculates the ring area for this ring.
-	 * 
-	 * @param ringIndex
-	 *            The index of this ring.
+	 *
+	 * @param ringIndex The index of this ring.
 	 * @return The ring area for this ring.
 	 */
 	public double calculateRingArea2D(int ringIndex) {
 		return m_impl.calculateRingArea2D(ringIndex);
 	}
 
-    /**
-     * Returns TRUE if the ring is an exterior ring. Valid only for simple
-     * polygons.
-     */
-    public boolean isExteriorRing(int partIndex) {
-        return m_impl.isExteriorRing(partIndex);
-    }
+	/**
+	 * Returns TRUE if the ring is an exterior ring. Valid only for simple
+	 * polygons.
+	 */
+	public boolean isExteriorRing(int partIndex) {
+		return m_impl.isExteriorRing(partIndex);
+	}
 
-    /**
-     * Returns TRUE when this geometry has exactly same type, properties, and
-     * coordinates as the other geometry.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other == null)
-            return false;
+	/**
+	 * Returns TRUE when this geometry has exactly same type, properties, and
+	 * coordinates as the other geometry.
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other == null)
+			return false;
 
-        if (other == this)
-            return true;
+		if (other == this)
+			return true;
 
-        if (other.getClass() != getClass())
-            return false;
+		if (other.getClass() != getClass())
+			return false;
 
-        return m_impl.equals(((Polygon) other)._getImpl());
-    }
+		return m_impl.equals(((Polygon) other)._getImpl());
+	}
 
-    /**
-     * Returns a hash code value for this polygon.
-     */
+	/**
+	 * Returns a hash code value for this polygon.
+	 */
 
-    @Override
-    public int hashCode() {
-        return m_impl.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return m_impl.hashCode();
+	}
 
-    /**
-     * Sets a new vertex for the polygon.
-     *
-     * @param i The index of the new vertex.
-     * @param x The X coordinate for the new vertex.
-     * @param y The Y coordinate for the new vertex.
-     */
-    public void setXY(int i, double x, double y) {
-        m_impl.setXY(i, x, y);
+	/**
+	 * Sets a new vertex for the polygon.
+	 *
+	 * @param i The index of the new vertex.
+	 * @param x The X coordinate for the new vertex.
+	 * @param y The Y coordinate for the new vertex.
+	 */
+	public void setXY(int i, double x, double y) {
+		m_impl.setXY(i, x, y);
 
-    }
+	}
 
-    public void interpolateAttributes(int path_index, int from_point_index,
-                                      int to_point_index) {
-        m_impl.interpolateAttributes(path_index, from_point_index,
-                to_point_index);
-    }
+	public void interpolateAttributes(int path_index, int from_point_index,
+	                                  int to_point_index) {
+		m_impl.interpolateAttributes(path_index, from_point_index,
+				to_point_index);
+	}
 
-    public void interpolateAttributes(int semantics, int path_index,
-                                      int from_point_index, int to_point_index) {
-        m_impl.interpolateAttributesForSemantics(semantics, path_index,
-                from_point_index, to_point_index);
-    }
+	public void interpolateAttributes(int semantics, int path_index,
+	                                  int from_point_index, int to_point_index) {
+		m_impl.interpolateAttributesForSemantics(semantics, path_index,
+				from_point_index, to_point_index);
+	}
 
 	public int getExteriorRingCount() {
 		return m_impl.getOGCPolygonCount();
 	}
-	
+
 	public interface FillRule {
 		/**
 		 * odd-even fill rule. This is the default value. A point is in the polygon
@@ -157,7 +156,9 @@ public class Polygon extends MultiPath implements Serializable {
 		 * crosses segments directed down, then the winding number is equal to N-M.
 		 */
 		public final static int enumFillRuleWinding = 1;
-	};
+	}
+
+	;
 
 	/**
 	 * Fill rule for the polygon that defines the interior of the self intersecting

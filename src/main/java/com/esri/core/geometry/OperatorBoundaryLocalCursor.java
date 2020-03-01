@@ -24,30 +24,30 @@
 package com.esri.core.geometry;
 
 final class OperatorBoundaryLocalCursor extends GeometryCursor {
-    ProgressTracker m_progress_tracker;
+	ProgressTracker m_progress_tracker;
 
-    OperatorBoundaryLocalCursor(GeometryCursor inputGeoms,
-                                ProgressTracker tracker) {
-        m_inputGeoms = inputGeoms;
-        m_progress_tracker = tracker;
-    }
+	OperatorBoundaryLocalCursor(GeometryCursor inputGeoms,
+	                            ProgressTracker tracker) {
+		m_inputGeoms = inputGeoms;
+		m_progress_tracker = tracker;
+	}
 
-    @Override
-    public Geometry next() {
-        if (hasNext()) {
-            return calculate_boundary(m_inputGeoms.next(), m_progress_tracker);
-        }
+	@Override
+	public Geometry next() {
+		if (hasNext()) {
+			return calculate_boundary(m_inputGeoms.next(), m_progress_tracker);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private static Geometry calculate_boundary(Geometry geom,
-                                               ProgressTracker progress_tracker) {
-        Geometry res = Boundary.calculate(geom, progress_tracker);
-        if (res == null)
-            return new Point(geom.getDescription());// cannot return null
-        else
-            return res;
-    }
+	private static Geometry calculate_boundary(Geometry geom,
+	                                           ProgressTracker progress_tracker) {
+		Geometry res = Boundary.calculate(geom, progress_tracker);
+		if (res == null)
+			return new Point(geom.getDescription());// cannot return null
+		else
+			return res;
+	}
 
 }

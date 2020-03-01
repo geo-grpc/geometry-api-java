@@ -29,32 +29,32 @@ package com.esri.core.geometry;
  * notation and coordinates.
  */
 public interface MgrsConversionMode {
-    /**
-     * Uses the spheroid to determine the military grid string.
-     */
-    public static final int mgrsAutomatic = 0;// PE_MGRS_STYLE_AUTO
-    /**
-     * Treats all spheroids as new, like WGS 1984, when creating or reading a
-     * military grid string. The 180 longitude falls into zone 60.
-     */
-    public static final int mgrsNewStyle = 0x100; // PE_MGRS_STYLE_NEW
-    /**
-     * Treats all spheroids as old, like Bessel 1841, when creating or reading a
-     * military grid string. The 180 longitude falls into zone 60.
-     */
-    public static final int mgrsOldStyle = 0x200; // PE_MGRS_STYLE_OLD
-    /**
-     * Treats all spheroids as new, like WGS 1984, when creating or reading a
-     * military grid string. The 180 longitude falls into zone 01.
-     */
-    public static final int mgrsNewWith180InZone01 = 0x1000 + 0x100; // PE_MGRS_180_ZONE_1_PLUS
-    // |
-    // PE_MGRS_STYLE_NEW
-    /**
-     * Treats all spheroids as old, like Bessel 1841, when creating or reading a
-     * military grid string. The 180 longitude falls into zone 01.
-     */
-    public static final int mgrsOldWith180InZone01 = 0x1000 + 0x200; // PE_MGRS_180_ZONE_1_PLUS
-    // |
-    // PE_MGRS_STYLE_OLD
+	/**
+	 * Uses the spheroid to determine the military grid string.
+	 */
+	public static final int mgrsAutomatic = 0;// PE_MGRS_STYLE_AUTO
+	/**
+	 * Treats all spheroids as new, like WGS 1984, when creating or reading a
+	 * military grid string. The 180 longitude falls into zone 60.
+	 */
+	public static final int mgrsNewStyle = 0x100; // PE_MGRS_STYLE_NEW
+	/**
+	 * Treats all spheroids as old, like Bessel 1841, when creating or reading a
+	 * military grid string. The 180 longitude falls into zone 60.
+	 */
+	public static final int mgrsOldStyle = 0x200; // PE_MGRS_STYLE_OLD
+	/**
+	 * Treats all spheroids as new, like WGS 1984, when creating or reading a
+	 * military grid string. The 180 longitude falls into zone 01.
+	 */
+	public static final int mgrsNewWith180InZone01 = 0x1000 + 0x100; // PE_MGRS_180_ZONE_1_PLUS
+	// |
+	// PE_MGRS_STYLE_NEW
+	/**
+	 * Treats all spheroids as old, like Bessel 1841, when creating or reading a
+	 * military grid string. The 180 longitude falls into zone 01.
+	 */
+	public static final int mgrsOldWith180InZone01 = 0x1000 + 0x200; // PE_MGRS_180_ZONE_1_PLUS
+	// |
+	// PE_MGRS_STYLE_OLD
 }

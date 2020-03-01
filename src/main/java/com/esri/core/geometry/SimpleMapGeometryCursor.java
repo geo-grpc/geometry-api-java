@@ -32,48 +32,50 @@ import java.util.stream.Collectors;
  * an array of MapGeometry classes
  */
 class SimpleMapGeometryCursor extends MapGeometryCursor {
-    private ArrayDeque<MapGeometry> m_geomDeque;
-    private long m_index = -1;
-    private String m_currentFeatureID = "";
-    private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
+	private ArrayDeque<MapGeometry> m_geomDeque;
+	private long m_index = -1;
+	private String m_currentFeatureID = "";
+	private SimpleStateEnum m_simpleState = SimpleStateEnum.SIMPLE_UNKNOWN;
 
 
-    public SimpleMapGeometryCursor(MapGeometry geom) {
-        m_geomDeque = new ArrayDeque<>(1);
-    }
+	public SimpleMapGeometryCursor(MapGeometry geom) {
+		m_geomDeque = new ArrayDeque<>(1);
+	}
 
-    public SimpleMapGeometryCursor(MapGeometry[] geoms) {
-        m_geomDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
-    }
+	public SimpleMapGeometryCursor(MapGeometry[] geoms) {
+		m_geomDeque = Arrays.stream(geoms).collect(Collectors.toCollection(ArrayDeque::new));
+	}
 
-    @Override
-    public long getGeometryID() {
-        return m_index;
-    }
+	@Override
+	public long getGeometryID() {
+		return m_index;
+	}
 
-    @Override
-    public SimpleStateEnum getSimpleState() {
-        return m_simpleState;
-    }
+	@Override
+	public SimpleStateEnum getSimpleState() {
+		return m_simpleState;
+	}
 
-    @Override
-    public String getFeatureID() { return m_currentFeatureID; }
+	@Override
+	public String getFeatureID() {
+		return m_currentFeatureID;
+	}
 
 
-    @Override
-    public boolean hasNext() {
-        return m_geomDeque.size() > 0;
-    }
+	@Override
+	public boolean hasNext() {
+		return m_geomDeque.size() > 0;
+	}
 
-    @Override
-    public MapGeometry next() {
-        if (hasNext()) {
-            m_index++;
-            MapGeometry mapGeometry = m_geomDeque.pop();
-            m_simpleState = mapGeometry.m_geometry.getSimpleState();
-            return mapGeometry;
-        }
+	@Override
+	public MapGeometry next() {
+		if (hasNext()) {
+			m_index++;
+			MapGeometry mapGeometry = m_geomDeque.pop();
+			m_simpleState = mapGeometry.m_geometry.getSimpleState();
+			return mapGeometry;
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

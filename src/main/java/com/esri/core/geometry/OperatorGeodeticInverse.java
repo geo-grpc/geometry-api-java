@@ -29,31 +29,32 @@ package com.esri.core.geometry;
  */
 public abstract class OperatorGeodeticInverse extends Operator {
 
-    @Override
-    public Type getType() {
-        return Type.GeodeticInverse;
-    }
+	@Override
+	public Type getType() {
+		return Type.GeodeticInverse;
+	}
 
-    /**
-     * calculate the ngs forward equations for distance and azimuth calculations
-     * @param geom1 point1 (for now only supports point, could support centroids in future)
-     * @param geom2 point2 (for now only supports point, could support centroids in future)
-     * @param sr1 spatial reference of point one (this is the ellipsoid that the calculation will use)
-     * @param sr2 spatial reference of point two
-     * @param geodeticCurveType for now only ellipsoid geodesic
-     * @param progressTracker not used
-     * @return forward results of azimuth from 1 to 2, azimuth from 2 to 1, and the distance
-     */
-    public abstract InverseResult execute(Geometry geom1,
-                                          Geometry geom2,
-                                          SpatialReference sr1,
-                                          SpatialReference sr2,
-                                          int geodeticCurveType,
-                                          ProgressTracker progressTracker);
+	/**
+	 * calculate the ngs forward equations for distance and azimuth calculations
+	 *
+	 * @param geom1             point1 (for now only supports point, could support centroids in future)
+	 * @param geom2             point2 (for now only supports point, could support centroids in future)
+	 * @param sr1               spatial reference of point one (this is the ellipsoid that the calculation will use)
+	 * @param sr2               spatial reference of point two
+	 * @param geodeticCurveType for now only ellipsoid geodesic
+	 * @param progressTracker   not used
+	 * @return forward results of azimuth from 1 to 2, azimuth from 2 to 1, and the distance
+	 */
+	public abstract InverseResult execute(Geometry geom1,
+	                                      Geometry geom2,
+	                                      SpatialReference sr1,
+	                                      SpatialReference sr2,
+	                                      int geodeticCurveType,
+	                                      ProgressTracker progressTracker);
 
-    public static OperatorGeodeticInverse local() {
-        return (OperatorGeodeticInverse) OperatorFactoryLocal.getInstance()
-                .getOperator(Type.GeodeticInverse);
-    }
+	public static OperatorGeodeticInverse local() {
+		return (OperatorGeodeticInverse) OperatorFactoryLocal.getInstance()
+				.getOperator(Type.GeodeticInverse);
+	}
 
 }

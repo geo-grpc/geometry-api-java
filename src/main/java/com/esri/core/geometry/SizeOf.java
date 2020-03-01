@@ -72,7 +72,7 @@ public final class SizeOf {
 	public static final int SIZE_OF_OGC_POINT = 24;
 
 	public static final int SIZE_OF_OGC_POLYGON = 24;
-	
+
 	static final int SIZE_OF_MAPGEOMETRY = 24;
 
 	static long sizeOfByteArray(int length) {

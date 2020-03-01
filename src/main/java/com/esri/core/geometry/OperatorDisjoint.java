@@ -31,14 +31,14 @@ import com.esri.core.geometry.Operator.Type;
  */
 public abstract class OperatorDisjoint extends OperatorSimpleRelation {
 
-    @Override
-    public Type getType() {
-        return Type.Disjoint;
-    }
+	@Override
+	public Type getType() {
+		return Type.Disjoint;
+	}
 
-    public static OperatorDisjoint local() {
-        return (OperatorDisjoint) OperatorFactoryLocal.getInstance()
-                .getOperator(Type.Disjoint);
-    }
+	public static OperatorDisjoint local() {
+		return (OperatorDisjoint) OperatorFactoryLocal.getInstance()
+				.getOperator(Type.Disjoint);
+	}
 
 }

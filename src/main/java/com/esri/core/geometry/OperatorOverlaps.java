@@ -26,14 +26,14 @@ package com.esri.core.geometry;
 import com.esri.core.geometry.Operator.Type;
 
 public abstract class OperatorOverlaps extends OperatorSimpleRelation {
-    @Override
-    public Type getType() {
-        return Type.Equals;
-    }
+	@Override
+	public Type getType() {
+		return Type.Equals;
+	}
 
-    public static OperatorOverlaps local() {
-        return (OperatorOverlaps) OperatorFactoryLocal.getInstance()
-                .getOperator(Type.Overlaps);
-    }
+	public static OperatorOverlaps local() {
+		return (OperatorOverlaps) OperatorFactoryLocal.getInstance()
+				.getOperator(Type.Overlaps);
+	}
 
 }

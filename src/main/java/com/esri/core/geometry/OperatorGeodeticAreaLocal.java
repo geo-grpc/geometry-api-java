@@ -28,22 +28,22 @@ import java.util.ArrayList;
 
 //This is a stub
 class OperatorGeodeticAreaLocal extends OperatorGeodeticArea {
-    @Override
-    public double[] execute(GeometryCursor geoms, SpatialReference sr,
-                            int geodeticCurveType, ProgressTracker progressTracker) {
-        ArrayList<Double> areas = new ArrayList<>();
-        while (geoms.hasNext()) {
-            areas.add(execute(geoms.next(), sr, geodeticCurveType, progressTracker));
-        }
-        return areas.stream().mapToDouble(d -> d).toArray();
-    }
+	@Override
+	public double[] execute(GeometryCursor geoms, SpatialReference sr,
+	                        int geodeticCurveType, ProgressTracker progressTracker) {
+		ArrayList<Double> areas = new ArrayList<>();
+		while (geoms.hasNext()) {
+			areas.add(execute(geoms.next(), sr, geodeticCurveType, progressTracker));
+		}
+		return areas.stream().mapToDouble(d -> d).toArray();
+	}
 
-    @Override
-    public double execute(Geometry geom, SpatialReference sr,
-                          int geodeticCurveType, ProgressTracker progressTracker) {
-        if (geodeticCurveType != GeodeticCurveType.Geodesic) {
-            throw new GeometryException("Only implemented for Geodesic");
-        }
-        return ((OperatorProject)OperatorFactoryLocal.getInstance().getOperator(Type.Project)).execute(geom, ProjectionTransformation.getEqualArea(geom, sr), null).calculateArea2D();
-    }
+	@Override
+	public double execute(Geometry geom, SpatialReference sr,
+	                      int geodeticCurveType, ProgressTracker progressTracker) {
+		if (geodeticCurveType != GeodeticCurveType.Geodesic) {
+			throw new GeometryException("Only implemented for Geodesic");
+		}
+		return ((OperatorProject) OperatorFactoryLocal.getInstance().getOperator(Type.Project)).execute(geom, ProjectionTransformation.getEqualArea(geom, sr), null).calculateArea2D();
+	}
 }

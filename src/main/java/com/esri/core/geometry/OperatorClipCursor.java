@@ -25,25 +25,25 @@
 package com.esri.core.geometry;
 
 class OperatorClipCursor extends GeometryCursor {
-    private Envelope2D m_envelope;
-    double m_tolerance;
+	private Envelope2D m_envelope;
+	double m_tolerance;
 
-    OperatorClipCursor(GeometryCursor geoms, Envelope2D envelope,
-                       SpatialReference spatial_ref, ProgressTracker progress_tracker) {
-        if (geoms == null)
-            throw new IllegalArgumentException();
+	OperatorClipCursor(GeometryCursor geoms, Envelope2D envelope,
+	                   SpatialReference spatial_ref, ProgressTracker progress_tracker) {
+		if (geoms == null)
+			throw new IllegalArgumentException();
 
-        m_envelope = envelope;
-        m_inputGeoms = geoms;
+		m_envelope = envelope;
+		m_inputGeoms = geoms;
 
-        m_tolerance = InternalUtils.calculateToleranceFromGeometry(spatial_ref, envelope, false);
-    }
+		m_tolerance = InternalUtils.calculateToleranceFromGeometry(spatial_ref, envelope, false);
+	}
 
-    @Override
-    public Geometry next() {
-        if (hasNext()) {
-            return Clipper.clip(m_inputGeoms.next(), m_envelope, m_tolerance, 0.0);
-        }
-        return null;
-    }
+	@Override
+	public Geometry next() {
+		if (hasNext()) {
+			return Clipper.clip(m_inputGeoms.next(), m_envelope, m_tolerance, 0.0);
+		}
+		return null;
+	}
 }

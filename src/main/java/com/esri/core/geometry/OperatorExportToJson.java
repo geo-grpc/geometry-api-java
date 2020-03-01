@@ -32,37 +32,37 @@ import com.esri.core.geometry.Operator.Type;
  */
 public abstract class OperatorExportToJson extends Operator {
 
-    @Override
-    public Type getType() {
-        return Type.ExportToJson;
-    }
+	@Override
+	public Type getType() {
+		return Type.ExportToJson;
+	}
 
-    /**
-     * Performs the ExportToJson operation
-     *
-     * @return Returns a StringCursor.
-     */
-    public abstract StringCursor execute(SpatialReference spatialReference,
-                                         GeometryCursor geometryCursor);
+	/**
+	 * Performs the ExportToJson operation
+	 *
+	 * @return Returns a StringCursor.
+	 */
+	public abstract StringCursor execute(SpatialReference spatialReference,
+	                                     GeometryCursor geometryCursor);
 
-    /**
-     * Performs the ExportToJson operation
-     *
-     * @return Returns a String.
-     */
-    public abstract String execute(SpatialReference spatialReference,
-                                   Geometry geometry);
+	/**
+	 * Performs the ExportToJson operation
+	 *
+	 * @return Returns a String.
+	 */
+	public abstract String execute(SpatialReference spatialReference,
+	                               Geometry geometry);
 
-    /**
-     * Performs the ExportToJson operation
-     *
-     * @return Returns a String.
-     */
-    public abstract String execute(SpatialReference spatialReference,
-                                   Geometry geometry, Map<String, Object> exportProperties);
+	/**
+	 * Performs the ExportToJson operation
+	 *
+	 * @return Returns a String.
+	 */
+	public abstract String execute(SpatialReference spatialReference,
+	                               Geometry geometry, Map<String, Object> exportProperties);
 
-    public static OperatorExportToJson local() {
-        return (OperatorExportToJson) OperatorFactoryLocal.getInstance()
-                .getOperator(Type.ExportToJson);
-    }
+	public static OperatorExportToJson local() {
+		return (OperatorExportToJson) OperatorFactoryLocal.getInstance()
+				.getOperator(Type.ExportToJson);
+	}
 }

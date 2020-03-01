@@ -27,50 +27,50 @@ package com.esri.core.geometry;
 //This is a stub
 class OperatorGeodesicBufferLocal extends OperatorGeodesicBuffer {
 
-    @Override
-    public GeometryCursor execute(GeometryCursor inputGeometries,
-                                  SpatialReference sr,
-                                  int curveType,
-                                  double[] distancesMeters,
-                                  double maxDeviationMeters,
-                                  boolean bReserved,
-                                  boolean bUnion,
-                                  ProgressTracker progressTracker) {
-        SpatialReference gcs = SpatialReference.create(4326);
-        if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
-            // TODO assigning to WGS 84, but should grab GCS from projection
-            ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, gcs);
-            inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
-        } else {
-            gcs = sr;
-        }
+	@Override
+	public GeometryCursor execute(GeometryCursor inputGeometries,
+	                              SpatialReference sr,
+	                              int curveType,
+	                              double[] distancesMeters,
+	                              double maxDeviationMeters,
+	                              boolean bReserved,
+	                              boolean bUnion,
+	                              ProgressTracker progressTracker) {
+		SpatialReference gcs = SpatialReference.create(4326);
+		if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
+			// TODO assigning to WGS 84, but should grab GCS from projection
+			ProjectionTransformation projectionTransformation = new ProjectionTransformation(sr, gcs);
+			inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
+		} else {
+			gcs = sr;
+		}
 
-        inputGeometries = new OperatorGeodesicBufferCursor(inputGeometries, gcs, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
+		inputGeometries = new OperatorGeodesicBufferCursor(inputGeometries, gcs, distancesMeters, maxDeviationMeters, bReserved, bUnion, progressTracker);
 
-        if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
-            ProjectionTransformation projectionTransformation = new ProjectionTransformation(gcs, sr);
-            inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
-        }
+		if (sr.getCoordinateSystemType() != SpatialReference.CoordinateSystemType.GEOGRAPHIC) {
+			ProjectionTransformation projectionTransformation = new ProjectionTransformation(gcs, sr);
+			inputGeometries = new OperatorProjectCursor(inputGeometries, projectionTransformation, progressTracker);
+		}
 
-        return inputGeometries;
-    }
+		return inputGeometries;
+	}
 
-    @Override
-    public Geometry execute(Geometry inputGeometry,
-                            SpatialReference sr,
-                            int curveType,
-                            double distanceMeters,
-                            double maxDeviationMeters,
-                            boolean bReserved,
-                            ProgressTracker progressTracker) {
+	@Override
+	public Geometry execute(Geometry inputGeometry,
+	                        SpatialReference sr,
+	                        int curveType,
+	                        double distanceMeters,
+	                        double maxDeviationMeters,
+	                        boolean bReserved,
+	                        ProgressTracker progressTracker) {
 
-        SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(inputGeometry);
+		SimpleGeometryCursor inputCursor = new SimpleGeometryCursor(inputGeometry);
 
-        double[] distances = new double[1];
-        distances[0] = distanceMeters;
+		double[] distances = new double[1];
+		distances[0] = distanceMeters;
 
-        GeometryCursor outputCursor = execute(inputCursor, sr, curveType, distances, maxDeviationMeters, false, false, progressTracker);
+		GeometryCursor outputCursor = execute(inputCursor, sr, curveType, distances, maxDeviationMeters, false, false, progressTracker);
 
-        return outputCursor.next();
-    }
+		return outputCursor.next();
+	}
 }

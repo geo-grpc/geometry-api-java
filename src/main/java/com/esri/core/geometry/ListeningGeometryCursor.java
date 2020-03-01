@@ -34,47 +34,51 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * but are coming in a stream.
  */
 public final class ListeningGeometryCursor extends GeometryCursor {
-    // required for use with grpc streaming
-    // https://github.com/grpc/grpc-java/blob/06e9b8814787b5cdec10a60e0d9a2228feb8554d/examples/src/main/java/io/grpc/examples/routeguide/RouteGuideServer.java#L246
-    private Queue<Geometry> m_geomList = new ConcurrentLinkedQueue<Geometry>();
+	// required for use with grpc streaming
+	// https://github.com/grpc/grpc-java/blob/06e9b8814787b5cdec10a60e0d9a2228feb8554d/examples/src/main/java/io/grpc/examples/routeguide/RouteGuideServer.java#L246
+	private Queue<Geometry> m_geomList = new ConcurrentLinkedQueue<Geometry>();
 
-    private long m_index = -1;
+	private long m_index = -1;
 
-    public ListeningGeometryCursor() {
-    }
+	public ListeningGeometryCursor() {
+	}
 
-    @Override
-    public boolean hasNext() { return m_geomList != null && !m_geomList.isEmpty(); }
+	@Override
+	public boolean hasNext() {
+		return m_geomList != null && !m_geomList.isEmpty();
+	}
 
-    @Override
-    public long getGeometryID() {
-        return m_index;
-    }
+	@Override
+	public long getGeometryID() {
+		return m_index;
+	}
 
-    @Override
-    public String getFeatureID() { return ""; }
+	@Override
+	public String getFeatureID() {
+		return "";
+	}
 
-    @Override
-    public Geometry next() {
-        if (m_geomList != null && !m_geomList.isEmpty()) {
-            m_index++;
-            return m_geomList.poll();
-        }
+	@Override
+	public Geometry next() {
+		if (m_geomList != null && !m_geomList.isEmpty()) {
+			m_index++;
+			return m_geomList.poll();
+		}
 
-        m_geomList = null;//prevent the class from being used again
-        return null;
-    }
+		m_geomList = null;//prevent the class from being used again
+		return null;
+	}
 
-    /**
-     * Call this method to add geometry to the cursor. After this method is
-     * called, call immediately the tock() method on the GeometryCursor returned
-     * by the OperatorUnion (or OperatorConvexHull with b_merge == true). Call
-     * next() on the GeometryCursor returned by the OperatorUnion when done
-     * listening to incoming geometries to finish the union operation.
-     *
-     * @param geom The geometry to be pushed into the cursor.
-     */
-    public void tick(Geometry geom) {
-        m_geomList.add(geom);
-    }
+	/**
+	 * Call this method to add geometry to the cursor. After this method is
+	 * called, call immediately the tock() method on the GeometryCursor returned
+	 * by the OperatorUnion (or OperatorConvexHull with b_merge == true). Call
+	 * next() on the GeometryCursor returned by the OperatorUnion when done
+	 * listening to incoming geometries to finish the union operation.
+	 *
+	 * @param geom The geometry to be pushed into the cursor.
+	 */
+	public void tick(Geometry geom) {
+		m_geomList.add(geom);
+	}
 }

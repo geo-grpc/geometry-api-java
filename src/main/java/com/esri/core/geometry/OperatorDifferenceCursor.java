@@ -25,33 +25,33 @@
 package com.esri.core.geometry;
 
 class OperatorDifferenceCursor extends GeometryCursor {
-    ProgressTracker m_progress_tracker;
-    SpatialReference m_Spatial_reference;
-    Geometry m_geomSubtractor;
-    boolean m_bEmpty;
+	ProgressTracker m_progress_tracker;
+	SpatialReference m_Spatial_reference;
+	Geometry m_geomSubtractor;
+	boolean m_bEmpty;
 
-    OperatorDifferenceCursor(GeometryCursor inputGeoms,
-                             GeometryCursor geomSubtractor, SpatialReference sr,
-                             ProgressTracker progress_tracker) {
-        m_bEmpty = (geomSubtractor == null);
-        m_inputGeoms = inputGeoms;
-        m_Spatial_reference = sr;
-        m_geomSubtractor = geomSubtractor.next();
-        m_progress_tracker = progress_tracker;
-    }
+	OperatorDifferenceCursor(GeometryCursor inputGeoms,
+	                         GeometryCursor geomSubtractor, SpatialReference sr,
+	                         ProgressTracker progress_tracker) {
+		m_bEmpty = (geomSubtractor == null);
+		m_inputGeoms = inputGeoms;
+		m_Spatial_reference = sr;
+		m_geomSubtractor = geomSubtractor.next();
+		m_progress_tracker = progress_tracker;
+	}
 
-    @Override
-    public Geometry next() {
-        if (m_bEmpty)
-            return null;
+	@Override
+	public Geometry next() {
+		if (m_bEmpty)
+			return null;
 
-        if (hasNext()) {
-            return OperatorDifferenceLocal.difference(
-                    m_inputGeoms.next(),
-                    m_geomSubtractor,
-                    m_Spatial_reference,
-                    m_progress_tracker);
-        }
-        return null;
-    }
+		if (hasNext()) {
+			return OperatorDifferenceLocal.difference(
+					m_inputGeoms.next(),
+					m_geomSubtractor,
+					m_Spatial_reference,
+					m_progress_tracker);
+		}
+		return null;
+	}
 }
